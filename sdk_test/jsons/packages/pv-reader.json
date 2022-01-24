@@ -1,0 +1,50 @@
+{
+  "name": "pv-reader",
+  "packageVersion": "v1.0.0",
+  "description": "pv-reader sdk test package",
+  "plans": [
+    {
+      "name": "default",
+      "metadata": {},
+      "singleton": false,
+      "components": [
+        {
+          "name": "default",
+          "description": "",
+          "cloudInfra": {
+            "replicas": 1,
+            "endpoints": []
+          },
+          "ros": {
+            "topics": [],
+            "services": [],
+            "actions": [],
+            "isROS": false
+          },
+          "requiredRuntime": "cloud",
+          "architecture": "amd64",
+          "executables": [
+            {
+              "name": "CompReaderExec",
+              "gitExecutable": {
+                "repository": "https://github.com/hiteshsethi/go-reader-writer",
+                "strategyType": "Docker",
+                "dockerFilePath": "Dockerfile.reader",
+                "contextDir": ""
+              },
+              "cmd": []
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "dependentDeployments": [],
+      "exposedParameters": [],
+      "inboundROSInterfaces": {
+        "topics": [],
+        "services": [],
+        "actions": []
+      }
+    }
+  ]
+}

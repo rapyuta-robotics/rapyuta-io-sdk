@@ -1,0 +1,42 @@
+{
+  "name": "listener",
+  "packageVersion": "v1.0.0",
+  "description": "listener arm32v7 sdk test package",
+  "plans": [
+    {
+      "name": "default",
+      "metadata": {},
+      "singleton": false,
+      "components": [
+        {
+          "name": "default",
+          "description": "",
+          "ros": {
+            "topics": [],
+            "services": [],
+            "actions": [],
+            "isROS": true
+          },
+          "requiredRuntime": "device",
+          "architecture": "arm32v7",
+          "executables": [
+            {
+              "name": "listenerExec",
+              "cmd": [
+                "roslaunch listener listener.launch"
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "dependentDeployments": [],
+      "exposedParameters": [],
+      "inboundROSInterfaces": {
+        "topics": [],
+        "services": [],
+        "actions": []
+      }
+    }
+  ]
+}

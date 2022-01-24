@@ -1,0 +1,27 @@
+{
+  "catalog_host": "https://v14catalog.az39.rapyuta.io",
+  "core_api_host": "https://qaapiserver.az39.rapyuta.io",
+  "hwil_host": "https://hwil.rapyuta.io",
+  "hwil_user": "USER",
+  "hwil_password": "PASSWORD",
+  "auth_token": "Bearer AUTH_TOKEN",
+  "devices": [
+    {
+      "name":  "NAME",
+      "runtime": "RUNTIME",
+      "ip": "IP_ADDRESS",
+      "arch": "ARCHITECTURE",
+      "distro": "ROS_DISTRIBUTION"
+    }
+  ],
+  "git": {
+    "ssh-key": "SSH_KEY"
+  },
+  "docker": {
+    "username": "DOCKER_USERNAME",
+    "password": "DOCKER_PASSWORD",
+    "email": "DOCKER_EMAIL"
+  },
+  "test_files": [],
+  "worker_threads": 1
+}

@@ -1,0 +1,59 @@
+{
+  "name": "test-rosbag-talker-cloud-pkg",
+  "packageVersion": "v1.0.0",
+  "description": "",
+  "bindable": true,
+  "plans": [
+    {
+      "name": "default",
+      "metadata": {},
+      "singleton": false,
+      "components": [
+        {
+          "name": "talker-cloud",
+          "description": "",
+          "cloudInfra": {
+            "replicas": 1,
+            "endpoints": []
+          },
+          "ros": {
+            "topics": [],
+            "services": [],
+            "actions": [],
+            "isROS": true,
+            "ros_distro": "melodic"
+          },
+          "requiredRuntime": "cloud",
+          "architecture": "amd64",
+          "executables": [
+            {
+              "name": "talker",
+              "simulationOptions": {
+                "simulation": false
+              },
+              "cmd": [
+                "roslaunch talker talker.launch"
+              ]
+            }
+          ],
+          "parameters": [],
+          "rosBagJobDefs": [
+              {
+                "name":"test-rosbag-defs",
+                "recordOptions":{
+                  "topics":[
+                    "/telemetry"
+                  ]
+                }
+              }
+          ]
+        }
+      ],
+      "dependentDeployments": [],
+      "inboundROSInterfaces": {
+        "anyIncomingScopedOrTargetedRosConfig": false
+      },
+      "exposedParameters": []
+    }
+  ]
+}
