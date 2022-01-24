@@ -1,0 +1,16 @@
+*.pyc
+*.DS_Store
+.idea
+config.cfg
+*.log
+.coverage
+cover/
+docs/build/
+*.*~
+build/*
+dist/*
+rapyuta_io.egg-info/*
+sdk_test/package_info.json
+config.json
+venv/
+htmlcov/

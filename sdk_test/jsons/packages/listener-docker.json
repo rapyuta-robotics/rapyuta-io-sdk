@@ -1,0 +1,54 @@
+{
+  "name": "listener-docker",
+  "packageVersion": "v1.0.0",
+  "description": "listener-docker sdk test package",
+  "plans": [
+    {
+      "name": "default",
+      "metadata": {},
+      "singleton": false,
+      "components": [
+        {
+          "name": "default",
+          "description": "",
+          "ros": {
+            "topics": [],
+            "services": [],
+            "actions": [],
+            "isROS": true
+          },
+          "requiredRuntime": "device",
+          "architecture": "arm32v7",
+          "executables": [
+            {
+              "name": "listenerExec",
+              "gitExecutable": {
+                "repository": "https://github.com/bhuvanchandra/listener_py.git",
+                "strategyType": "Source",
+                "dockerFilePath": "",
+                "contextDir": ""
+              },
+              "cmd": [
+                "roslaunch listener listener.launch"
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "default": "/telemetry_decorated",
+              "name": "topic_name",
+              "description": "config param.."
+            }
+          ]
+        }
+      ],
+      "dependentDeployments": [],
+      "exposedParameters": [],
+      "inboundROSInterfaces": {
+        "topics": [],
+        "services": [],
+        "actions": []
+      }
+    }
+  ]
+}
