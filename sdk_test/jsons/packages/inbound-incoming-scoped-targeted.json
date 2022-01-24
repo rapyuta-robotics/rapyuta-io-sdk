@@ -1,0 +1,59 @@
+{
+  "apiVersion": "2.0.0",
+  "name": "inbound-incoming-scoped-targeted",
+  "packageVersion": "v1.0.0",
+  "description": "Package contains single component",
+  "bindable": true,
+  "plans": [
+    {
+      "name": "default",
+      "metadata": {},
+      "singleton": false,
+      "components": [
+        {
+          "name": "listener",
+          "description": "",
+          "cloudInfra": {
+            "replicas": 1,
+            "endpoints": []
+          },
+          "ros": {
+            "topics": [],
+            "services": [],
+            "actions": [],
+            "isROS": true,
+            "ros_distro": "melodic"
+          },
+          "requiredRuntime": "cloud",
+          "architecture": "amd64",
+          "executables": [
+            {
+              "name": "ListenerExec",
+              "simulationOptions": {
+                "simulation": false
+              },
+              "gitExecutable": {
+                "repository": "https://github.com/rapyuta/io_tutorials",
+                "strategyType": "Source",
+                "dockerFilePath": "",
+                "contextDir": ""
+              },
+              "buildOptions": {
+                "catkinOptions": []
+              },
+              "cmd": [
+                "roslaunch listener listener.launch"
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "dependentDeployments": [],
+      "inboundROSInterfaces": {
+        "anyIncomingScopedOrTargetedRosConfig": true
+      },
+      "exposedParameters": []
+    }
+  ]
+}

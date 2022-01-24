@@ -1,0 +1,65 @@
+{
+  "name": "scoped-cloud",
+  "packageVersion": "v1.0.0",
+  "description": "scoped sdk test package",
+  "bindable": true,
+  "plans": [
+    {
+      "name": "default",
+      "metadata": {},
+      "singleton": false,
+      "components": [
+        {
+          "name": "cloudping",
+          "description": "",
+          "cloudInfra": {
+            "replicas": 1,
+            "endpoints": []
+          },
+          "ros": {
+            "topics": [
+              {
+                "name": "ping",
+                "qos": "low",
+                "compression": "",
+                "scoped": true,
+                "targeted": false
+              }
+            ],
+            "services": [],
+            "actions": [],
+            "isROS": true
+          },
+          "requiredRuntime": "cloud",
+          "architecture": "amd64",
+          "executables": [
+            {
+              "name": "cloudy",
+              "cmd": []
+            }
+          ],
+          "parameters": [
+            {
+              "default": "pingpong",
+              "name": "ROS_PKG",
+              "description": ""
+            },
+            {
+              "default": "pingst.launch",
+              "name": "ROS_LAUNCH_FILE",
+              "description": ""
+            }
+          ]
+        }
+      ],
+      "includePackages": [],
+      "dependentDeployments": [],
+      "inboundROSInterfaces": {
+        "topics": [],
+        "services": [],
+        "actions": []
+      },
+      "exposedParameters": []
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "name": "device-volume",
+  "packageVersion": "v1.0.0",
+  "description": "device-volume sdk test package",
+  "plans": [
+    {
+      "name": "default",
+      "metadata": {},
+      "singleton": false,
+      "components": [
+        {
+          "name": "default",
+          "description": "",
+          "ros": {
+            "topics": [],
+            "services": [],
+            "actions": [],
+            "isROS": false
+          },
+          "requiredRuntime": "device",
+          "architecture": "amd64",
+          "executables": [
+            {
+                "name": "nginx",
+                "simulationOptions": {
+                    "simulation": false
+                },
+                "cmd": [ ],
+                "docker": "nginx:alpine"
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "dependentDeployments": [],
+      "exposedParameters": [],
+      "inboundROSInterfaces": {
+        "topics": [],
+        "services": [],
+        "actions": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: sdk-integration
+  namespace: v13-rapyuta-core
+spec:
+  failedBuildsHistoryLimit: 2
+  nodeSelector: null
+  output:
+    to:
+      kind: DockerImage
+      name: 'docker-registry.default.svc:5000/v13-rapyuta-images/sdk-integration-test:latest'
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    contextDir: /
+    git:
+      ref: master
+      uri: 'git@bitbucket.org:rapyutians/rio-sdk-python.git'
+    sourceSecret:
+      name: sshsecret
+    type: Git
+  strategy:
+    dockerStrategy:
+      dockerfilePath: Dockerfile.sdk_test
+    type: Docker
+  successfulBuildsHistoryLimit: 5
+  triggers: []
+status:
+  lastVersion: 323
+

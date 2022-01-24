@@ -1,0 +1,57 @@
+{
+    "plans": [
+        {
+            "singleton": false,
+            "name": "default",
+            "inboundROSInterfaces": {
+                "topics": [ ],
+                "services": [ ],
+                "actions": [ ]
+            },
+            "dependentDeployments": [ ],
+            "components": [
+                {
+                    "executables": [
+                        {
+                            "name": "nginx",
+                            "simulationOptions": {
+                                "simulation": false
+                            },
+                            "cmd": [ ],
+                            "docker": "nginx:alpine"
+                        }
+                    ],
+                    "cloudInfra": {
+                        "endpoints": [
+                            {
+                                "targetPort": 80,
+                                "proto": "HTTPS",
+                                "exposeExternally": true,
+                                "name": "test",
+                                "port": 443
+                            }
+                        ],
+                        "replicas": 1
+                    },
+                    "name": "nginx",
+                    "parameters": [ ],
+                    "architecture": "amd64",
+                    "requiredRuntime": "cloud",
+                    "ros": {
+                        "services": [ ],
+                        "topics": [ ],
+                        "isROS": false,
+                        "actions": [ ]
+                    },
+                    "description": ""
+                }
+            ],
+            "exposedParameters": [ ],
+            "metadata": { }
+        }
+    ],
+    "description": "",
+    "bindable": true,
+    "packageVersion": "v1.0.0",
+    "name": "nginx-single-component"
+}

@@ -1,0 +1,30 @@
+name: Code Quality
+on: [push, pull_request]
+
+jobs:
+  checks:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [ '3.6', '3.7', '3.8', '3.9', '3.10' ]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Pipenv
+        run: LC_ALL=C.UTF-8 LANG=C.UTF-8 pip3 install pipenv
+
+      - name: Install Dependencies
+        run: |
+          export LC_ALL=C.UTF-8
+          export LANG=C.UTF-8
+          pipenv install --python ${{ matrix.python-version }} --dev
+          pipenv run pip3 install -U pytest pytest-cov
+
+      - name: Unit Tests
+        run: LC_ALL=C.UTF-8 LANG=C.UTF-8 pipenv run pytest --cov=rapyuta_io tests/

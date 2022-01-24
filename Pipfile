@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+requests = ">=2.20.0"
+six = ">=1.13.0"
+urllib3 = ">=1.23"
+python-dateutil = ">=2.8.1"
+pytz = "*"
+
+[dev-packages]
+concurrencytest = "==0.1.2"
+testtools = "==2.4.0"
+pyfakefs = "==3.7"
+mock = "==2.0.0"
+sphinx = "==4.2.0"
+furo = "==2021.10.9"
+
+[requires]
+python_version = "3"

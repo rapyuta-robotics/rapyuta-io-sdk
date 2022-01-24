@@ -1,0 +1,55 @@
+{
+  "name": "talker-docker",
+  "packageVersion": "v1.0.0",
+  "description": "talker-docker sdk test package",
+  "plans": [
+    {
+      "name": "default",
+      "metadata": {},
+      "singleton": false,
+      "components": [
+        {
+          "name": "default",
+          "description": "",
+          "ros": {
+            "topics": [
+              {
+                "name": "/telemetry",
+                "qos": "med",
+                "scoped": "False",
+                "targeted": "False"
+              }
+            ],
+            "services": [],
+            "actions": [],
+            "isROS": true
+          },
+          "requiredRuntime": "device",
+          "architecture": "arm32v7",
+          "executables": [
+            {
+              "name": "talkerExec",
+              "gitExecutable": {
+                "repository": "https://github.com/bhuvanchandra/ros_talker_py.git",
+                "strategyType": "Source",
+                "dockerFilePath": "",
+                "contextDir": ""
+              },
+              "cmd": [
+                "roslaunch talker talker.launch"
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "dependentDeployments": [],
+      "exposedParameters": [],
+      "inboundROSInterfaces": {
+        "topics": [],
+        "services": [],
+        "actions": []
+      }
+    }
+  ]
+}

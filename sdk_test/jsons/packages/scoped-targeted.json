@@ -1,0 +1,93 @@
+{
+  "name": "scoped-targeted",
+  "packageVersion": "v1.0.0",
+  "description": "scoped and targeted sdk test package",
+  "bindable": true,
+  "plans": [
+    {
+      "name": "default",
+      "metadata": {},
+      "singleton": false,
+      "components": [
+        {
+          "name": "cloudping",
+          "description": "",
+          "cloudInfra": {
+            "replicas": 1,
+            "endpoints": []
+          },
+          "ros": {
+            "topics": [
+              {
+                "name": "ping",
+                "qos": "low",
+                "compression": "",
+                "scoped": true,
+                "targeted": false
+              }
+            ],
+            "services": [],
+            "actions": [],
+            "isROS": true
+          },
+          "requiredRuntime": "cloud",
+          "architecture": "amd64",
+          "executables": [
+            {
+              "name": "cloudy",
+              "cmd": []
+            }
+          ],
+          "parameters": [
+            {
+              "default": "pingpong",
+              "name": "ROS_PKG",
+              "description": ""
+            },
+            {
+              "default": "pingst.launch",
+              "name": "ROS_LAUNCH_FILE",
+              "description": ""
+            }
+          ]
+        },
+        {
+          "name": "devicepong",
+          "description": "",
+          "ros": {
+            "topics": [
+              {
+                "name": "pong",
+                "qos": "low",
+                "compression": "",
+                "scoped": false,
+                "targeted": true
+              }
+            ],
+            "services": [],
+            "actions": [],
+            "isROS": true
+          },
+          "requiredRuntime": "device",
+          "architecture": "arm32v7",
+          "executables": [
+            {
+              "name": "divvy",
+              "cmd": [
+                "roslaunch pingpong pongst.launch"
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "dependentDeployments": [],
+      "inboundROSInterfaces": {
+        "topics": [],
+        "services": [],
+        "actions": []
+      },
+      "exposedParameters": []
+    }
+  ]
+}
