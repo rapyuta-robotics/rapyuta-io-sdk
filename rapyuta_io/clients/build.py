@@ -95,6 +95,32 @@ class CatkinOption(ObjDict):
             raise InvalidParameterException('catkinMakeArgs must be of string type')
 
 
+class GithubWebhook(ObjDict):
+    """
+    Github Webhook to be triggered on build completion
+
+    :ivar workflowName: Represents name of the github dispatch workflow file.
+    :ivar accessToken: Represents github access token
+
+    """
+    WebhookType = "githubWorkflow"
+
+    def __init__(self, workflowName, accessToken):
+        self.validate(workflowName, accessToken)
+        self.webhookType = GithubWebhook.WebhookType
+        self.workflowName = workflowName
+        self.accessToken = accessToken
+
+    @staticmethod
+    def validate(workflowName, accessToken):
+
+        if not workflowName or not isinstance(workflowName, six.string_types):
+            raise InvalidParameterException('workflowName must be present and should be of string type')
+
+        if not accessToken or not isinstance(accessToken, six.string_types):
+            raise InvalidParameterException('accessToken must be present and should be of string type')
+
+
 class Build(PartialMixin, RefreshPollerMixin, ObjDict):
 
     """
@@ -135,15 +161,17 @@ class Build(PartialMixin, RefreshPollerMixin, ObjDict):
     :type triggerName: str
     :param tagName: Represents tag name of the build
     :type tagName: str
+    :param buildWebhooks: Represents webhooks to be triggered on build completion
+    :type buildWebhooks: list(:py:class:`~rapyuta_io.clients.build.GithubWebhook`)
     """
     def __init__(self, buildName, strategyType, repository, architecture, rosDistro='',
                  isRos=False,  contextDir='', dockerFilePath='', secret='',
                  dockerPullSecret='', dockerPushSecret='', dockerPushRepository='',
-                 simulationOptions=None, buildOptions=None, branch='', triggerName='', tagName=''):
+                 simulationOptions=None, buildOptions=None, branch='', triggerName='', tagName='', buildWebhooks=None):
 
         self.validate(buildName, strategyType, repository, architecture, rosDistro, isRos,
                       contextDir, dockerFilePath, secret, dockerPullSecret, dockerPushSecret,
-                      dockerPushRepository, simulationOptions, buildOptions, branch, triggerName, tagName)
+                      dockerPushRepository, simulationOptions, buildOptions, branch, triggerName, tagName, buildWebhooks)
 
         if not strategyType or strategyType not in list(StrategyType.__members__.values()):
             raise InvalidParameterException('StrategyType must be one of rapyuta_io.clients.package.StrategyType')
@@ -173,13 +201,14 @@ class Build(PartialMixin, RefreshPollerMixin, ObjDict):
         )
         self.buildInfo.simulationOptions = simulationOptions
         self.buildInfo.buildOptions = buildOptions
+        self.buildWebhooks = buildWebhooks
 
         super(ObjDict, self).__init__()
 
     @staticmethod
     def validate(buildName, strategyType, repository, architecture, rosDistro, isRos,
                  contextDir, dockerFilePath, secret, dockerPullSecret, dockerPushSecret,
-                 dockerPushRepository, simulationOptions, buildOptions, branch, triggerName, tagName):
+                 dockerPushRepository, simulationOptions, buildOptions, branch, triggerName, tagName, buildWebhooks):
 
         if not buildName or not isinstance(buildName, six.string_types):
             raise InvalidParameterException('buildName must be a non-empty string')
@@ -245,6 +274,10 @@ class Build(PartialMixin, RefreshPollerMixin, ObjDict):
 
         if dockerPushSecret == '' and tagName != '':
             raise InvalidParameterException('cannot use tagName without dockerPushSecret')
+
+        if buildWebhooks is not None and (not isinstance(buildWebhooks, list) or not all(isinstance(webhook, GithubWebhook) for webhook in buildWebhooks)):
+            raise InvalidParameterException('buildWebhooks must be a list of rapyuta_io.clients.build.GithubWebhook')
+
 
     @classmethod
     def _deserialize(cls, data, obj=None):
@@ -333,6 +366,9 @@ class Build(PartialMixin, RefreshPollerMixin, ObjDict):
         if self.buildInfo.get('branch'):
             build['branch'] = self.buildInfo.get('branch')
 
+        if self.buildWebhooks is not None:
+            build['buildWebhooks'] = self.buildWebhooks
+
         return build
 
     def refresh(self):
@@ -391,7 +427,8 @@ class Build(PartialMixin, RefreshPollerMixin, ObjDict):
                       self.buildInfo.buildOptions,
                       self.buildInfo.branch,
                       '',
-                      ''
+                      '',
+                      None
                       )
         url = self._host + '/build/{}'.format(self.guid)
         headers = create_auth_header(self._auth_token, self._project)

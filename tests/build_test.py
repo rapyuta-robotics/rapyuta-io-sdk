@@ -3,7 +3,7 @@ import requests
 import unittest
 import json
 from mock import patch, Mock, MagicMock, call
-from rapyuta_io.clients.build import Build, BuildStatus, SimulationOptions, BuildOptions, CatkinOption
+from rapyuta_io.clients.build import Build, BuildStatus, SimulationOptions, BuildOptions, CatkinOption, GithubWebhook
 from rapyuta_io.clients.buildoperation import BuildOperation, BuildOperationInfo
 from tests.utils.client import get_client, remove_auth_token, headers
 from rapyuta_io.utils.error import InvalidParameterException, ResourceNotFoundError
@@ -144,6 +144,17 @@ class BuildTest(unittest.TestCase):
         with self.assertRaises(InvalidParameterException) as e:
             BuildOperationInfo('build-guid', triggerName='trigger_name', tagName=inavlid_tag_name)
 
+        self.assertEqual(str(e.exception), expected_err_msg)
+
+    def test_create_build_operation_info_with_invalid_webhook(self):
+        expected_err_msg = 'buildWebhooks must be a list of rapyuta_io.clients.build.GithubWebhook'
+        inavlid_webhook = 1
+        client = get_client()
+        with self.assertRaises(InvalidParameterException) as e:
+            client.create_build(Build('test_build', 'Source', 'https://github.com/example', 'amd64',
+                                      isRos=False, dockerPushSecret='secret-guid',
+                                      dockerPushRepository='docker.io/example/example',
+                                      buildWebhooks = inavlid_webhook))
         self.assertEqual(str(e.exception), expected_err_msg)
 
     @patch('requests.request')
@@ -290,6 +301,50 @@ class BuildTest(unittest.TestCase):
         self.assertEqual(build.get('guid'), 'build-guid')
         self.assertEqual(build.get('buildName'), 'test_build')
         self.assertFalse(build.is_partial)
+
+    @patch('requests.request')
+    def test_create_build_with_webhook_success(self, mock_request):
+        expected_payload = {
+            "buildName": "test_build",
+            "strategyType": "Source",
+            "repository": "https://github.com/rapyuta-robotics/io_tutorials.git",
+            "architecture": "amd64",
+            "rosDistro": "melodic",
+            "isRos": True,
+            "buildWebhooks": [
+                {
+                    "webhookType": "githubWorkflow",
+                    "accessToken": "fake_access_token",
+                    "workflowName": "fake.yaml"
+                }
+            ]
+        }
+        expected_url = 'https://gacatalog.apps.okd4v2.prod.rapyuta.io/build'
+        expected_get_url = 'https://gacatalog.apps.okd4v2.prod.rapyuta.io/build/build-guid'
+        mock_create_build = Mock()
+        mock_create_build.text = BUILD_CREATE_SUCCESS
+        mock_create_build.status_code = requests.codes.OK
+        mock_get_build = Mock()
+        mock_get_build.text = BUILD_GET_SUCCESS_WITH_BUILD_REQUESTS
+        mock_get_build.status_code = requests.codes.OK
+        mock_request.side_effect = [mock_create_build, mock_get_build]
+        webhooks = [GithubWebhook(workflowName='fake.yaml', accessToken='fake_access_token')]
+        client = get_client()
+        created_build = client.create_build(
+            Build('test_build', 'Source', 'https://github.com/rapyuta-robotics/io_tutorials.git',
+                  'amd64', 'melodic', True, buildWebhooks=webhooks), False)
+        build = client.get_build('build-guid', include_build_requests=True)
+        mock_request.assert_has_calls([
+            call(headers=headers, json=expected_payload, url=expected_url, method='POST', params=None),
+            call(headers=headers, json=None, url=expected_get_url, method='GET', params={'include_build_requests': True}),
+        ])
+        self.assertEqual(created_build.get('guid'), 'build-guid')
+        self.assertEqual(created_build.get('buildName'), 'test_build')
+        self.assertEqual(build.buildRequests[0]['buildWebhooks'][0]['webhookType'], 'githubWorkflow')
+        self.assertEqual(build.buildRequests[0]['buildWebhooks'][0]['accessToken'], 'fake_access_token')
+        self.assertEqual(build.buildRequests[0]['buildWebhooks'][0]['workflowName'], 'fake.yaml')
+        self.assertEqual(build.buildRequests[0]['buildWebhooks'][0]['repositoryUrl'], 'https://github.com/rapyuta-robotics/io_tutorials.git')
+
 
     @patch('requests.request')
     def test_get_build_success(self, mock_request):

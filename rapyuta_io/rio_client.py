@@ -849,10 +849,11 @@ class Client(object):
 
         Following example demonstrates how to create a build.
 
-            >>> from rapyuta_io import Client, ROSDistro, SimulationOptions, BuildOptions, CatkinOption
+            >>> from rapyuta_io import Client, ROSDistro, SimulationOptions, BuildOptions, CatkinOption, GithubWebhook
             >>> client = Client(auth_token='auth_token', project='project_guid')
             >>> simulationOptions = SimulationOptions(False)
             >>> buildOptions = BuildOptions(catkinOptions=[CatkinOption(rosPkgs='talker')])
+            >>> webhooks = [GithubWebhook(workflowName='test.yaml', accessToken='github_access_token')]
             >>> build = Build(buildName='test-build',
             ...               strategyType='Source',
             ...               repository='https://github.com/rapyuta-robotics/io_tutorials.git',
@@ -861,7 +862,8 @@ class Client(object):
             ...               isRos=True,
             ...               contextDir='talk/talker',
             ...               simulationOptions=simulationOptions,
-            ...               buildOptions=buildOptions)
+            ...               buildOptions=buildOptions,
+            ...               buildWebhooks=webhooks)
             >>> build = client.create_build(build)
             >>> build.poll_build_till_ready()
 
