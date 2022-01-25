@@ -2,6 +2,7 @@ from __future__ import absolute_import
 import unittest
 from rapyuta_io import Build, BuildStatus, StrategyType, SimulationOptions, CatkinOption, BuildOptions, \
     BuildOperation, BuildOperationInfo, ROSDistro, DeviceArch, Secret, SecretConfigSourceBasicAuth
+from rapyuta_io.clients.build import GithubWebhook
 from sdk_test.config import Configuration
 from sdk_test.util import get_logger
 from rapyuta_io.utils.error import ForbiddenError, BuildOperationFailed
@@ -233,3 +234,25 @@ class BuildTest(unittest.TestCase):
         self.assertEqual(created_build.buildRequests[0]['tagName'], self.tagName)
         self.build.delete()
 
+    def test_17_create_build_with_webhook(self):
+        repository = 'https://github.com/adityeah8969/demo-flask-app#feature/adding_github_workflow'
+        accessToken = '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'
+        workflowName = 'dispatch.yaml'
+        webhooks = [GithubWebhook(workflowName=workflowName, accessToken=accessToken)]
+        build = Build(
+                    buildName='test-sdk-build-webhook',
+                    strategyType='Docker',
+                    repository=repository,
+                    architecture='amd64',
+                    isRos = False,
+                    buildWebhooks=webhooks
+        )
+        self.build = self.config.client.create_build(build)
+        self.build.poll_build_till_ready()
+        created_build = self.config.client.get_build(self.build.guid, include_build_requests=True)
+        self.logger.info('asserting the build')
+        self.assertEqual(created_build.buildRequests[0]['buildWebhooks'][0]['webhookType'] , 'githubWorkflow')
+        self.assertEqual(created_build.buildRequests[0]['buildWebhooks'][0]['accessToken'] , accessToken)
+        self.assertEqual(created_build.buildRequests[0]['buildWebhooks'][0]['workflowName'] , workflowName)
+        self.assertEqual(created_build.buildRequests[0]['buildWebhooks'][0]['repositoryUrl'] , repository)
+        self.build.delete()
