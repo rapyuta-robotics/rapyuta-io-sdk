@@ -24,12 +24,12 @@ class MetricsTest(DeviceTest):
         self.assertEqual(metric_names, expected_metrics_list)
 
     def test_unsubscribe_metrics(self):
+        """Only tests whether unsubscribe_metrics() returns True.
+        All metric APIs have been deprecated and they return stubbed responses."""
         metrics_to_unsubscribe = [SystemMetric.CPU, SystemMetric.NETWORK, SystemMetric.MEMORY,
                                   SystemMetric.DISKIO, SystemMetric.DISK, SystemMetric.WIRELESS]
         for metric in metrics_to_unsubscribe:
             self.assertTrue(self.device.unsubscribe_metric(metric))
-        metrics = self.device.metrics()
-        self.assertEqual(6, len([metrc for metrc in metrics if metrc.status == 'unsubscribed']))
 
     def test_subscribe_metrics(self):
         metrics_to_unsubscribe = [SystemMetric.CPU, SystemMetric.NETWORK, SystemMetric.MEMORY,
