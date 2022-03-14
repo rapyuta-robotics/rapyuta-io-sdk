@@ -31,3 +31,14 @@ class TestUser(unittest.TestCase):
 
         self.assertEqual(self.user.state, UserState.ACTIVATED)
         self.assertEqual(self.user.organization.state, OrganizationState.ACTIVATED)
+
+        self.assertTrue(len(self.user.organizations))
+        for org in self.user.organizations:
+            self.assertIsNotNone(org.guid)
+            self.assertIsInstance(org, Organization)
+
+    def test_get_user_organizations(self):
+        self.organizations = self.config.client.get_user_organizations()
+        for org in self.organizations:
+            self.assertIsNotNone(org.guid)
+            self.assertIsInstance(org, Organization)

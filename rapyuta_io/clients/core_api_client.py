@@ -239,3 +239,11 @@ class CoreAPIClient:
         response = RestClient(url).method(HttpMethod.GET).headers(headers).execute()
         data = get_api_response_data(response, parse_full=True)
         return User.deserialize(data)
+
+    def get_user_organizations(self):
+        url = self._core_api_host + GET_USER_PATH
+        headers = create_auth_header(self._auth_token, self._project)
+        response = RestClient(url).method(HttpMethod.GET).headers(headers).execute()
+        data = get_api_response_data(response, parse_full=True)
+        user = User.deserialize(data)
+        return user.organizations
