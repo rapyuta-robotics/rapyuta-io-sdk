@@ -3,6 +3,8 @@ import re
 
 import enum
 
+import six
+
 from rapyuta_io.clients.organization import Organization
 from rapyuta_io.utils import RestClient, InvalidParameterException
 from rapyuta_io.utils.object_converter import ObjBase, list_field, nested_field
@@ -32,11 +34,13 @@ class Project(ObjBase):
     :vartype creator: str
     :ivar users: Users that have access to the Project
     :vartype users:   list(:py:class:`~rapyuta_io.clients.project.User`)
+    :ivar organization: Organization that the project belongs to
+    :vartype organization: :py:class:`~rapyuta_io.clients.organization.Organization`
     """
     PROJECT_PATH = '/api/project'
 
-    def __init__(self, name):
-        self.validate(name)
+    def __init__(self, name, organization_guid=None):
+        self.validate(name, organization_guid)
         self.name = name
         self.id = None
         self.guid = None
@@ -45,6 +49,11 @@ class Project(ObjBase):
         self.deleted_at = None
         self.creator = None
         self.users = None
+        org = None
+        if organization_guid is not None:
+            org = Organization()
+            setattr(org, 'guid', organization_guid)
+        self.organization = org
 
     def get_deserialize_map(self):
         return {
@@ -55,21 +64,27 @@ class Project(ObjBase):
             'deleted_at': 'DeletedAt',
             'name': 'name',
             'creator': 'creator',
-            'users': list_field('users', User)
+            'users': list_field('users', User),
+            'organization': nested_field('organization', Organization)
         }
 
     def get_serialize_map(self):
-        return {
-            'name': 'name'
+        serialized_project = {
+            'name': 'name',
         }
+        if self.organization is not None:
+            serialized_project['organization'] = 'organization'
+        return serialized_project
 
     @staticmethod
-    def validate(name):
+    def validate(name, organization_guid):
         if not isinstance(name, str):
             raise InvalidParameterException('name must be a string')
         length = len(name)
         if length < 3 or length > 15:
             raise InvalidParameterException('length of name must be between 3 and 15 characters')
+        if organization_guid is not None and not isinstance(organization_guid, six.string_types):
+            raise InvalidParameterException('organization_guid needs to a non empty string')
         if not project_name_regex.match(name):
             raise InvalidParameterException('name can have alphabets, numbers or - only')
 
@@ -112,8 +127,10 @@ class User(ObjBase):
     :vartype state: :py:class:`~rapyuta_io.clients.project.UserState`
     :ivar projects: Projects to which the User Belongs
     :vartype projects:   list(:py:class:`~rapyuta_io.clients.project.Project`)
-    :ivar organization: Organization to which the User Belongs
+    :ivar organization: Primary organization that the user created or got invited to for the first time
     :vartype organization:  :py:class:`~rapyuta_io.clients.organization.Organization`
+    :ivar organizations: List of organizations that the user is part of
+    :vartype organizations:  list(:py:class:`~rapyuta_io.clients.organization.Organization`)
     """
     def __init__(self):
         self.guid = None
@@ -123,6 +140,7 @@ class User(ObjBase):
         self.state = None
         self.projects = None
         self.organization = None
+        self.organizations = None
 
     def get_deserialize_map(self):
         return {
@@ -132,7 +150,8 @@ class User(ObjBase):
             'email_id': 'emailID',
             'state': 'state',
             'projects': list_field('projects', Project),
-            'organization': nested_field('organization', Organization)
+            'organization': nested_field('organization', Organization),
+            'organizations': list_field('organizations', Organization),
         }
 
     def get_serialize_map(self):

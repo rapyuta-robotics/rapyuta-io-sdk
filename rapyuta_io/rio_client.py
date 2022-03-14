@@ -9,6 +9,7 @@ from rapyuta_io.clients.core_api_client import CoreAPIClient
 from rapyuta_io.clients.deployment import Deployment
 from rapyuta_io.clients.device import Device
 from rapyuta_io.clients.native_network import NativeNetwork
+from rapyuta_io.clients.organization import Organization
 from rapyuta_io.clients.package import Package
 from rapyuta_io.clients.project import Project
 from rapyuta_io.clients.secret import Secret
@@ -343,6 +344,21 @@ class Client(object):
 
         """
         return self._core_api_client.get_user()
+
+    def get_user_organizations(self):
+        """
+        Get list of organizations that a user is part of.
+
+        :rtype: list(:py:class:`~rapyuta_io.clients.organization.Organization`)
+
+        Following example demonstrates how to get the list of organizations that a user is part of.
+
+        >>> from rapyuta_io import Client
+        >>> client = Client(auth_token='auth_token', project='project_guid')
+        >>> organizations = client.get_user_organizations()
+
+        """
+        return self._core_api_client.get_user_organizations()
 
     def get_all_devices(self, online_device=False, arch_list=None, retry_limit=0):
         """
@@ -1308,6 +1324,14 @@ class Client(object):
             >>> from rapyuta_io.clients.project import Project
             >>> client = Client(auth_token='auth_token')
             >>> proj = Project('project-name')
+            >>> client.create_project(proj)
+
+        Following example demonstrates the use of this method for creating a new Project in a different organization.
+        Please do note that the user should be a part of the organization where the project is to be created.
+
+            >>> from rapyuta_io.clients.project import Project
+            >>> client = Client(auth_token='auth_token')
+            >>> proj = Project('project-name', 'org-guid')
             >>> client.create_project(proj)
 
         """
