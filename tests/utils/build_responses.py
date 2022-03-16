@@ -105,7 +105,15 @@ BUILD_GET_SUCCESS_WITH_BUILD_REQUESTS = '''
                         "imageName": "rio-project-uwlzvnyirczyqbpezodmkcxq/is-416@sha256:8dbb4ac217ab51224ce074eaf5e8e8ea2bf8b248ed72270831015b4909c3e8f9"
                     }
                 ]
-            }
+            },
+            "buildWebhooks": [
+                {
+                    "webhookType": "githubWorkflow",
+                    "accessToken": "fake_access_token",
+                    "workflowName": "fake.yaml",
+                    "repositoryUrl": "https://github.com/rapyuta-robotics/io_tutorials.git"
+                }
+            ]
         }
     ]
 }
