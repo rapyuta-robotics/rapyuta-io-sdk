@@ -1,5 +1,5 @@
 name: Release
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   release:
@@ -7,6 +7,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_TOKEN }}
 
       - name: Run semantic-release
         run: |
