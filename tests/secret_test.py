@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 import base64
+from http.client import INTERNAL_SERVER_ERROR
 import requests
 import unittest
 
@@ -9,7 +10,7 @@ from rapyuta_io.clients.secret import SecretConfigSourceBasicAuth, SecretConfigS
     SecretConfigDocker, DOCKER_HUB_REGISTRY, Secret
 from rapyuta_io.utils import InvalidParameterException, InternalServerError, ResourceNotFoundError
 from tests.utils.client import get_client, headers, AUTH_TOKEN
-from tests.utils.secrets_responses import SECRET_CREATE_SUCCESS, SECRET_LIST_SUCCESS
+from tests.utils.secrets_responses import SECRET_CREATE_SUCCESS, SECRET_LIST_SUCCESS, SECRET_UPDATE_SUCCESS
 
 
 class SecretConfigTests(unittest.TestCase):
@@ -335,4 +336,71 @@ class SecretTests(unittest.TestCase):
         secret.delete()
         mock_request.assert_has_calls([
             call(headers=headers, json=expected_payload, url=expected_url, method='DELETE', params={})
+        ])
+
+    @patch('requests.request')
+    def test_update_method_success(self, mock_request):
+        secret = Secret('test-secret', SecretConfigSourceBasicAuth(username="testuser", password='testpassword'))
+        client = get_client()
+        expected_payload = {
+            'type': SecretType.SOURCE_BASIC_AUTH,
+            'data': {
+                "username": base64.b64encode('testuser'.encode()).decode(),
+                "password": base64.b64encode('testpassword'.encode()).decode()
+            },
+            'name': 'test-secret'
+        }
+        expected_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/secret/secret-guid/update'
+        mock_secret = Mock()
+        mock_secret.text = SECRET_UPDATE_SUCCESS
+        mock_secret.status_code = requests.codes.OK
+        mock_request.side_effect = [mock_secret]
+        result = client.update_secret('secret-guid', secret)
+        mock_request.assert_has_calls([
+            call(headers=headers, json=expected_payload, url=expected_url, method='PUT', params={}),
+        ])
+        self.assertIsInstance(result, Secret)
+    
+    @patch('requests.request')
+    def test_update_method_internal_server_error(self, mock_request):
+        secret = Secret('test-secret', SecretConfigSourceBasicAuth(username="testuser", password='testpassword'))
+        client = get_client()
+        expected_payload = {
+            'type': SecretType.SOURCE_BASIC_AUTH,
+            'data': {
+                "username": base64.b64encode('testuser'.encode()).decode(),
+                "password": base64.b64encode('testpassword'.encode()).decode()
+            },
+            'name': 'test-secret'
+        }
+        expected_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/secret/secret-guid/update'
+        mock_secret = Mock()
+        mock_secret.status_code = requests.codes.INTERNAL_SERVER_ERROR
+        mock_request.side_effect = [mock_secret]
+        with self.assertRaises(InternalServerError) as e:
+            client.update_secret("secret-guid", secret)
+        mock_request.assert_has_calls([
+            call(headers=headers, json=expected_payload, url=expected_url, method='PUT', params={}),
+        ])
+    
+    @patch('requests.request')
+    def test_update_method_not_found_error(self, mock_request):
+        secret = Secret('test-secret', SecretConfigSourceBasicAuth(username="testuser", password='testpassword'))
+        client = get_client()
+        expected_payload = {
+            'type': SecretType.SOURCE_BASIC_AUTH,
+            'data': {
+                "username": base64.b64encode('testuser'.encode()).decode(),
+                "password": base64.b64encode('testpassword'.encode()).decode()
+            },
+            'name': 'test-secret'
+        }
+        expected_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/secret/secret-guid/update'
+        mock_secret = Mock()
+        mock_secret.status_code = requests.codes.NOT_FOUND
+        mock_request.side_effect = [mock_secret]
+        with self.assertRaises(ResourceNotFoundError) as e:
+            client.update_secret("secret-guid", secret)
+        mock_request.assert_has_calls([
+            call(headers=headers, json=expected_payload, url=expected_url, method='PUT', params={}),
         ])
