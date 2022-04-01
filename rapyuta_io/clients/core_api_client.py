@@ -176,6 +176,15 @@ class CoreAPIClient:
             secrets.append(secret)
         return secrets
 
+    def update_secret(self, guid, secret):
+        url = self._core_api_host + self.SECRET_PATH + '/' + guid + '/update'
+        headers = create_auth_header(self._auth_token, self._project)
+        response = RestClient(url).method(HttpMethod.PUT).headers(headers).execute(secret.serialize())
+        data = get_api_response_data(response, parse_full=True)
+        secret = Secret.deserialize(data)
+        self._add_header_fields(secret)
+        return secret
+
     def delete_secret(self, guid):
         url = self._core_api_host + self.SECRET_PATH + '/delete'
         headers = create_auth_header(self._auth_token, self._project)
