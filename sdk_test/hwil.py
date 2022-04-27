@@ -29,7 +29,7 @@ class HWIL(object):
         """
         url = self.RUN_COMMAND_URL.format(self.config.hwil_server)
         # Note: If this is not efficient, we can directly take the device_id as input from configuration.
-        payload = {'device_id': device_id, 'command': cmd, 'timeout': timeout}
+        payload = {'device_id': device_id, 'command': cmd, 'timeout': timeout, 'uuid': ''}
         response = requests.post(url, json=payload, auth=self.config.get_hwil_credentials()).json()
         self.logger.debug('Submitted the command successfully!')
         if wait:
@@ -63,7 +63,7 @@ class HWIL(object):
         url = self.GET_COMMAND_URL.format(self.config.hwil_server, cmd_id)
         for i in range(tries):
             response = requests.get(url, auth=self.config.get_hwil_credentials()).json()
-            if response['status'] == 'IN_PROGRESS':
+            if response['status'] == 'IN_PROGRESS' or response['status'] == 'PENDING':
                 sleep(timeout)
                 continue
             elif response['status'] == 'SUCCESS':
