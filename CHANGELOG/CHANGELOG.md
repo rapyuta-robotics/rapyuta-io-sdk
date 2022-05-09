@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.1.0...v1.2.0) (2022-05-09)
+
+
+### Features
+
+* **secret:** add method to update secrets ([21eaeb8](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/21eaeb844a988ae7487782243b003b905d8aa278))
+
 # [1.1.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.0.0...v1.1.0) (2022-03-24)
 
 
