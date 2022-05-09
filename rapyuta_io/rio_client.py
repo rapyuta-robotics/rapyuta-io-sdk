@@ -1451,6 +1451,30 @@ class Client(object):
         """
         return self._core_api_client.get_secret(guid)
 
+    def update_secret(self, guid, secret):
+        """
+        Update an existing Secret on the Platform under the project.
+
+        :param guid: Secret's GUID
+        :type guid: str
+        :param secret: Secret object
+        :type secret: :py:class:`~rapyuta_io.clients.secret.Secret`
+        :rtype: :py:class:`~rapyuta_io.clients.secret.Secret`
+
+        Following example demonstrates the use of this method for creating a new Secret.
+
+            >>> from rapyuta_io.clients.secret import Secret, SecretConfigSourceBasicAuth
+            >>> client = Client(auth_token='auth_token', project='project_guid')
+            >>> secret_config = SecretConfigSourceBasicAuth('user', 'new_password')
+            >>> secret = Secret('secret-name', secret_config)
+            >>> client.update_secret('secret-guid', secret)
+
+        """
+        if not isinstance(secret, Secret):
+            raise InvalidParameterException("secret must be non-empty and of type "
+                                            "rapyuta_io.clients.secret.Secret")
+        return self._core_api_client.update_secret(guid, secret)
+
     def delete_secret(self, guid):
         """
         Delete a secret using its GUID.

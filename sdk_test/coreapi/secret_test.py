@@ -40,4 +40,9 @@ class TestSecret(unittest.TestCase):
         secret_list = self.config.client.list_secrets()
         secret_list = [s for s in secret_list if s.guid == self.secret.guid]
         self.assertEqual(len(secret_list), 1)
+    
+    def test_update_secret_source_basic_auth(self):
+        self.secret = self.config.client.create_secret(Secret('basic-auth-test', SecretConfigSourceBasicAuth('user', 'pass')))
+        self.secret = self.config.client.update_secret(self.secret.guid, Secret('basic-auth-test', SecretConfigSourceBasicAuth('user', 'newpass')))
+        self.assertSecret(self.secret)
 
