@@ -401,6 +401,7 @@ class Build(PartialMixin, RefreshPollerMixin, ObjDict):
         * build.secret
         * build.dockerPullSecret
         * build.dockerPushRepository
+        * build.buildWebhooks
 
         Following example demonstrates how to save a build:
 
@@ -410,7 +411,8 @@ class Build(PartialMixin, RefreshPollerMixin, ObjDict):
             >>> build.buildInfo.branch = 'master'
             >>> build.save()
         """
-
+        if not hasattr(self, 'buildWebhooks'):
+            self.buildWebhooks = None
         self.validate(self.buildName,
                       self.buildInfo.strategyType,
                       self.buildInfo.repository,
@@ -428,7 +430,7 @@ class Build(PartialMixin, RefreshPollerMixin, ObjDict):
                       self.buildInfo.branch,
                       '',
                       '',
-                      None
+                      self.buildWebhooks
                       )
         url = self._host + '/build/{}'.format(self.guid)
         headers = create_auth_header(self._auth_token, self._project)
