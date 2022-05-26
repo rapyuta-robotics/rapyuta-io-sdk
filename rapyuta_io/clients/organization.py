@@ -61,7 +61,10 @@ class Organization(ObjBase):
         }
 
     def get_serialize_map(self):
-        pass
+        return {
+            'guid': 'guid',
+        }
+
 
 
 class OrganizationState(str, enum.Enum):

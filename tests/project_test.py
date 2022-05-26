@@ -7,7 +7,8 @@ from mock import patch, call, Mock
 from rapyuta_io.clients.project import Project
 from rapyuta_io.utils import InvalidParameterException, InternalServerError
 from tests.utils.client import get_client, headers, AUTH_TOKEN
-from tests.utils.projects_responses import PROJECT_CREATE_SUCCESS, PROJECT_GET_SUCCESS, PROJECT_LIST_SUCCESS
+from tests.utils.projects_responses import PROJECT_CREATE_SUCCESS, PROJECT_GET_SUCCESS, PROJECT_LIST_SUCCESS, \
+    PROJECT_CREATE_INVITED_ORG_SUCCESS
 
 
 class ProjectTests(unittest.TestCase):
@@ -37,6 +38,12 @@ class ProjectTests(unittest.TestCase):
 
         self.assertEqual(str(e.exception), expected_err_msg)
 
+    def test_create_project_invalid_organization_id(self):
+        expected_err_msg = 'organization_guid needs to a non empty string'
+        with self.assertRaises(InvalidParameterException) as e:
+            Project('test-project', 1)
+        self.assertEqual(expected_err_msg, str(e.exception))
+
     @patch('requests.request')
     def test_create_project_success(self, mock_request):
         project = Project('test-project')
@@ -53,6 +60,26 @@ class ProjectTests(unittest.TestCase):
         ])
         self.assertIsInstance(result, Project)
         self.assertTrue(hasattr(result, 'guid'))
+
+    @patch('requests.request')
+    def test_create_project_in_invited_organization_success(self, mock_request):
+        project = Project('test-project', 'invited-org-guid')
+        client = get_client()
+        expected_payload = {'name': 'test-project', 'organization': {'guid': 'invited-org-guid'}}
+        expected_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/project/create'
+        mock_project = Mock()
+        mock_project.text = PROJECT_CREATE_INVITED_ORG_SUCCESS
+        mock_project.status_code = requests.codes.OK
+        mock_request.side_effect = [mock_project]
+        result = client.create_project(project)
+        mock_request.assert_has_calls([
+            call(headers=headers, json=expected_payload, url=expected_url, method='POST', params={}),
+        ])
+        self.assertIsInstance(result, Project)
+        self.assertTrue(hasattr(result, 'guid'))
+        self.assertEqual(result.name, 'test-project')
+        self.assertEqual(len(result.users), 2)
+        self.assertEqual(result.organization.guid, 'invited-org-guid')
 
     @patch('requests.request')
     def test_create_project_server_error(self, mock_request):
@@ -114,6 +141,8 @@ class ProjectTests(unittest.TestCase):
         for proj in proj_list:
             self.assertIsInstance(proj, Project)
             self.assertTrue(hasattr(proj, 'guid'))
+            self.assertTrue(hasattr(proj, 'organization'))
+            self.assertEqual(proj.organization.name, 'temp-org')
 
     @patch('rapyuta_io.utils.rest_client.DEFAULT_RETRY_COUNT', 0)
     @patch('requests.request')
