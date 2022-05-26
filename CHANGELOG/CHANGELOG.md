@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.2.0...v1.3.0) (2022-05-26)
+
+
+### Features
+
+* **user:** adding user to multiple organizations ([5072307](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/507230787c32aca96ded2cd0eb0a62c88b085ca5))
+
 # [1.2.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.1.0...v1.2.0) (2022-05-09)
 
 
