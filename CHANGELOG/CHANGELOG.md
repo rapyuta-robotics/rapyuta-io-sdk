@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.3.0...v1.4.0) (2022-06-23)
+
+
+### Features
+
+* **build:** added support for webhooks in build update ([d7f53f5](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/d7f53f50b552686c67a533946ee4207264e10911))
+
 # [1.3.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.2.0...v1.3.0) (2022-05-26)
 
 
