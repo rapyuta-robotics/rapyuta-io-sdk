@@ -345,7 +345,6 @@ class BuildTest(unittest.TestCase):
         self.assertEqual(build.buildRequests[0]['buildWebhooks'][0]['workflowName'], 'fake.yaml')
         self.assertEqual(build.buildRequests[0]['buildWebhooks'][0]['repositoryUrl'], 'https://github.com/rapyuta-robotics/io_tutorials.git')
 
-
     @patch('requests.request')
     def test_get_build_success(self, mock_request):
         expected_url = 'https://gacatalog.apps.okd4v2.prod.rapyuta.io/build/{}'.format('build-guid')
@@ -526,6 +525,57 @@ class BuildTest(unittest.TestCase):
         mock_request.assert_called_with(headers=headers, json=expected_payload,
                                         url=expected_url, method='PUT', params={})
 
+    @patch('requests.request')
+    def test_update_build_with_webhook_success(self, mock_request):
+        expected_payload = {
+            "buildName": "test_build",
+            "strategyType": "Source",
+            "architecture": "amd64",
+            "isRos": True,
+            "rosDistro": "melodic",
+            "repository": "https://github.com/rapyuta-robotics",
+            "contextDir": "contextDir",
+            "branch": "master",
+            "buildOptions": {
+                "catkinOptions": [
+                    {
+                        "rosPkgs": "listener",
+                        "cmakeArgs": None,
+                        "makeArgs": None,
+                        "blacklist": None,
+                        "catkinMakeArgs": None
+                    }
+                ]
+            },
+            "secret": "test-secret",
+            "buildWebhooks": [
+                {
+                    "webhookType": "githubWorkflow",
+                    "accessToken": "fake_access_token",
+                    "workflowName": "fake.yaml"
+                }
+            ]
+        }
+        expected_url = 'https://gacatalog.apps.okd4v2.prod.rapyuta.io/build/{}'.format('build-guid')
+        build = Build('test_build', 'Source', 'https://github.com/rapyuta-robotics/io_tutorials.git', 'amd64',
+                      'melodic', True)
+        setattr(build, '_host', 'https://gacatalog.apps.okd4v2.prod.rapyuta.io')
+        setattr(build, 'guid', 'build-guid')
+        setattr(build, '_auth_token', 'Bearer test_auth_token')
+        setattr(build, '_project', 'test_project')
+        mock_update_build = Mock()
+        mock_update_build.text = 'null'
+        mock_update_build.status_code = requests.codes.OK
+        mock_request.side_effect = [mock_update_build]
+        build.buildInfo.repository = 'https://github.com/rapyuta-robotics'
+        build.buildInfo.branch = 'master'
+        build.buildInfo.contextDir = 'contextDir'
+        build.buildInfo.buildOptions = BuildOptions(catkinOptions=[CatkinOption(rosPkgs='listener')])
+        build.secret = 'test-secret'
+        build.buildWebhooks = [GithubWebhook(workflowName='fake.yaml', accessToken='fake_access_token')]
+        build.save()
+        mock_request.assert_called_with(headers=headers, json=expected_payload,
+                                        url=expected_url, method='PUT', params={})
 
     @patch('requests.request')
     def test_update_build_invalid_secret(self, mock_request):
@@ -594,6 +644,26 @@ class BuildTest(unittest.TestCase):
                       'melodic', True)
         with self.assertRaises(InvalidParameterException) as e:
             build.buildInfo.contextDir = 1
+            build.save()
+        self.assertEqual(str(e.exception), expected_err_msg)
+
+    @patch('requests.request')
+    def test_update_build_invalid_webhook(self, mock_request):
+        expected_err_msg = 'buildWebhooks must be a list of rapyuta_io.clients.build.GithubWebhook'
+        build = Build('test_build', 'Source', 'https://github.com/rapyuta-robotics/io_tutorials.git', 'amd64',
+                      'melodic', True)
+        with self.assertRaises(InvalidParameterException) as e:
+            build.buildWebhooks = ''
+            build.save()
+        self.assertEqual(str(e.exception), expected_err_msg)
+
+    @patch('requests.request')
+    def test_update_build_invalid_webhook_workflow(self, mock_request):
+        expected_err_msg = 'workflowName must be present and should be of string type'
+        build = Build('test_build', 'Source', 'https://github.com/rapyuta-robotics/io_tutorials.git', 'amd64',
+                      'melodic', True)
+        with self.assertRaises(InvalidParameterException) as e:
+            build.buildWebhooks = [GithubWebhook(workflowName='', accessToken='fake_access_token')]
             build.save()
         self.assertEqual(str(e.exception), expected_err_msg)
 
