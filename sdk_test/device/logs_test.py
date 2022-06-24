@@ -26,6 +26,7 @@ class LogsTest(DeviceTest):
         self.device = devices[0]
         self.logs_uuid = None
         self.file_name = '{}-{}'.format(MINION, generate_random_value(5))
+        self.log_upload_in_progress_statuses = ['PENDING', 'IN PROGRESS']
 
     def tearDown(self):
         self._delete_logs_upload()
@@ -33,12 +34,13 @@ class LogsTest(DeviceTest):
     def _delete_logs_upload(self):
         self.logger.info('deleting uploaded logs')
         retry_count = 0
-        retry_limit = 20
+        retry_limit = 4
         try:
-            while self.device.get_log_upload_status(self.logs_uuid).status == 'IN PROGRESS':
+            while self.device.get_log_upload_status(self.logs_uuid).status \
+                    in self.log_upload_in_progress_statuses:
                 if retry_count > retry_limit:
                     raise Exception('exceeded retry limit')
-                time.sleep(5)
+                time.sleep(30)
                 retry_count += 1
             self.device.delete_uploaded_log_file(self.logs_uuid, retry_limit=0)
         except LogsUUIDNotFoundException as ex:
@@ -54,6 +56,7 @@ class LogsTest(DeviceTest):
         logs_upload_request = LogsUploadRequest(LOG_SALT_MINION, self.file_name, override=True)
         self.logs_uuid = self.device.upload_log_file(logs_upload_request, retry_limit=0)
         self.assertTrue(self.logs_uuid)
+        time.sleep(35)
         status_list = self.device.list_uploaded_files_for_device(sort='filename',
                                                                  paginate=True, page_size=10, page_number=1,
                                                                  filter_by_filename='minion',
@@ -75,6 +78,7 @@ class LogsTest(DeviceTest):
         logs_upload_request = LogsUploadRequest(LOG_SALT_MINION, self.file_name, override=True)
         self.logs_uuid = self.device.upload_log_file(logs_upload_request, retry_limit=0)
         self.assertTrue(self.logs_uuid)
+        time.sleep(35)
         logs_upload_status = self.device.get_log_upload_status(self.logs_uuid, retry_limit=0)
         self.assertTrue(logs_upload_status.status in ['IN PROGRESS', 'FAILED', 'COMPLETED', 'CANCELLED'])
         self.assertTrue(len(logs_upload_status.error_message) == 0)
