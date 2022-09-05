@@ -108,13 +108,33 @@ DOCKER_RUNTIME = {
     '''
 }
 
+PREINSTALLED_WITH_NEW_RUNTIME_CONFIG = {
+    "runtime": '''
+    {
+        "value": "True",
+        "id": 2140,
+        "key": "runtime_preinstalled"
+    },
+    {
+        "value": "ros_workspace",
+        "id": 2139,
+        "key": ""
+    },
+    {
+        "value": "ros_distro",
+        "id": 2138,
+        "key": "ros_distro"
+    }
+    '''
+}
+
 CREATE_PREINSTALLED_DEVICE_SUCCESS = '''
 {
     "status": "success",
     "response": {
         "data": "sample-token",
         "device_id": "test-device-id",
-        "script_command": "sudo bash start -w test/path"
+        "script_command": "sudo bash start -r preinstalled -w test/path"
     }
 }
 '''
@@ -126,6 +146,17 @@ CREATE_DOCKERCOMPOSE_DEVICE_SUCCESS = '''
         "data": "sample-token",
         "device_id": "test-device-id",
         "script_command": "sudo bash start -r dockercompose -d melodic -b test/path"
+    }
+}
+'''
+
+CREATE_BOTH_RUNTIMES_DEVICE_SUCCESS = '''
+{
+    "status": "success",
+    "response": {
+        "data": "sample-token",
+        "device_id": "test-device-id",
+        "script_command": "sudo bash start -r dockercompose -d melodic -b test/path -r preinstalled"
     }
 }
 '''
@@ -187,6 +218,7 @@ GET_PREINSTALLED_DEVICE_SUCCESS = '''
 
 DEVICE_INFO = DEVICE_BASE.substitute(merge_dicts(PREINSTALL_RUNTIME_CONFIG))
 DOCKER_DEVICE = DEVICE_BASE.substitute(merge_dicts(DOCKER_RUNTIME))
+PREINSTALLED_DEVICE_WITH_NEW_RUNTIME = DEVICE_BASE.substitute(merge_dicts(PREINSTALLED_WITH_NEW_RUNTIME_CONFIG))
 
 DEVICE_LIST = '''
 {

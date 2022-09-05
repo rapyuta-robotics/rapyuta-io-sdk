@@ -36,8 +36,7 @@ class Configuration(six.with_metaclass(_Singleton, object)):
 
     Following snippet is an example configuration file with all possible fields. There is no validation on extra fields.
     The configuration MUST include one device each of the following configuration:
-    * ARM32 with Preinstalled runtime
-    * ARM32 with Dockercompose runtime
+    * AMD64 with Preinstalled runtime
     * AMD64 with Dockercompose runtime
 
     Example:
@@ -88,10 +87,8 @@ class Configuration(six.with_metaclass(_Singleton, object)):
         self.worker_threads = self._config['worker_threads']
 
     def validate(self):
-        if len(self.get_device_configs(arch=DeviceArch.ARM32V7, runtime='Preinstalled')) != 1:
-            raise InvalidConfig('One arm32 device with Preinstalled runtime is required')
-        if len(self.get_device_configs(arch=DeviceArch.ARM32V7, runtime='Dockercompose')) != 1:
-            raise InvalidConfig('One arm32 device with Docker Compose runtime is required')
+        if len(self.get_device_configs(arch=DeviceArch.AMD64, runtime='Preinstalled')) != 1:
+            raise InvalidConfig('One amd64 device with Preinstalled runtime is required')
         if len(self.get_device_configs(arch=DeviceArch.AMD64, runtime='Dockercompose')) != 1:
             raise InvalidConfig('One amd64 device with Docker Compose runtime is required')
 

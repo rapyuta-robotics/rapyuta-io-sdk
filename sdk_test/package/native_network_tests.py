@@ -11,8 +11,8 @@ from sdk_test.util import get_logger, get_package, add_package, delete_package
 
 NETWORK_INTERFACE = 'network_interface'
 
-class NativeNetworkTest(PackageTest, DeviceTest):
 
+class NativeNetworkTest(PackageTest, DeviceTest):
     native_network = None
 
     TALKER_CLOUD_MANIFEST = 'talker-cloud.json'
@@ -24,6 +24,7 @@ class NativeNetworkTest(PackageTest, DeviceTest):
     def setUpClass(cls):
         add_package(cls.TALKER_CLOUD_MANIFEST, cls.TALKER_CLOUD_PACKAGE)
         add_package(cls.TALKER_DEVICE_MANIFEST, cls.TALKER_DEVICE_PACKAGE)
+
     @classmethod
     def tearDownClass(cls):
         delete_package(cls.TALKER_CLOUD_PACKAGE)
@@ -39,8 +40,6 @@ class NativeNetworkTest(PackageTest, DeviceTest):
         self.device_runtime = Runtime.DEVICE
         self.docker_device = self.config.get_devices(arch=DeviceArch.AMD64, runtime='Dockercompose')[0]
         self.docker_device.refresh()
-        self.arm_device = self.config.get_devices(arch=DeviceArch.ARM32V7, runtime='Dockercompose')[0]
-        self.arm_device.refresh()
         self.device_parameters = Parameters(limits=None, device=self.docker_device, network_interface='docker0')
 
     def add_network_interface_config_variable(self, device):
@@ -160,12 +159,11 @@ class NativeNetworkTest(PackageTest, DeviceTest):
         self.config.client.delete_native_network(guid)
         self.assert_native_network_stopped()
 
-
     def test_06_create_device_native_network(self):
         self.add_network_interface_config_variable(self.docker_device)
         self.logger.info('Started creating device native network')
         native_network_payload = NativeNetwork(self.name, Runtime.DEVICE, self.ros_distro, self.device_parameters)
-        self.native_network  = self.config.client.create_native_network(native_network_payload)
+        self.native_network = self.config.client.create_native_network(native_network_payload)
         guid = self.native_network.guid
         self.logger.info('polling till the native network {} is ready'.format(self.name))
         self.native_network.poll_native_network_till_ready()
@@ -174,24 +172,24 @@ class NativeNetworkTest(PackageTest, DeviceTest):
         self.validate_refresh(guid)
         self.assertEqual(self.native_network.runtime, self.device_runtime)
 
-        self.add_network_interface_config_variable(self.arm_device)
+        self.add_network_interface_config_variable(self.docker_device)
         self.logger.info('Started creating package talker component')
         app_package = get_package(self.TALKER_DEVICE_PACKAGE)
         prov_config = app_package.get_provision_configuration()
-        prov_config.add_device('default', self.arm_device)
+        prov_config.add_device('default', self.docker_device)
         prov_config.add_native_network(self.native_network, 'docker0')
         self.assertEqual(prov_config.context['nativeNetworks'], [{"guid": guid, "bindParameters":
             {"NETWORK_INTERFACE": 'docker0'}}])
         self.logger.info('creating deployment')
         ignored_device_configs = ['ros_workspace', 'ros_distro']
-        deployment = self.deploy_package(app_package, prov_config, device=self.arm_device,
+        deployment = self.deploy_package(app_package, prov_config, device=self.docker_device,
                                          ignored_device_configs=ignored_device_configs)
         self.logger.info('polling till deployment is ready')
         deployment.poll_deployment_till_ready(retry_count=50)
         self.logger.info('deployment is ready')
         deployment.deprovision()
         self.logger.info('deprovisioned the deployment')
-        self.delete_network_interface_config_variable(self.arm_device)
+        self.delete_network_interface_config_variable(self.docker_device)
 
         self.logger.info('Delete routed network with guid : %s' % guid)
         self.config.client.delete_native_network(guid)

@@ -865,7 +865,7 @@ class Client(object):
 
         Following example demonstrates how to create a build.
 
-            >>> from rapyuta_io import Client, ROSDistro, SimulationOptions, BuildOptions, CatkinOption, GithubWebhook
+            >>> from rapyuta_io import Client, ROSDistro, Build, SimulationOptions, BuildOptions, CatkinOption, GithubWebhook
             >>> client = Client(auth_token='auth_token', project='project_guid')
             >>> simulationOptions = SimulationOptions(False)
             >>> buildOptions = BuildOptions(catkinOptions=[CatkinOption(rosPkgs='talker')])

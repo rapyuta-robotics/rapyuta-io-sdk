@@ -296,7 +296,13 @@ class ProvisionConfiguration(ObjDict):
                 return component
         raise AttributeError
 
-    def validate_component_executables(self, component_name, device_runtime):
+    def validate_component_executables(
+            self,
+            component_name,
+            device_runtime,
+            device_docker_enabled,
+            device_preinstalled_enabled
+    ):
         component = self.plan.get_component_by_name(component_name)
         if not component:
             raise OperationNotAllowedError('Component named %s is not found on the plan' %
@@ -304,9 +310,11 @@ class ProvisionConfiguration(ObjDict):
         for executable in component.executables:
             is_docker_executable = executable.get('buildGUID') or \
                                    executable.get('gitExecutable') or executable.get('docker')
-            if is_docker_executable and device_runtime == Device.PRE_INSTALLED:
+
+            if is_docker_executable and (device_runtime != Device.DOCKER_COMPOSE and not device_docker_enabled):
                 raise OperationNotAllowedError('Device must be a {} device'.format(Device.DOCKER_COMPOSE))
-            if not is_docker_executable and device_runtime == Device.DOCKER_COMPOSE:
+            if not is_docker_executable and \
+                    (device_runtime != Device.PRE_INSTALLED and not device_preinstalled_enabled):
                 raise OperationNotAllowedError('Device must be a {} device'.format(Device.PRE_INSTALLED))
 
     def add_restart_policy(self, component_name, restart_policy):
@@ -526,7 +534,7 @@ class ProvisionConfiguration(ObjDict):
              >>> device = client.get_device('test_device_id')
              >>> package_provision_config = package.get_provision_configuration('test_plan_id')
              >>> # ros_workspace will be ignored while adding device to provision configuration
-             >>> package_provision_config.add_device('test_component_name', 'test_device_id',
+             >>> package_provision_config.add_device('test_component_name', device,
              >>>                                     ignore_device_config=['ros_workspace'], set_component_alias=False)
              >>> package.provision('deployment_name', package_provision_config)
 
@@ -536,24 +544,35 @@ class ProvisionConfiguration(ObjDict):
             raise OperationNotAllowedError('Device should be online')
 
         device_runtime = device.get_runtime()
-        self.validate_component_executables(component_name, device_runtime)
+        device_docker_enabled = device.is_docker_enabled()
+        device_preinstalled_enabled = device.is_preinstalled_enabled()
+
+        self.validate_component_executables(
+            component_name,
+            device_runtime,
+            device_docker_enabled,
+            device_preinstalled_enabled
+        )
 
         component_id = self.plan.get_component_id(component_name)
         component_params = self.parameters.get(component_id)
         component_params[DEVICE_ID] = device.deviceId
+
         if set_component_alias:
             self.set_component_alias(component_name, device.name)
-        if device_runtime == device.DOCKER_COMPOSE and 'ros_workspace' not in ignore_device_config:
+        if (device_runtime != device.PRE_INSTALLED and not device_preinstalled_enabled) \
+                and 'ros_workspace' not in ignore_device_config:
             ignore_device_config.append('ros_workspace')
-        if device_runtime == device.PRE_INSTALLED and \
+        if (device_runtime != device.DOCKER_COMPOSE and not device_docker_enabled) and \
                 'rosbag_mount_path' not in ignore_device_config:
             ignore_device_config.append('rosbag_mount_path')
+
         for config_var in device.get_config_variables():
             if config_var.key in ignore_device_config:
                 continue
             component_params[config_var.key] = config_var.value
 
-        if device_runtime == device.PRE_INSTALLED:
+        if device_runtime == device.PRE_INSTALLED or device_preinstalled_enabled:
             if 'ros_workspace' not in ignore_device_config and not self._validate_ros_workspace(
                     component_id):
                 raise InvalidParameterException('ros_workspace is not set')
@@ -561,7 +580,7 @@ class ProvisionConfiguration(ObjDict):
         component = self._get_component_by_name(component_name)
         if not component.ros.isROS:
             self.parameters[component_id].pop('ros_distro', None)
-        if device_runtime == device.PRE_INSTALLED and \
+        if (device_runtime == device.PRE_INSTALLED or device_preinstalled_enabled) and \
                 not self._validate_ros_distro(component.ros.isROS, component_id):
             raise InvalidParameterException('ros_distro is not set')
         global_config = self.parameters.get('global')
@@ -693,7 +712,7 @@ class ProvisionConfiguration(ObjDict):
                     'executable_mounts must be a list of rapyuta_io.clients.package.ExecutableMount')
             if not device.is_online():
                 raise OperationNotAllowedError('Device should be online')
-            if device.get_runtime() != Device.DOCKER_COMPOSE:
+            if device.get_runtime() != Device.DOCKER_COMPOSE and not device.is_docker_enabled():
                 raise OperationNotAllowedError('Device must be a {} device'.format(Device.DOCKER_COMPOSE))
             component_params = self.parameters.get(component_id)
             if component_params.get(DEVICE_ID) != device.deviceId:

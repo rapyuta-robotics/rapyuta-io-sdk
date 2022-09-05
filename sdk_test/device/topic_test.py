@@ -14,20 +14,20 @@ class TestTopic(DeviceTest):
     @classmethod
     def setUpClass(cls):
         config = Configuration()
-        devices = config.get_devices(arch=DeviceArch.ARM32V7, runtime="Preinstalled")
+        devices = config.get_devices(arch=DeviceArch.AMD64, runtime="Preinstalled")
         start_roscore(devices[0])
 
     @classmethod
     def tearDownClass(cls):
         config = Configuration()
-        devices = config.get_devices(arch=DeviceArch.ARM32V7, runtime="Preinstalled")
+        devices = config.get_devices(arch=DeviceArch.AMD64, runtime="Preinstalled")
         stop_roscore(devices[0])
 
     def setUp(self):
         self.config = Configuration()
         self.logger = get_logger()
-        # Assumption: We only have one Arm32 device with Docker runtime.
-        self.device = self.config.get_devices(arch=DeviceArch.ARM32V7, runtime="Preinstalled")[0]
+        # Assumption: We only have one amd64 device with Preinstalled runtime.
+        self.device = self.config.get_devices(arch=DeviceArch.AMD64, runtime="Preinstalled")[0]
 
     def assert_topic_subscription_status(self, topic, subscription_status):
         if subscription_status.get('subscribed_success', None):
