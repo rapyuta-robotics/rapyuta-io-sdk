@@ -33,6 +33,10 @@ class DeviceConfig(ObjDict):
     def is_deletable(self):
         if self.key in self.DEFAULT_DEVICE_CONFIG_VARIABLES:
             return False
+
+        if self.key in ['runtime_docker', 'runtime_preinstalled']:
+            return False
+
         return True
 
     def is_updatable(self):

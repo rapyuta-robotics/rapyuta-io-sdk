@@ -359,7 +359,7 @@ def get_logger():
 
 
 def start_roscore(device, bg=True):
-    command = Command(cmd='source /opt/ros/kinetic/setup.bash && roscore', shell='/bin/bash', bg=bg)
+    command = Command(cmd='source /opt/ros/melodic/setup.bash && roscore', shell='/bin/bash', bg=bg)
     device.execute_command(command, retry_limit=10)
     sleep(10)
 

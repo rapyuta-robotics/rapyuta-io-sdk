@@ -131,3 +131,12 @@ def valid_list_elements(elements, type):
     if not isinstance(elements, list):
         return False
     return not [x for x in elements if not isinstance(x, type)]
+
+
+def is_true(value):
+    return value in [True, 'True', 'true']
+
+
+def is_false(value):
+    return value in [False, 'False', 'false']
+

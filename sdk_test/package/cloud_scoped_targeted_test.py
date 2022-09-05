@@ -34,7 +34,7 @@ class TestScopedTargeted(PackageTest):
         })
         add_package(cls.NO_SCOPED_TARGETED_MANIFEST, cls.NO_SCOPED_TARGETED_PACKAGE)
         config = Configuration()
-        devices = config.get_devices(arch=DeviceArch.ARM32V7, runtime="Preinstalled")
+        devices = config.get_devices(arch=DeviceArch.AMD64, runtime="Preinstalled")
         start_roscore(devices[0])
         add_cloud_native_network('cloud_scoped_targeted_native_network')
         add_cloud_routed_network('cloud_scoped_targeted_routed_network')
@@ -42,7 +42,7 @@ class TestScopedTargeted(PackageTest):
     @classmethod
     def tearDownClass(cls):
         config = Configuration()
-        devices = config.get_devices(arch=DeviceArch.ARM32V7, runtime="Preinstalled")
+        devices = config.get_devices(arch=DeviceArch.AMD64, runtime="Preinstalled")
         stop_roscore(devices[0])
         delete_package(cls.SCOPED_TARGETED_PACKAGE, False)
         delete_package(cls.SCOPED_CLOUD_PACKAGE)
@@ -53,7 +53,7 @@ class TestScopedTargeted(PackageTest):
     def setUp(self):
         self.config = Configuration()
         self.logger = get_logger()
-        devices = self.config.get_devices(arch=DeviceArch.ARM32V7, runtime="Preinstalled")
+        devices = self.config.get_devices(arch=DeviceArch.AMD64, runtime="Preinstalled")
         self.device = devices[0]
         self.deployments = []
         self.non_st_dep_deployment = None

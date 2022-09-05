@@ -32,7 +32,7 @@ class RoutedNetworkTest(PackageTest, DeviceTest):
         self.shared = True
         self.routed_network = None
         self.docker_device = self.config.get_devices(arch=DeviceArch.AMD64, runtime='Dockercompose')[0]
-        self.supervisor_device = self.config.get_devices(arch=DeviceArch.ARM32V7, runtime='Preinstalled')[0]
+        self.supervisor_device = self.config.get_devices(arch=DeviceArch.AMD64, runtime='Preinstalled')[0]
         self.parameters = Parameters(RoutedNetworkLimits.SMALL)
 
     def create_routed_network(self, runtime, parameters):

@@ -30,7 +30,7 @@ class TestTransformerWithDockerDevice(PackageTest):
     def setUp(self):
         self.config = Configuration()
         self.logger = get_logger()
-        self.device = self.config.get_devices(arch=DeviceArch.ARM32V7, runtime='Dockercompose')[0]
+        self.device = self.config.get_devices(arch=DeviceArch.AMD64, runtime='Dockercompose')[0]
         self.talker_deployment = None
         self.cloud_transform_deployment = None
         self.listener_deployment = None

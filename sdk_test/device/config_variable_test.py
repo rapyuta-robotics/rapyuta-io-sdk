@@ -12,8 +12,8 @@ class TestDeviceConfigVariable(DeviceTest):
     def setUp(self):
         self.config = Configuration()
         self.logger = get_logger()
-        # Assumption: We only have one Arm32 device with Preinstalled runtime.
-        devices = self.config.get_devices(arch=DeviceArch.ARM32V7, runtime="Preinstalled")
+        # Assumption: We only have one amd64 device with Dockercompose runtime.
+        devices = self.config.get_devices(arch=DeviceArch.AMD64, runtime="Dockercompose")
         self.device = devices[0]
         self.config_variable = None
 
@@ -54,7 +54,7 @@ class TestDeviceConfigVariable(DeviceTest):
 
     def assert_device_config_variables(self, config_variables):
         self.assertIsNotNone(config_variables)
-        runtime_config_var = None
+        runtime_config_vars = []
         for config_variable in config_variables:
             self.assertTrue(isinstance(config_variable, DeviceConfig),
                             'Config variable object should be instance of class DeviceConfig')
@@ -62,11 +62,11 @@ class TestDeviceConfigVariable(DeviceTest):
             self.assertIsNotNone(config_variable.key)
             self.assertIsNotNone(config_variable.value)
 
-            if config_variable.key == 'runtime':
-                runtime_config_var = config_variable
+            if config_variable.key in ['runtime_docker', 'runtime_preinstalled']:
+                runtime_config_vars.append(config_variable)
 
-        if not runtime_config_var:
-            raise AssertionError('runtime config variable not found')
+        if len(runtime_config_vars) != 2:
+            raise AssertionError('not enough runtime config variables present')
 
         self.logger.info('Total device configuration variables: %d' % len(config_variables))
         self.logger.info(config_variables)
@@ -111,16 +111,6 @@ class TestDeviceConfigVariable(DeviceTest):
         self.with_error(operation, ResourceNotFoundError, self.device.update_config_variable,
                         invalid_config_var)
 
-    def test_update_default_config_variable(self):
-        operation = 'Updating default configuration variable: runtime '
-        self.logger.info(operation)
-        for config in self.device.get_config_variables():
-            if config.key == "runtime":
-                self.with_error(operation, OperationNotAllowedError,
-                                self.device.update_config_variable, config)
-                return
-        raise AssertionError('runtime config variable is not present')
-
     def test_delete_device_config_variable(self):
         self.logger.info('Deleting configuration variable')
         self.create_config_variable()
@@ -137,7 +127,7 @@ class TestDeviceConfigVariable(DeviceTest):
         operation = 'Deleting default configuration variable'
         self.logger.info(operation)
         for config in self.device.get_config_variables():
-            if config.key in DeviceConfig.DEFAULT_DEVICE_CONFIG_VARIABLES:
+            if config.key in DeviceConfig.DEFAULT_DEVICE_CONFIG_VARIABLES + ('runtime_docker', 'runtime_preinstalled'):
                 self.with_error(operation + ' %s' % config.key, OperationNotAllowedError,
                                 self.device.delete_config_variable, config.id)
                 return

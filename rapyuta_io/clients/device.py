@@ -21,7 +21,7 @@ from rapyuta_io.utils import ObjDict, RestClient, ParameterMissingException, \
 from rapyuta_io.utils.rest_client import HttpMethod
 from rapyuta_io.utils.settings import *
 from rapyuta_io.utils.utils import create_auth_header, get_error, get_api_response_data, \
-    validate_key_value, response_validator
+    validate_key_value, response_validator, is_true
 from rapyuta_io.utils.partials import PartialMixin
 
 DEVICE_API_ERRORS = {
@@ -142,6 +142,20 @@ class DeviceRuntime(str, enum.Enum):
     PREINSTALLED = 'preinstalled'
 
 
+class DeviceRuntimeKeys(str, enum.Enum):
+    """
+    The Device runtime keys to enable/disable runtimes available in rapyuta.io. \n
+    DeviceRuntimeKeys.RUNTIME_DOCKER ('runtime_docker') \n
+    DeviceRuntimeKeys.RUNTIME_PREINSTALLED ('runtime_preinstalled')
+    """
+
+    def __str__(self):
+        return str(self.value)
+
+    RUNTIME_DOCKER = 'runtime_docker'
+    RUNTIME_PREINSTALLED = 'runtime_preinstalled'
+
+
 class OnboardScript(object):
     """
     OnboardScript class can be used to download and run the device onboard script.
@@ -237,11 +251,22 @@ class Device(PartialMixin, ObjDict):
     PRE_INSTALLED = 'preinstalled'
     DOCKER_COMPOSE = 'dockercompose'
 
-    def __init__(self, name, runtime=None, ros_distro=None, rosbag_mount_path=None, ros_workspace=None,
-                 description=None, python_version=DevicePythonVersion.PYTHON2):
-        self.validate(name, runtime, ros_distro, rosbag_mount_path, ros_workspace, description, python_version)
+    def __init__(self, name, runtime=None, runtime_docker=False, runtime_preinstalled=False, ros_distro=None,
+                 rosbag_mount_path=None,
+                 ros_workspace=None, description=None, python_version=DevicePythonVersion.PYTHON2):
+        self.validate(name, runtime, runtime_docker, runtime_preinstalled, ros_distro, rosbag_mount_path, ros_workspace,
+                      description, python_version)
         self.name = name
-        self._runtime = runtime
+        # The below is done to ensure backward compatibility
+        if runtime == DeviceRuntime.DOCKER:
+            self._runtime_docker = True
+            self._runtime_preinstalled = False
+        elif runtime == DeviceRuntime.PREINSTALLED:
+            self._runtime_docker = False
+            self._runtime_preinstalled = True
+        else:
+            self._runtime_docker = runtime_docker
+            self._runtime_preinstalled = runtime_preinstalled
         self._ros_distro = ros_distro
         self._rosbag_mount_path = rosbag_mount_path
         self._ros_workspace = ros_workspace
@@ -249,11 +274,16 @@ class Device(PartialMixin, ObjDict):
         self.python_version = python_version
 
     @staticmethod
-    def validate(name, runtime, ros_distro, rosbag_mount_path, ros_workspace, description, python_version):
+    def validate(name, runtime, runtime_docker, runtime_preinstalled, ros_distro, rosbag_mount_path,
+                 ros_workspace, description, python_version):
         if not name or not isinstance(name, six.string_types):
             raise InvalidParameterException('name must be a non-empty string')
         if runtime is not None and (runtime not in list(DeviceRuntime.__members__.values())):
             raise InvalidParameterException('runtime must be one of rapyuta_io.clients.device.DeviceRuntime')
+        if not isinstance(runtime_docker, bool):
+            raise InvalidParameterException('runtime_docker must be a boolean')
+        if not isinstance(runtime_preinstalled, bool):
+            raise InvalidParameterException('runtime_preinstalled must be a boolean')
         if python_version is not None and (
                 python_version not in list(DevicePythonVersion.__members__.values())):
             raise InvalidParameterException(
@@ -261,7 +291,7 @@ class Device(PartialMixin, ObjDict):
         if ros_distro is not None and (
                 ros_distro not in list(rapyuta_io.clients.package.ROSDistro.__members__.values())):
             raise InvalidParameterException('ros_distro must be one of rapyuta_io.clients.package.ROSDistro')
-        if runtime == DeviceRuntime.PREINSTALLED and ros_distro == rapyuta_io.clients.package.ROSDistro.NOETIC:
+        if runtime_preinstalled and ros_distro == rapyuta_io.clients.package.ROSDistro.NOETIC:
             raise InvalidParameterException('preinstalled runtime does not support noetic ros_distro yet')
         if ros_distro == rapyuta_io.clients.package.ROSDistro.NOETIC and python_version == DevicePythonVersion.PYTHON2:
             raise InvalidParameterException('noetic ros_distro not supported on python_version 2')
@@ -286,7 +316,8 @@ class Device(PartialMixin, ObjDict):
         device['config_variables'] = {}
         if self.description:
             device['description'] = self.description
-        for field in ['_runtime', '_ros_distro', '_rosbag_mount_path', '_ros_workspace']:
+        for field in ['_runtime_docker', '_runtime_preinstalled', '_ros_distro', '_rosbag_mount_path',
+                      '_ros_workspace']:
             if getattr(self, field):
                 device['config_variables'][field[1:]] = getattr(self, field)
         return device
@@ -329,10 +360,49 @@ class Device(PartialMixin, ObjDict):
         >>> device = client.get_device('test_device_id')
         >>> device.get_runtime()
         """
-
         for config in self.config_variables:
             if config.key == self.RUNTIME:
                 return config.value
+
+    def is_docker_enabled(self):
+        """
+        Check if docker runtime is enabled
+        :return: boolean value depicting if docker runtime is enabled/disabled on the device
+
+        Following example demonstrates how to check if docker runtime is enabled/disabled on the device.
+
+        >>> from rapyuta_io import Client
+        >>> client = Client(auth_token='auth_token', project="project_guid")
+        >>> device = client.get_device('test_device_id')
+        >>> device.is_docker_enabled()
+        """
+        for config in self.config_variables:
+            if config.key != DeviceRuntimeKeys.RUNTIME_DOCKER:
+                continue
+
+            return is_true(config.value)
+
+        return False
+
+    def is_preinstalled_enabled(self):
+        """
+        Check if preinstalled runtime is enabled
+        :return: boolean value depicting if preinstalled runtime is enabled/disabled on the device
+
+        Following example demonstrates how to check if preinstalled runtime is enabled/disabled on the device.
+
+        >>> from rapyuta_io import Client
+        >>> client = Client(auth_token='auth_token', project="project_guid")
+        >>> device = client.get_device('test_device_id')
+        >>> device.is_preinstalled_enabled()
+        """
+        for config in self.config_variables:
+            if config.key != DeviceRuntimeKeys.RUNTIME_PREINSTALLED:
+                continue
+
+            return is_true(config.value)
+
+        return False
 
     def onboard_script(self):
         """

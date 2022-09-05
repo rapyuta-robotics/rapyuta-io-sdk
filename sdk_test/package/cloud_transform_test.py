@@ -34,7 +34,7 @@ class TestCloudTransform(PackageTest):
     def setUp(self):
         self.config = Configuration()
         self.logger = get_logger()
-        devices = self.config.get_devices(arch=DeviceArch.ARM32V7, runtime='Preinstalled')
+        devices = self.config.get_devices(arch=DeviceArch.AMD64, runtime='Preinstalled')
         self.device = devices[0]
         self.routed_network = self.create_cloud_routed_network('cloud_transform_network')
 

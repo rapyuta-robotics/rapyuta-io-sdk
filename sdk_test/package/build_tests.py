@@ -263,7 +263,7 @@ class BuildTest(unittest.TestCase):
         workflowName = 'dispatch.yaml'
         webhooks = [GithubWebhook(workflowName=workflowName, accessToken=accessToken)]
         build = Build(
-                    buildName='test-sdk-build-webhook',
+                    buildName='test-sdk-build-webhook-update',
                     strategyType='Docker',
                     repository=repository,
                     architecture='amd64',
