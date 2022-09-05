@@ -13,7 +13,7 @@ from mock import patch, Mock, MagicMock, call
 from requests import Response
 
 from rapyuta_io import ROSDistro
-from rapyuta_io.clients.device import Device, DeviceRuntime, DevicePythonVersion
+from rapyuta_io.clients.device import Device, DeviceConfig, DevicePythonVersion
 from rapyuta_io.utils import ObjDict, InvalidCommandException
 from rapyuta_io.clients.device_manager import DeviceArch
 from rapyuta_io.clients.model import Command, SharedURL
@@ -26,7 +26,7 @@ from tests.utils.device_respones import DEVICE_LIST, DEVICE_INFO, DEVICE_LIST_EM
     DELETE_DEVICE_OK, UPDATE_DEVICE_BAD_REQUEST, UPDATE_DEVICE_OK, DEVICE_SELECTION, APPLY_PARAMETERS_SUCCESS_RESPONSE, \
     CREATE_DIRECT_LINK_SUCCESS_RESPONSE, CREATE_DOCKERCOMPOSE_DEVICE_SUCCESS, GET_DOCKERCOMPOSE_DEVICE_SUCCESS, \
     CREATE_PREINSTALLED_DEVICE_SUCCESS, GET_PREINSTALLED_DEVICE_SUCCESS, UPGRADE_DOCKERCOMPOSE_DEVICE_SUCCESS, \
-    UPGRADE_DEVICE_BAD_REQUEST
+    UPGRADE_DEVICE_BAD_REQUEST, CREATE_BOTH_RUNTIMES_DEVICE_SUCCESS
 
 
 class DeviceTests(unittest.TestCase):
@@ -382,7 +382,8 @@ class DeviceTests(unittest.TestCase):
         result = get_client().apply_parameters(device_list, tree_names)
         self.assertSequenceEqual(expected_result, result)
         mock_request.assert_called_once_with(
-            url='https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/parameters/', method='POST', headers=headers,
+            url='https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/parameters/', method='POST',
+            headers=headers,
             params={}, json=dict(device_list=device_list, tree_names=tree_names))
 
     @patch('requests.request')
@@ -506,6 +507,18 @@ class DeviceTests(unittest.TestCase):
             device = Device(name='test-device', runtime='invalid-runtime')
         self.assertEqual(expected_msg, str(e.exception))
 
+    def test_create_device_invalid_device_docker_runtime_failure(self):
+        expected_msg = 'runtime_docker must be a boolean'
+        with self.assertRaises(InvalidParameterException) as e:
+            device = Device(name='test-device', runtime_docker='True')
+        self.assertEqual(expected_msg, str(e.exception))
+
+    def test_create_device_invalid_device_preinstalled_runtime_failure(self):
+        expected_msg = 'runtime_preinstalled must be a boolean'
+        with self.assertRaises(InvalidParameterException) as e:
+            device = Device(name='test-device', runtime_preinstalled='True')
+        self.assertEqual(expected_msg, str(e.exception))
+
     def test_create_device_invalid_ros_distro_failure(self):
         expected_msg = 'ros_distro must be one of rapyuta_io.clients.package.ROSDistro'
         with self.assertRaises(InvalidParameterException) as e:
@@ -515,14 +528,14 @@ class DeviceTests(unittest.TestCase):
     def test_create_device_preinstalled_noetic_failure(self):
         expected_msg = 'preinstalled runtime does not support noetic ros_distro yet'
         with self.assertRaises(InvalidParameterException) as e:
-            device = Device(name='test-device', runtime=DeviceRuntime.PREINSTALLED,
+            device = Device(name='test-device', runtime_preinstalled=True,
                             ros_distro=ROSDistro.NOETIC)
         self.assertEqual(expected_msg, str(e.exception))
 
     def test_create_device_noetic_python2_failure(self):
         expected_msg = 'noetic ros_distro not supported on python_version 2'
         with self.assertRaises(InvalidParameterException) as e:
-            device = Device(name='test-device', runtime=DeviceRuntime.DOCKER,
+            device = Device(name='test-device', runtime_docker=True,
                             ros_distro=ROSDistro.NOETIC, python_version=DevicePythonVersion.PYTHON2)
         self.assertEqual(expected_msg, str(e.exception))
 
@@ -551,15 +564,15 @@ class DeviceTests(unittest.TestCase):
             'description': 'test-description',
             'python_version': '2',
             'config_variables': {
-                'runtime': 'dockercompose',
+                'runtime_docker': True,
                 'ros_distro': 'melodic',
                 'rosbag_mount_path': 'test/path'
             }
         }
         expected_create_device_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/auth-keys/?download_type=script'
         expected_get_device_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/devices/test-device-id'
-        device = Device(name='test-device', runtime=DeviceRuntime.DOCKER, ros_distro=ROSDistro.MELODIC,
-                        rosbag_mount_path='test/path', description='test-description')
+        device = Device(name='test-device', runtime_docker=True, runtime_preinstalled=False,
+                        ros_distro=ROSDistro.MELODIC, rosbag_mount_path='test/path', description='test-description')
         create_device_response = Mock()
         create_device_response.text = CREATE_DOCKERCOMPOSE_DEVICE_SUCCESS
         create_device_response.status_code = requests.codes.OK
@@ -595,14 +608,14 @@ class DeviceTests(unittest.TestCase):
             'description': 'test-description',
             'python_version': '2',
             'config_variables': {
-                'runtime': 'preinstalled',
+                'runtime_preinstalled': True,
                 'ros_distro': 'melodic',
                 'ros_workspace': 'test/path'
             }
         }
         expected_create_device_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/auth-keys/?download_type=script'
         expected_get_device_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/devices/test-device-id'
-        device = Device(name='test-device', runtime=DeviceRuntime.PREINSTALLED, ros_distro=ROSDistro.MELODIC,
+        device = Device(name='test-device', runtime_preinstalled=True, ros_distro=ROSDistro.MELODIC,
                         ros_workspace='test/path', description='test-description')
         create_device_response = Mock()
         create_device_response.text = CREATE_PREINSTALLED_DEVICE_SUCCESS
@@ -633,6 +646,51 @@ class DeviceTests(unittest.TestCase):
                 self.assertEqual(expected_configs[config.key], config.value)
 
     @patch('requests.request')
+    def test_create_device_dockercompose_success(self, mock_request):
+        expected_payload = {
+            'name': 'test-device',
+            'description': 'test-description',
+            'python_version': '2',
+            'config_variables': {
+                'runtime_docker': True,
+                'runtime_preinstalled': True,
+                'ros_distro': 'melodic',
+                'rosbag_mount_path': 'test/path'
+            }
+        }
+        expected_create_device_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/auth-keys/?download_type=script'
+        expected_get_device_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/devices/test-device-id'
+        device = Device(name='test-device', runtime_docker=True, runtime_preinstalled=True,
+                        ros_distro=ROSDistro.MELODIC, rosbag_mount_path='test/path', description='test-description')
+        create_device_response = Mock()
+        create_device_response.text = CREATE_BOTH_RUNTIMES_DEVICE_SUCCESS
+        create_device_response.status_code = requests.codes.OK
+
+        get_device_response = Mock()
+        get_device_response.text = GET_DOCKERCOMPOSE_DEVICE_SUCCESS
+        get_device_response.status_code = requests.codes.OK
+
+        mock_request.side_effect = [create_device_response, get_device_response]
+        client = get_client()
+        device = client.create_device(device)
+        mock_request.assert_has_calls([
+            call(url=expected_create_device_url, method='POST', headers=headers, params={}, json=expected_payload),
+            call(headers=headers, json=None, url=expected_get_device_url, method='GET', params={})
+        ])
+
+        self.assertEqual(device.name, 'test-device')
+        self.assertEqual(device.description, 'test-description')
+
+        expected_configs = {
+            'runtime': 'dockercompose',
+            'ros_distro': 'melodic',
+            'rosbag_mount_path': 'test/path'
+        }
+        for config in device.config_variables:
+            if config.key in expected_configs:
+                self.assertEqual(expected_configs[config.key], config.value)
+
+    @patch('requests.request')
     def test_onboard_script_dockercompose_success(self, mock_request):
         expected_onboard_script_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager' \
                                       '/v0/auth-keys/test-device-id/token'
@@ -643,7 +701,7 @@ class DeviceTests(unittest.TestCase):
         get_onboard_success.text = CREATE_DOCKERCOMPOSE_DEVICE_SUCCESS
         get_onboard_success.status_code = requests.codes.OK
         mock_request.side_effect = [get_onboard_success]
-        device = Device(name='test-device', runtime=DeviceRuntime.DOCKER, ros_distro=ROSDistro.MELODIC,
+        device = Device(name='test-device', runtime_docker=True, ros_distro=ROSDistro.MELODIC,
                         rosbag_mount_path='test/path', python_version=DevicePythonVersion.PYTHON3)
         device.deviceId = 'test-device-id'
         device._device_api_host = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io'
@@ -667,12 +725,12 @@ class DeviceTests(unittest.TestCase):
                                       '/v0/auth-keys/test-device-id/token'
         expected_onboard_script = "curl -O -H 'Authorization: Bearer sample-token' " \
                                   "https://gaapiserver.apps.okd4v2.prod.rapyuta.io/start && " \
-                                  "sudo bash start -w test/path"
+                                  "sudo bash start -r preinstalled -w test/path"
         get_onboard_success = Mock()
         get_onboard_success.text = CREATE_PREINSTALLED_DEVICE_SUCCESS
         get_onboard_success.status_code = requests.codes.OK
         mock_request.side_effect = [get_onboard_success]
-        device = Device(name='test-device', runtime=DeviceRuntime.PREINSTALLED, ros_distro=ROSDistro.MELODIC,
+        device = Device(name='test-device', runtime_preinstalled=True, ros_distro=ROSDistro.MELODIC,
                         rosbag_mount_path='test/path')
         device.deviceId = 'test-device-id'
         device._device_api_host = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io'
@@ -686,7 +744,38 @@ class DeviceTests(unittest.TestCase):
         mock_request.assert_called_once_with(
             url=expected_onboard_script_url, method='GET', headers=temp_header, params={}, json=None)
         self.assertEqual(onboard_script.url, 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/start')
-        self.assertEqual(onboard_script.command, 'sudo bash start -w test/path')
+        self.assertEqual(onboard_script.command, 'sudo bash start -r preinstalled -w test/path')
+        self.assertEqual(onboard_script.token, 'sample-token')
+        self.assertEqual(onboard_script.full_command(), expected_onboard_script)
+
+    @patch('requests.request')
+    def test_onboard_script_both_runtimes_success(self, mock_request):
+        expected_onboard_script_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager' \
+                                      '/v0/auth-keys/test-device-id/token'
+        expected_onboard_script = "curl -O -H 'Authorization: Bearer sample-token' " \
+                                  "https://gaapiserver.apps.okd4v2.prod.rapyuta.io/start && " \
+                                  "sudo bash start -r dockercompose -d melodic -b test/path -r preinstalled"
+        get_onboard_success = Mock()
+        get_onboard_success.text = CREATE_BOTH_RUNTIMES_DEVICE_SUCCESS
+        get_onboard_success.status_code = requests.codes.OK
+        mock_request.side_effect = [get_onboard_success]
+        device = Device(name='test-device', runtime_docker=True, runtime_preinstalled=True,
+                        ros_distro=ROSDistro.MELODIC, rosbag_mount_path='test/path',
+                        python_version=DevicePythonVersion.PYTHON3)
+        device.deviceId = 'test-device-id'
+        device._device_api_host = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io'
+        device._auth_token = headers['Authorization']
+        device._project = headers['project']
+        onboard_script = device.onboard_script()
+
+        temp_header = copy.deepcopy(headers)
+        temp_header['Content-Type'] = 'application/json'
+
+        mock_request.assert_called_once_with(
+            url=expected_onboard_script_url, method='GET', headers=temp_header, params={}, json=None)
+        self.assertEqual(onboard_script.url, 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/start')
+        self.assertEqual(onboard_script.command, 'sudo bash start -r dockercompose -d melodic -b test/path -r '
+                                                 'preinstalled')
         self.assertEqual(onboard_script.token, 'sample-token')
         self.assertEqual(onboard_script.full_command(), expected_onboard_script)
 
@@ -699,7 +788,7 @@ class DeviceTests(unittest.TestCase):
 
     @patch('requests.request')
     def test_delete_device_success(self, mock_request):
-        device = Device(name='test-device', runtime=DeviceRuntime.PREINSTALLED, ros_distro=ROSDistro.MELODIC,
+        device = Device(name='test-device', runtime_preinstalled=True, ros_distro=ROSDistro.MELODIC,
                         rosbag_mount_path='test/path')
         device.deviceId = 'test-device-id'
         expected_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/devices/test-device-id'
@@ -775,14 +864,14 @@ class DeviceTests(unittest.TestCase):
             'description': 'test-description',
             'python_version': '3',
             'config_variables': {
-                'runtime': 'dockercompose',
+                'runtime_docker': True,
                 'ros_distro': 'melodic',
                 'rosbag_mount_path': 'test/path'
             }
         }
         expected_create_device_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/auth-keys/?download_type=script'
         expected_get_device_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/devices/test-device-id'
-        device = Device(name='test-device', runtime=DeviceRuntime.DOCKER, ros_distro=ROSDistro.MELODIC,
+        device = Device(name='test-device', runtime_docker=True, ros_distro=ROSDistro.MELODIC,
                         rosbag_mount_path='test/path', description='test-description',
                         python_version=DevicePythonVersion.PYTHON3)
         create_device_response = Mock()
@@ -812,3 +901,63 @@ class DeviceTests(unittest.TestCase):
         for config in device.config_variables:
             if config.key in expected_configs:
                 self.assertEqual(expected_configs[config.key], config.value)
+
+    def test_device_is_docker_enabled_true(self):
+        device = Device(name='test-device')
+        device.config_variables = [
+            DeviceConfig(id=100, key="runtime_docker", value="True")
+        ]
+
+        self.assertTrue(device.is_docker_enabled())
+
+    def test_device_is_docker_enabled_false(self):
+        device = Device(name='test-device')
+        device.config_variables = [
+            DeviceConfig(id=100, key="runtime_docker", value="False")
+        ]
+
+        self.assertFalse(device.is_docker_enabled())
+
+    def test_device_is_docker_enabled_false_empty_config_variables(self):
+        device = Device(name='test-device')
+        device.config_variables = []
+
+        self.assertFalse(device.is_docker_enabled())
+
+    def test_device_is_docker_enabled_false_no_runtime_docker_config_variable(self):
+        device = Device(name='test-device')
+        device.config_variables = [
+            DeviceConfig(id=100, key="testkey", value="testvalue")
+        ]
+
+        self.assertFalse(device.is_docker_enabled())
+
+    def test_device_is_preinstalled_enabled_true(self):
+        device = Device(name='test-device')
+        device.config_variables = [
+            DeviceConfig(id=100, key="runtime_preinstalled", value="True")
+        ]
+
+        self.assertTrue(device.is_preinstalled_enabled())
+
+    def test_device_is_preinstalled_enabled_false(self):
+        device = Device(name='test-device')
+        device.config_variables = [
+            DeviceConfig(id=100, key="runtime_preinstalled", value="False")
+        ]
+
+        self.assertFalse(device.is_preinstalled_enabled())
+
+    def test_device_is_preinstalled_enabled_false_empty_config_variables(self):
+        device = Device(name='test-device')
+        device.config_variables = []
+
+        self.assertFalse(device.is_preinstalled_enabled())
+
+    def test_device_is_preinstalled_enabled_false_no_runtime_preinstalled_config_variable(self):
+        device = Device(name='test-device')
+        device.config_variables = [
+            DeviceConfig(id=100, key="testkey", value="testvalue")
+        ]
+
+        self.assertFalse(device.is_preinstalled_enabled())

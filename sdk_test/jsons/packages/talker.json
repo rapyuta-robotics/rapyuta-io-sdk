@@ -1,7 +1,7 @@
 {
   "name": "talker",
   "packageVersion": "v1.0.0",
-  "description": "talker arm32v7 sdk test package",
+  "description": "talker amd64 sdk test package",
   "plans": [
     {
       "name": "default",
@@ -22,10 +22,11 @@
             ],
             "services": [],
             "actions": [],
-            "isROS": true
+            "isROS": true,
+            "ros_distro": "melodic"
           },
           "requiredRuntime": "device",
-          "architecture": "arm32v7",
+          "architecture": "amd64",
           "executables": [
             {
               "name": "talkerExec",

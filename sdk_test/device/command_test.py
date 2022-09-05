@@ -13,8 +13,8 @@ class TestDeviceCommand(DeviceTest):
     def setUp(self):
         self.config = Configuration()
         self.logger = get_logger()
-        # Assumption: We only have one Arm32 device with Preinstalled runtime.
-        devices = self.config.get_devices(arch=DeviceArch.ARM32V7, runtime="Preinstalled")
+        # Assumption: We only have one amd64 device with Dockercompose runtime.
+        devices = self.config.get_devices(arch=DeviceArch.AMD64, runtime="Dockercompose")
         self.device = devices[0]
 
     def test_execute_command(self):

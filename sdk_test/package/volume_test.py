@@ -73,7 +73,7 @@ class TestVolume(PackageTest):
         provision_configuration = self.device_package.get_provision_configuration()
         self.logger.info('Adding device to component')
         provision_configuration.add_device('default', self.docker_device)
-        exec_mounts = [ExecutableMount('nginx', '/tmp/', '/home/rapyuta/Downloads/')]
+        exec_mounts = [ExecutableMount('nginx', '/tmp/', '/home/rapyuta/')]
         self.logger.info('Adding mount paths to device volume')
         provision_configuration.mount_volume('default', device=self.docker_device, mount_path=None, executable_mounts=exec_mounts)
         self.deployment = self.deploy_package(self.device_package, provision_configuration)

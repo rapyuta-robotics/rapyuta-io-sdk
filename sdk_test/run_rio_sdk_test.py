@@ -67,7 +67,7 @@ class IntegrationSuite(testtools.ConcurrentTestSuite):
             self.onboard_device(device)
 
     def remove_devices(self):
-        devices = self.config.client.get_all_devices(online_device=True, arch_list=[DeviceArch.ARM32V7, DeviceArch.AMD64])
+        devices = self.config.client.get_all_devices(online_device=True, arch_list=[DeviceArch.AMD64])
         configs = self.config.get_device_configs()
         for device in devices:
             device_name = device.get('name')
@@ -85,8 +85,8 @@ class IntegrationSuite(testtools.ConcurrentTestSuite):
         """
         self.logger.debug('Adding the device on the platform')
         name, runtime, distro, ip = device['name'], device['runtime'], device['distro'], device['ip']
-        token = self.add_device(name, runtime, distro)
-        cmd = self.generate_onboard_command(token, runtime, distro)
+        response_data = self.add_device(name, runtime, distro)
+        cmd = self.generate_onboard_command(response_data)
         self.logger.debug('Running the onboarding command')
         device_id = self.hwil.get_device_id(ip)
         self.hwil.run_command(device_id, cmd, wait=True, timeout=60, tries=20)
@@ -99,17 +99,18 @@ class IntegrationSuite(testtools.ConcurrentTestSuite):
         payload = {'name': name, 'description': '', 'python_version': '2'}
         if runtime == 'Dockercompose':
             payload['config_variables'] = {
-                'runtime': runtime.lower(),
+                'runtime_docker': True,
                 'ros_distro': distro.lower()
             }
         elif runtime == 'Preinstalled':
             payload['config_variables'] = {
+                'runtime_preinstalled': True,
                 'ros_workspace': self._CATKIN_WS
             }
         response = RestClient(url).method(HttpMethod.POST).headers(self.config.get_auth_header()).execute(payload)
-        return get_api_response_data(response)
+        return get_api_response_data(response, parse_full=True)
 
-    def generate_onboard_command(self, token, runtime, distro):
+    def generate_onboard_command(self, response_data):
         """
         Generates the command to run on the device for it to onboard on the platform. It supports both Dockercompose and
         Preinstalled runtimes.
@@ -117,11 +118,11 @@ class IntegrationSuite(testtools.ConcurrentTestSuite):
         The use-case is simple enough to not use template but in future we might want to switch to a template.
         """
         url = '{}/start'.format(self.config.api_server)
-        run_cmd = 'sudo bash start -w /home/rapyuta/catkin_ws'
-        if runtime == 'Dockercompose':
-            run_cmd = 'sudo bash start -r dockercompose -d {}'.format(distro)
+        run_cmd = response_data['response']['script_command']
 
-        download_cmd = "curl -O -H 'Authorization: Bearer {}' {}".format(token, url)
+        download_cmd = "curl -O -H 'Authorization: Bearer {}' {}".format(
+            response_data['response']['data'], url
+        )
         return '{} && {}'.format(download_cmd, run_cmd)
 
     def wait_for_devices(self):
