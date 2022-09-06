@@ -1,6 +1,6 @@
 # Rapyuta.io Python SDK
 
-Rapyuta.io Python SDK enables you to access platform services and resources in
+Rapyuta.io python SDK enables you to access platform services and resources in
 your python applications.
 
 The SDK supports Python 3.6+. For older Python 2.x support, you can use the
