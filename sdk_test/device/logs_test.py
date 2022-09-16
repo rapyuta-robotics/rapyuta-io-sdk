@@ -21,8 +21,8 @@ class LogsTest(DeviceTest):
     def setUp(self):
         self.config = Configuration()
         self.logger = get_logger()
-        # Assumption: We only have one Arm32 device with Docker runtime.
-        devices = self.config.get_devices(arch=DeviceArch.ARM32V7, runtime="Preinstalled")
+        # Assumption: We only have one amd64 device with Dockercompose runtime.
+        devices = self.config.get_devices(arch=DeviceArch.AMD64, runtime="Dockercompose")
         self.device = devices[0]
         self.logs_uuid = None
         self.file_name = '{}-{}'.format(MINION, generate_random_value(5))
@@ -35,11 +35,13 @@ class LogsTest(DeviceTest):
         retry_count = 0
         retry_limit = 20
         try:
-            while self.device.get_log_upload_status(self.logs_uuid).status == 'IN PROGRESS':
+            log_status = self.device.get_log_upload_status(self.logs_uuid).status
+            while log_status == 'IN PROGRESS' or log_status == 'PENDING':
                 if retry_count > retry_limit:
                     raise Exception('exceeded retry limit')
                 time.sleep(5)
                 retry_count += 1
+                log_status = self.device.get_log_upload_status(self.logs_uuid).status
             self.device.delete_uploaded_log_file(self.logs_uuid, retry_limit=0)
         except LogsUUIDNotFoundException as ex:
             self.logger.error('uuid not found or log is already deleted : {}'.format(ex))
@@ -57,7 +59,8 @@ class LogsTest(DeviceTest):
         status_list = self.device.list_uploaded_files_for_device(sort='filename',
                                                                  paginate=True, page_size=10, page_number=1,
                                                                  filter_by_filename='minion',
-                                                                 filter_by_status=['COMPLETED', 'IN PROGRESS'])
+                                                                 filter_by_status=['COMPLETED', 'IN PROGRESS',
+                                                                                   'PENDING'])
         self.assertTrue(len(status_list) > 0)
         itr = [status for status in status_list if status.request_uuid == self.logs_uuid]
         self.assertTrue(len(itr) == 1)
@@ -76,8 +79,8 @@ class LogsTest(DeviceTest):
         self.logs_uuid = self.device.upload_log_file(logs_upload_request, retry_limit=0)
         self.assertTrue(self.logs_uuid)
         logs_upload_status = self.device.get_log_upload_status(self.logs_uuid, retry_limit=0)
-        self.assertTrue(logs_upload_status.status in ['IN PROGRESS', 'FAILED', 'COMPLETED', 'CANCELLED'])
-        self.assertTrue(len(logs_upload_status.error_message) == 0)
+        self.assertTrue(logs_upload_status.status in ['PENDING', 'IN PROGRESS', 'FAILED', 'COMPLETED', 'CANCELLED'])
+        self.assertTrue(not logs_upload_status.error_message or len(logs_upload_status.error_message) == 0)
         self.assertTrue(logs_upload_status.filename == self.file_name)
         self.assertEqual(self.logs_uuid, logs_upload_status.request_uuid)
 
@@ -90,6 +93,10 @@ class LogsTest(DeviceTest):
         self.assertTrue(download_url)
 
     def _poll_for_status_complete(self, logs_uuid):
+        self.logger.info('polling for logs_uuid: {} for device: {}'.format(
+            logs_uuid,
+            self.device
+        ))
         while True:
             current_status = self.device.get_log_upload_status(logs_uuid).status
             if current_status == 'COMPLETED' or current_status == 'FAILED':

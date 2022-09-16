@@ -22,7 +22,7 @@ from rapyuta_io.utils.rest_client import HttpMethod
 from tests.utils.client import get_client, headers
 from tests.utils.device_respones import DEVICE_INFO, CONFIG_VARIABLES, DOCKER_CONFIG_VARIABLES, \
     DOCKER_DEVICE, DOCKER_EMPTY_ROSBAG_CONFIG_VARIABLES, GET_DOCKERCOMPOSE_DEVICE_SUCCESS, \
-    DOCKER_CONFIG_VARIABLE_WITH_ROSBAG_VARIABLES
+    DOCKER_CONFIG_VARIABLE_WITH_ROSBAG_VARIABLES, PREINSTALLED_DEVICE_WITH_NEW_RUNTIME
 from .utils.package_responses import PACKAGE_OK_VALIDATE, PACKAGE_OK_VALIDATE_DEVICE, \
     DEPLOYMENT_INFO, PACKAGE_OK_NO_VALIDATE, DEPLOYMENT_STATUS_RUNNING, DEPLOYMENT_STATUS_STOPPED, \
     PROVISION_OK, DEPLOYMENT_LIST, CREATE_PACKAGE, MANIFEST, PACKAGE_OK_VALIDATE_DEVICE_DOCKER, \
@@ -664,6 +664,29 @@ class PackageTests(unittest.TestCase):
     def test_package_add_device_volume_to_provision_config_preinstalled_runtime(self, mock_request):
         get_device = Mock()
         get_device.text = DEVICE_INFO
+        get_device.status_code = requests.codes.OK
+        config_variable = Mock()
+        config_variable.text = CONFIG_VARIABLES
+        config_variable.status_code = requests.codes.OK
+        get_package = Mock()
+        get_package.text = PACKAGE_OK_VALIDATE_DEVICE
+        get_package.status_code = requests.codes.OK
+        mock_request.side_effect = [get_package, get_device, config_variable]
+        client = get_client()
+        pkg = client.get_package('my_package')
+        device = client.get_device('test-dev')
+        prov_config = pkg.get_provision_configuration('test-plan')
+        prov_config.add_device('ros-talker', device, ['ros_workspace'])
+        executable_mounts = [ExecutableMount(exec_name='ros-talker', mount_path='/test_path', sub_path='/data')]
+        with self.assertRaises(OperationNotAllowedError) as e:
+            prov_config.mount_volume('ros-talker', device=device, mount_path=None, executable_mounts=executable_mounts)
+        self.assertEqual("Device must be a dockercompose device", str(e.exception))
+        self.assertEqual(mock_request.call_count, 3)
+
+    @patch('requests.request')
+    def test_package_add_device_volume_to_provision_config_with_new_preinstalled_runtime(self, mock_request):
+        get_device = Mock()
+        get_device.text = PREINSTALLED_DEVICE_WITH_NEW_RUNTIME
         get_device.status_code = requests.codes.OK
         config_variable = Mock()
         config_variable.text = CONFIG_VARIABLES

@@ -22,8 +22,8 @@ class TestDeployment(DeviceTest, PackageTest):
     def setUp(self):
         self.config = Configuration()
         self.logger = get_logger()
-        # Assumption: We only have one Arm32 device with Docker runtime.
-        devices = self.config.get_devices(arch=DeviceArch.ARM32V7, runtime='Dockercompose')
+        # Assumption: We only have one amd64 device with Docker runtime.
+        devices = self.config.get_devices(arch=DeviceArch.AMD64, runtime='Dockercompose')
         self.device = devices[0]
 
     def tearDown(self):

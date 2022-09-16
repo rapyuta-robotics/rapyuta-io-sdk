@@ -22,10 +22,11 @@
             ],
             "services": [],
             "actions": [],
-            "isROS": true
+            "isROS": true,
+            "ros_distro": "melodic"
           },
           "requiredRuntime": "device",
-          "architecture": "arm32v7",
+          "architecture": "amd64",
           "executables": [
             {
               "name": "talkerExec",
