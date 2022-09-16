@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.4.0...v1.5.0) (2022-09-16)
+
+
+### Features
+
+* **device:** added support to enable both runtimes on a device ([6bca6f1](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/6bca6f16f9bf9cfb7fb3d36915c8b017ed73e57c))
+
 # [1.4.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.3.0...v1.4.0) (2022-06-23)
 
 
