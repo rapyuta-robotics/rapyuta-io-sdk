@@ -4,12 +4,76 @@ import enum
 import six
 
 from rapyuta_io.clients.model import DEFAULT_LOG_UPLOAD_BANDWIDTH
-from rapyuta_io.utils.error import InvalidParameterException, ROSBagBlobError
+from rapyuta_io.utils.error import InvalidParameterException, ROSBagBlobError, BadRequestError
 from rapyuta_io.utils.object_converter import ObjBase, enum_field, nested_field, list_field
 from rapyuta_io.utils.partials import PartialMixin
 from rapyuta_io.utils.pollers import RefreshPollerMixin
 from rapyuta_io.utils.rest_client import HttpMethod, RestClient
 from rapyuta_io.utils.utils import create_auth_header, get_api_response_data
+
+
+class ROSBagUploadTypes(str, enum.Enum):
+    def __str__(self):
+        return str(self.value)
+
+    ON_STOP = "OnStop"
+    CONTINUOUS = "Continuous"
+    ON_DEMAND = "OnDemand"
+
+
+class ROSBagTimeRange(ObjBase):
+    """
+    ROSBagTimeRange represents the time range within which all the rosbags recorded are uploaded
+
+    :ivar: from_time: rosbags recorded after or at this time are uploaded
+    :vartype: from_time: int
+    :ivar: to_time: rosbags recorded before or at this time are uploaded
+    :vartype: to_time: int
+    """
+
+    def __init__(self, from_time: int, to_time: int):
+        self.validate(from_time, to_time)
+
+        self.from_time = from_time
+        self.to_time = to_time
+
+    def validate(self, from_time, to_time):
+        if from_time > to_time:
+            raise BadRequestError("\"from\" time cannot be greater than the \"to\" time")
+
+    def get_deserialize_map(self):
+        return {
+            'from_time': 'from',
+            'to_time': 'to'
+        }
+
+    def get_serialize_map(self):
+        return {
+            'from': 'from_time',
+            'to': 'to_time'
+        }
+
+
+class ROSBagOnDemandUploadOptions(ObjBase):
+    """
+    ROSBagOnDemandUploadOptions represents the options for a rosbag job with an upload type of OnDemand
+
+    :ivar time_range: The time range within which all the rosbags recorded are uploaded
+    :vartype time_range:  :py:class:`~rapyuta_io.clients.rosbags.ROSBagTimeRange`
+    """
+
+    def __init__(self, time_range: ROSBagTimeRange):
+        self.time_range = time_range
+
+    def get_deserialize_map(self):
+        return {
+            'time_range': nested_field('timeRange', ROSBagTimeRange),
+        }
+
+    def get_serialize_map(self):
+        return {
+            'timeRange': 'time_range',
+        }
 
 
 class UploadOptions(ObjBase):
@@ -20,36 +84,68 @@ class UploadOptions(ObjBase):
     :vartype max_upload_rate: int
     :ivar purge_after: Purge File after uploaded
     :vartype purge_after: bool
+    :ivar upload_type: The type of upload for a rosbag job
+    :vartype upload_type: :py:class:`~rapyuta_io.clients.rosbag.ROSBagUploadTypes`
+    :ivar on_demand_options: The options for a rosbag job with an upload type of OnDemand
+    :vartype on_demand_options: :py:class:`~rapyuta_io.clients.rosbag.ROSBagOnDemandUploadOptions`
 
     :param max_upload_rate: Upload Rate in Bytes for ROSBag Files
     :type max_upload_rate: int
     :param purge_after: Purge File after uploaded
     :type purge_after: bool
+    :param upload_type: The type of upload for a rosbag job
+    :type upload_type: :py:class:`~rapyuta_io.clients.rosbag.ROSBagUploadTypes`
     """
 
-    def __init__(self, max_upload_rate=DEFAULT_LOG_UPLOAD_BANDWIDTH, purge_after=False):
-        self.validate(max_upload_rate, purge_after)
+    def __init__(self, max_upload_rate=DEFAULT_LOG_UPLOAD_BANDWIDTH, purge_after=False,
+                 upload_type=ROSBagUploadTypes.ON_DEMAND, on_demand_options=None):
+        self.validate(
+            max_upload_rate,
+            purge_after,
+            upload_type,
+            on_demand_options
+        )
+
         self.max_upload_rate = max_upload_rate
         self.purge_after = purge_after
+        self.upload_type = upload_type
+        self.on_demand_options = on_demand_options
 
     @staticmethod
-    def validate(max_upload_rate, purge_after):
+    def validate(max_upload_rate, purge_after, upload_type, on_demand_options):
         if not isinstance(max_upload_rate, int) or max_upload_rate <= 0:
             raise InvalidParameterException('max_upload_rate must be a positive int')
         if not isinstance(purge_after, bool):
             raise InvalidParameterException('purge_after must be a bool')
+        if not isinstance(upload_type, ROSBagUploadTypes):
+            raise InvalidParameterException('upload_type must be of the type ROSBagUploadTypes')
+        if on_demand_options and not isinstance(on_demand_options, ROSBagOnDemandUploadOptions):
+            raise InvalidParameterException('on_demand_options must of the type ROSBagOnDemandUploadOptions')
 
     def get_deserialize_map(self):
         return {
             'max_upload_rate': 'maxUploadRate',
-            'purge_after': 'purgeAfter'
+            'purge_after': 'purgeAfter',
+            'upload_type': enum_field('uploadType', ROSBagUploadTypes),
+            'on_demand_options': nested_field('onDemandOpts', ROSBagOnDemandUploadOptions),
         }
 
     def get_serialize_map(self):
         return {
             'maxUploadRate': 'max_upload_rate',
-            'purgeAfter': 'purge_after'
+            'purgeAfter': 'purge_after',
+            'uploadType': 'upload_type',
+            'onDemandOpts': 'on_demand_options'
         }
+
+
+class OverrideOptions(ObjBase):
+    """
+    Override Options
+    """
+
+    def __init__(self):
+        self.topic_override_info
 
 
 class ROSBagOptions(ObjBase):
@@ -210,13 +306,14 @@ class ROSBagJob(ObjBase):
     """
 
     def __init__(self, name, rosbag_options, deployment_id=None, component_instance_id=None,
-                 upload_options=None):
+                 upload_options=None, override_options=None):
         self.validate(name, rosbag_options)
         self.component_instance_id = component_instance_id
         self.deployment_id = deployment_id
         self.name = name
         self.rosbag_options = rosbag_options
         self.upload_options = upload_options
+        self.override_options = override_options
         self.package_id = None
         self.status = None
         self.component_id = None
@@ -248,7 +345,8 @@ class ROSBagJob(ObjBase):
             'component_type': enum_field('componentType', ComponentType),
             'device_id': 'deviceID',
             'rosbag_options': nested_field('recordOptions', ROSBagOptions),
-            'upload_options': nested_field('uploadOptions', UploadOptions)
+            'upload_options': nested_field('uploadOptions', UploadOptions),
+            'override_options': nested_field('overrideOptions', OverrideOptions)
         }
 
     def get_serialize_map(self):
@@ -259,6 +357,48 @@ class ROSBagJob(ObjBase):
             'recordOptions': 'rosbag_options',
             'uploadOptions': 'upload_options'
         }
+
+    def patch(self, upload_type=None, on_demand_options=None):
+        """
+        Patches the rosbag job
+
+        :param upload_type: :py:class:`~rapyuta_io.clients.rosbag.ROSBagUploadTypes`
+        :param on_demand_options: :py:class:`~rapyuta_io.clients.rosbag.ROSBagOnDemandUploadOptions`
+
+        :raises: :py:class:`~utils.error.APIError`: If the api returns an error, the status code is
+            anything other than 200
+
+        Following example demonstrates how to patch a ROSBag Job.
+
+            >>> from rapyuta_io import Client
+            >>> from rapyuta_io.clients.rosbag import ROSBagUploadTypes, ROSBagOnDemandUploadOptions, ROSBagTimeRange
+            >>> client = Client(auth_token='auth_token', project='project_guid')
+            >>> rosbag_jobs = client.list_rosbag_jobs('deployment-id', guids=['job-guid'])
+            >>> on_demand_opts = ROSBagOnDemandUploadOptions(
+                ... ROSBagTimeRange(from_time=0, to_time=0)
+                ... )
+            >>> rosbag_jobs[0].patch(ROSBagUploadTypes.ON_STOP, on_demand_opts)
+        """
+        if upload_type and not isinstance(upload_type, ROSBagUploadTypes):
+            raise InvalidParameterException('upload_type must be of the type ROSBagUploadTypes')
+        if on_demand_options and not isinstance(on_demand_options, ROSBagOnDemandUploadOptions):
+            raise InvalidParameterException('on_demand_options must be of the type ROSBagOnDemandUploadOptions')
+
+        upload_options = {}
+        if upload_type:
+            upload_options.update({'uploadType': upload_type.value})
+        if on_demand_options:
+            upload_options.update({'onDemandOpts': on_demand_options.serialize()})
+
+        url = self._host + '/rosbag-jobs/{}/job/{}'.format(self.deployment_id, self.guid)
+        headers = create_auth_header(self._auth_token, self._project)
+        payload = {
+            'componentInstanceID': self.component_instance_id,
+            'uploadOptions': upload_options,
+        }
+
+        response = RestClient(url).method(HttpMethod.PATCH).headers(headers).execute(payload)
+        get_api_response_data(response, parse_full=True)
 
 
 class ROSBagCompression(str, enum.Enum):
