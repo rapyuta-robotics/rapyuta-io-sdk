@@ -52,6 +52,15 @@ class UploadOptions(ObjBase):
         }
 
 
+class OverrideOptions(ObjBase):
+    """
+    Override Options
+    """
+
+    def __init__(self):
+        self.topic_override_info
+
+
 class ROSBagOptions(ObjBase):
     """
     ROSBag options
@@ -210,13 +219,14 @@ class ROSBagJob(ObjBase):
     """
 
     def __init__(self, name, rosbag_options, deployment_id=None, component_instance_id=None,
-                 upload_options=None):
+                 upload_options=None, override_options=None):
         self.validate(name, rosbag_options)
         self.component_instance_id = component_instance_id
         self.deployment_id = deployment_id
         self.name = name
         self.rosbag_options = rosbag_options
         self.upload_options = upload_options
+        self.override_options = override_options
         self.package_id = None
         self.status = None
         self.component_id = None
@@ -248,7 +258,8 @@ class ROSBagJob(ObjBase):
             'component_type': enum_field('componentType', ComponentType),
             'device_id': 'deviceID',
             'rosbag_options': nested_field('recordOptions', ROSBagOptions),
-            'upload_options': nested_field('uploadOptions', UploadOptions)
+            'upload_options': nested_field('uploadOptions', UploadOptions),
+            'override_options': nested_field('overrideOptions', OverrideOptions)
         }
 
     def get_serialize_map(self):
