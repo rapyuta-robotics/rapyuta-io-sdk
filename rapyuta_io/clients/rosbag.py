@@ -12,6 +12,53 @@ from rapyuta_io.utils.rest_client import HttpMethod, RestClient
 from rapyuta_io.utils.utils import create_auth_header, get_api_response_data
 
 
+class ROSBagUploadTypes(str, enum.Enum):
+    def __str__(self):
+        return str(self.value)
+
+    ON_STOP = "OnStop"
+    CONTINUOUS = "Continuous"
+    ON_DEMAND = "OnDemand"
+
+
+class ROSBagTimeRange(ObjBase):
+    def __init__(self, from_time: int, to_time: int):
+        self.validate(from_time, to_time)
+        self.from_time = from_time
+        self.to_time = to_time
+
+    def validate(self, from_time, to_time):
+        # TODO: Confirm if we need to add validation here
+        pass
+
+    def get_deserialize_map(self):
+        return {
+            'from_time': 'from',
+            'to_time': 'to'
+        }
+
+    def get_serialize_map(self):
+        return {
+            'from': 'from_time',
+            'to': 'to_time'
+        }
+
+
+class ROSBagOnDemandUploadOptions(ObjBase):
+    def __init__(self, time_range: ROSBagTimeRange):
+        self.time_range = time_range
+
+    def get_deserialize_map(self):
+        return {
+            'time_range': nested_field('timeRange', ROSBagTimeRange),
+        }
+
+    def get_serialize_map(self):
+        return {
+            'timeRange': 'time_range',
+        }
+
+
 class UploadOptions(ObjBase):
     """
     ROSBag Upload Options
@@ -27,10 +74,13 @@ class UploadOptions(ObjBase):
     :type purge_after: bool
     """
 
-    def __init__(self, max_upload_rate=DEFAULT_LOG_UPLOAD_BANDWIDTH, purge_after=False):
+    def __init__(self, max_upload_rate=DEFAULT_LOG_UPLOAD_BANDWIDTH, purge_after=False,
+                 upload_type=ROSBagUploadTypes.ON_DEMAND, on_demand_options=None):
         self.validate(max_upload_rate, purge_after)
         self.max_upload_rate = max_upload_rate
         self.purge_after = purge_after
+        self.upload_type = upload_type  # TODO: use enum_field in object_converter.py
+        self.on_demand_options = on_demand_options
 
     @staticmethod
     def validate(max_upload_rate, purge_after):
@@ -38,17 +88,23 @@ class UploadOptions(ObjBase):
             raise InvalidParameterException('max_upload_rate must be a positive int')
         if not isinstance(purge_after, bool):
             raise InvalidParameterException('purge_after must be a bool')
+        # TODO: add type validation for upload_type
+        # TODO: add type validation for on_demand_opts
 
     def get_deserialize_map(self):
         return {
             'max_upload_rate': 'maxUploadRate',
-            'purge_after': 'purgeAfter'
+            'purge_after': 'purgeAfter',
+            'upload_type': 'uploadType',
+            'on_demand_options': nested_field('onDemandOpts', ROSBagOnDemandUploadOptions),
         }
 
     def get_serialize_map(self):
         return {
             'maxUploadRate': 'max_upload_rate',
-            'purgeAfter': 'purge_after'
+            'purgeAfter': 'purge_after',
+            'uploadTye': 'upload_type',
+            'onDemandOpts': 'on_demand_options'
         }
 
 
