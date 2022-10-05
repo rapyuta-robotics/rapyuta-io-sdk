@@ -391,7 +391,7 @@ class ROSBagJob(ObjBase):
             upload_options.update({'onDemandOpts': on_demand_options.serialize()})
 
         url = self._host + '/rosbag-jobs/{}/job/{}'.format(self.deployment_id, self.guid)
-        headers = create_auth_header(self._auth_token, self.project)
+        headers = create_auth_header(self._auth_token, self._project)
         payload = {
             'componentInstanceID': self.component_instance_id,
             'uploadOptions': upload_options,

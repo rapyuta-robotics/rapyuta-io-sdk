@@ -531,3 +531,43 @@ ROSBAG_BLOB_RETRY_SUCCESS = '''
     "status": "Starting"
 }
 '''
+
+ROSBAG_PATCH_RESPONSE = '''
+{
+    "ID": 591,
+    "CreatedAt": "2022-10-04T11:12:56.080625Z",
+    "UpdatedAt": "2022-10-04T12:49:05.629647Z",
+    "DeletedAt": null,
+    "guid": "job-guid",
+    "name": "name",
+    "deploymentID": "dep-id",
+    "componentInstanceID": "comp-inst-id",
+    "packageID": "package-id",
+    "deploymentName": "talker",
+    "componentID": "comp-id",
+    "componentType": "Device",
+    "deviceID": "device-id",
+    "recordOptions": {
+        "allTopics": true,
+        "compression": "",
+        "maxSplits": 5,
+        "maxSplitSize": 1024,
+        "chunkSize": 100,
+        "prefix": "prefix"
+    },
+    "uploadOptions": {
+        "maxUploadRate": 1048576,
+        "uploadType": "Continuous",
+        "onDemandOpts": {
+            "timeRange": {
+                "from": 0,
+                "to": 0
+            }
+        }
+    },
+    "status": "Running",
+    "creator": "creator-id",
+    "project": "project-id",
+    "deprovisioned": false
+}
+'''

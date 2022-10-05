@@ -7,13 +7,13 @@ from mock import patch, Mock, call
 from pyfakefs import fake_filesystem_unittest
 
 from rapyuta_io.clients.rosbag import ROSBagJob, ROSBagOptions, ROSBagJobStatus, ROSBagBlobStatus, \
-    ROSBagCompression, UploadOptions
-from rapyuta_io.utils.error import InvalidParameterException, ROSBagBlobError
+    ROSBagCompression, UploadOptions, ROSBagUploadTypes, ROSBagTimeRange, ROSBagOnDemandUploadOptions
+from rapyuta_io.utils.error import InvalidParameterException, ROSBagBlobError, BadRequestError
 from tests.utils.client import get_client, headers
 from tests.utils.rosbag_responses import ROSBAG_JOB_SUCCESS, ROSBAG_JOB_LIST_SUCCESS, \
     ROSBAG_BLOB_LIST_SUCCESS, ROSBAG_BLOB_LIST_WITH_ERROR_BLOB_SUCCESS, ROSBAG_BLOB_RETRY_SUCCESS, \
     ROSBAG_BLOB_GET_SUCCESS, ROSBAG_BLOB_LIST_WITH_UPLOADING_BLOB_SUCCESS, ROSBAG_BLOB_GET_WITH_UPLOADED_SUCCESS, \
-    ROSBAG_BLOB_GET_WITH_ERROR, ROSBAG_BLOB_LIST_WITH_DEVICE_BLOB_SUCCESS
+    ROSBAG_BLOB_GET_WITH_ERROR, ROSBAG_BLOB_LIST_WITH_DEVICE_BLOB_SUCCESS, ROSBAG_PATCH_RESPONSE
 
 
 class ROSBagTests(fake_filesystem_unittest.TestCase):
@@ -71,6 +71,17 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
                 'topics': ['/teleone', '/teletwo'],
                 'compression': ROSBagCompression.BZ2
             },
+            'uploadOptions': {
+                'maxUploadRate': 1048576,
+                'purgeAfter': False,
+                'uploadTye': ROSBagUploadTypes.ON_DEMAND,
+                'onDemandOpts': {
+                    'timeRange': {
+                        'from': 0,
+                        'to': 0
+                    }
+                }
+            },
             'name': 'job_name',
             'componentInstanceID': 'comp-inst-id',
             'deploymentID': 'dep-id'
@@ -83,8 +94,16 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         client = get_client()
         rosbag_options = ROSBagOptions(all_topics=True, topics=['/teleone', '/teletwo'],
                                        compression=ROSBagCompression.BZ2)
+        on_demand_options = ROSBagOnDemandUploadOptions(
+            time_range=ROSBagTimeRange(from_time=0, to_time=0)
+        )
+        upload_options = UploadOptions(
+            upload_type=ROSBagUploadTypes.ON_DEMAND,
+            on_demand_options=on_demand_options,
+        )
         rosbag_job = ROSBagJob('job_name', rosbag_options,
-                               deployment_id='dep-id', component_instance_id='comp-inst-id')
+                               deployment_id='dep-id', component_instance_id='comp-inst-id',
+                               upload_options=upload_options)
         job = client.create_rosbag_job(rosbag_job)
         mock_request.assert_called_once_with(headers=headers,
                                              json=expected_payload,
@@ -182,6 +201,32 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         expected_err_msg = 'purge_after must be a bool'
         with self.assertRaises(InvalidParameterException) as e:
             UploadOptions(purge_after='invalid')
+
+        self.assertEqual(str(e.exception), expected_err_msg)
+
+    def test_upload_options_invalid_upload_type(self):
+        expected_err_msg = 'upload_type must be of the type ROSBagUploadTypes'
+        with self.assertRaises(InvalidParameterException) as e:
+            UploadOptions(upload_type='invalid')
+
+        self.assertEqual(str(e.exception), expected_err_msg)
+
+    def test_upload_options_default_upload_type_on_demand(self):
+        opts = UploadOptions()
+
+        self.assertEqual(ROSBagUploadTypes.ON_DEMAND, opts.upload_type)
+
+    def test_upload_options_invalid_on_demand_options(self):
+        expected_err_msg = 'on_demand_options must of the type ROSBagOnDemandUploadOptions'
+        with self.assertRaises(InvalidParameterException) as e:
+            UploadOptions(on_demand_options='invalid')
+
+        self.assertEqual(str(e.exception), expected_err_msg)
+
+    def test_upload_options_invalid_time_range(self):
+        expected_err_msg = '"from" time cannot be greater than the "to" time'
+        with self.assertRaises(BadRequestError) as e:
+            ROSBagTimeRange(from_time=1000, to_time=10)
 
         self.assertEqual(str(e.exception), expected_err_msg)
 
@@ -385,6 +430,156 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
                                              json=None,
                                              params={'guid': ['job-id']})
 
+    def test_patch_rosbags_invalid_upload_type(self):
+        rosbag_options = ROSBagOptions(all_topics=True)
+        rosbag_job = ROSBagJob(name='test-job', rosbag_options=rosbag_options)
+
+        with self.assertRaises(InvalidParameterException) as e:
+            rosbag_job.patch('invalid')
+        self.assertEqual(
+            str(e.exception),
+            'upload_type must be of the type ROSBagUploadTypes'
+        )
+
+    def test_patch_rosbags_invalid_on_demand_options(self):
+        rosbag_options = ROSBagOptions(all_topics=True)
+        rosbag_job = ROSBagJob(name='test-job', rosbag_options=rosbag_options)
+
+        with self.assertRaises(InvalidParameterException) as e:
+            rosbag_job.patch(on_demand_options='invalid')
+        self.assertEqual(
+            str(e.exception),
+            'on_demand_options must be of the type ROSBagOnDemandUploadOptions'
+        )
+
+    @patch('requests.request')
+    def test_patch_rosbags_success_patch_only_upload_type(self, mock_request):
+        expected_url = 'https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-jobs/{}/job/{}'.format(
+            'dep-id',
+            'job-guid'
+        )
+        expected_req_body = {
+            'componentInstanceID': 'comp-inst-id',
+            'uploadOptions': {
+                'uploadType': ROSBagUploadTypes.CONTINUOUS.value,
+            },
+        }
+
+        mock_list_rosbag_request = Mock()
+        mock_list_rosbag_request.text = ROSBAG_JOB_LIST_SUCCESS
+        mock_list_rosbag_request.status_code = requests.codes.OK
+        mock_stop_rosbag_job_request = Mock()
+        mock_stop_rosbag_job_request.text = ROSBAG_PATCH_RESPONSE
+        mock_stop_rosbag_job_request.status_code = requests.codes.OK
+        mock_request.side_effect = [mock_list_rosbag_request, mock_stop_rosbag_job_request]
+
+        client = get_client()
+        rosbag_jobs = client.list_rosbag_jobs(deployment_id='dep-id',
+                                              guids=['job-guid'])
+        rosbag_jobs[0].patch(upload_type=ROSBagUploadTypes.CONTINUOUS)
+
+        self.assertEqual(
+            call(
+                headers=headers,
+                method='PATCH',
+                url=expected_url,
+                json=expected_req_body,
+                params={}
+            ),
+            mock_request.mock_calls[1],
+        )
+
+    @patch('requests.request')
+    def test_patch_rosbags_success_patch_only_on_demand_opts(self, mock_request):
+        expected_url = 'https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-jobs/{}/job/{}'.format(
+            'dep-id',
+            'job-guid'
+        )
+        expected_req_body = {
+            'componentInstanceID': 'comp-inst-id',
+            'uploadOptions': {
+                'onDemandOpts': {
+                    'timeRange': {
+                        'from': 0,
+                        'to': 0,
+                    }
+                }
+            },
+        }
+
+        mock_list_rosbag_request = Mock()
+        mock_list_rosbag_request.text = ROSBAG_JOB_LIST_SUCCESS
+        mock_list_rosbag_request.status_code = requests.codes.OK
+        mock_stop_rosbag_job_request = Mock()
+        mock_stop_rosbag_job_request.text = ROSBAG_PATCH_RESPONSE
+        mock_stop_rosbag_job_request.status_code = requests.codes.OK
+        mock_request.side_effect = [mock_list_rosbag_request, mock_stop_rosbag_job_request]
+
+        client = get_client()
+        rosbag_jobs = client.list_rosbag_jobs(deployment_id='dep-id',
+                                              guids=['job-guid'])
+        time_range = ROSBagTimeRange(from_time=0, to_time=0)
+        on_demand_opts = ROSBagOnDemandUploadOptions(time_range=time_range)
+        rosbag_jobs[0].patch(on_demand_options=on_demand_opts)
+
+        self.assertEqual(
+            call(
+                headers=headers,
+                method='PATCH',
+                url=expected_url,
+                json=expected_req_body,
+                params={}
+            ),
+            mock_request.mock_calls[1],
+        )
+
+    @patch('requests.request')
+    def test_patch_rosbags_success_patch(self, mock_request):
+        expected_url = 'https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-jobs/{}/job/{}'.format(
+            'dep-id',
+            'job-guid'
+        )
+        expected_req_body = {
+            'componentInstanceID': 'comp-inst-id',
+            'uploadOptions': {
+                'uploadType': ROSBagUploadTypes.CONTINUOUS.value,
+                'onDemandOpts': {
+                    'timeRange': {
+                        'from': 0,
+                        'to': 0,
+                    }
+                }
+            },
+        }
+
+        mock_list_rosbag_request = Mock()
+        mock_list_rosbag_request.text = ROSBAG_JOB_LIST_SUCCESS
+        mock_list_rosbag_request.status_code = requests.codes.OK
+        mock_stop_rosbag_job_request = Mock()
+        mock_stop_rosbag_job_request.text = ROSBAG_PATCH_RESPONSE
+        mock_stop_rosbag_job_request.status_code = requests.codes.OK
+        mock_request.side_effect = [mock_list_rosbag_request, mock_stop_rosbag_job_request]
+
+        client = get_client()
+        rosbag_jobs = client.list_rosbag_jobs(deployment_id='dep-id',
+                                              guids=['job-guid'])
+        time_range = ROSBagTimeRange(from_time=0, to_time=0)
+        on_demand_opts = ROSBagOnDemandUploadOptions(time_range=time_range)
+        rosbag_jobs[0].patch(
+            upload_type=ROSBagUploadTypes.CONTINUOUS,
+            on_demand_options=on_demand_opts
+        )
+
+        self.assertEqual(
+            call(
+                headers=headers,
+                method='PATCH',
+                url=expected_url,
+                json=expected_req_body,
+                params={}
+            ),
+            mock_request.mock_calls[1],
+        )
     def test_list_rosbag_blobs_invalid_deployment_ids(self):
         expected_err = 'deployment_ids needs to be a list of string'
         client = get_client()
@@ -669,7 +864,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
             rosbag_blobs[0].retry_upload()
 
         mock_request.assert_has_calls([
-            call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs', json=None,
+            call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs',
+                 json=None,
                  params={}),
         ])
         self.assertEqual(1, mock_request.call_count, 'extra request calls were made')
@@ -687,7 +883,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
             rosbag_blobs[0].retry_upload()
 
         mock_request.assert_has_calls([
-            call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs', json=None,
+            call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs',
+                 json=None,
                  params={}),
         ])
         self.assertEqual(1, mock_request.call_count, 'extra request calls were made')
@@ -707,9 +904,11 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         rosbag_blobs[0].retry_upload()
 
         mock_request.assert_has_calls([
-            call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs', json=None,
+            call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs',
+                 json=None,
                  params={}),
-            call(headers=headers, method='POST', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs/blob-id/retry',
+            call(headers=headers, method='POST',
+                 url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs/blob-id/retry',
                  json=None, params={}),
         ])
         self.assertEqual(2, mock_request.call_count, 'extra request calls were made')
@@ -730,9 +929,11 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         rosbag_blobs[0].refresh()
 
         mock_request.assert_has_calls([
-            call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs', json=None,
+            call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs',
+                 json=None,
                  params={}),
-            call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs/blob-id',
+            call(headers=headers, method='GET',
+                 url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs/blob-id',
                  json=None, params={}),
         ])
         self.assertEqual(2, mock_request.call_count, 'extra request calls were made')
@@ -757,11 +958,14 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         rosbag_blobs[0].poll_till_ready()
 
         mock_request.assert_has_calls([
-            call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs', json=None,
+            call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs',
+                 json=None,
                  params={}),
-            call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs/blob-id',
+            call(headers=headers, method='GET',
+                 url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs/blob-id',
                  json=None, params={}),
-            call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs/blob-id',
+            call(headers=headers, method='GET',
+                 url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs/blob-id',
                  json=None, params={}),
         ])
         self.assertEqual(3, mock_request.call_count, 'extra request calls were made')
@@ -788,11 +992,14 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
             rosbag_blobs[0].poll_till_ready()
 
         mock_request.assert_has_calls([
-            call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs', json=None,
+            call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs',
+                 json=None,
                  params={}),
-            call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs/blob-id',
+            call(headers=headers, method='GET',
+                 url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs/blob-id',
                  json=None, params={}),
-            call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs/blob-id',
+            call(headers=headers, method='GET',
+                 url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs/blob-id',
                  json=None, params={}),
         ])
         self.assertEqual(3, mock_request.call_count, 'extra request calls were made')
