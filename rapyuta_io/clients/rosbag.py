@@ -4,7 +4,7 @@ import enum
 import six
 
 from rapyuta_io.clients.model import DEFAULT_LOG_UPLOAD_BANDWIDTH
-from rapyuta_io.utils.error import InvalidParameterException, ROSBagBlobError
+from rapyuta_io.utils.error import InvalidParameterException, ROSBagBlobError, BadRequestError
 from rapyuta_io.utils.object_converter import ObjBase, enum_field, nested_field, list_field
 from rapyuta_io.utils.partials import PartialMixin
 from rapyuta_io.utils.pollers import RefreshPollerMixin
@@ -52,13 +52,54 @@ class UploadOptions(ObjBase):
         }
 
 
+class TopicOverrideInfo(ObjBase):
+    """
+    Topic override info
+    """
+    def __init__(self, topic_name=None, record_frequency=None, latched=None):
+        self.validate(topic_name, record_frequency, latched)
+        self.topic_name = topic_name
+        self.record_frequency = record_frequency
+        self.latched = latched
+
+    @staticmethod
+    def validate(topic_name, record_frequency, latched):
+        if not isinstance(topic_name, str) and len(topic_name):
+            raise InvalidParameterException('topic_name must be a non-empty string')
+        if record_frequency and not isinstance(record_frequency, int):
+            raise InvalidParameterException('record_frequency must be an int')
+        if latched and not isinstance(latched, bool):
+            raise InvalidParameterException('latched must be a boolean')
+        if latched and record_frequency:
+            raise BadRequestError('topic {} can either be throttled or latched, not both'.format(topic_name))
+
+    def get_serialize_map(self):
+        return {}
+
+    def get_deserialize_map(self):
+        return {
+            'topic_name': 'topicName',
+            'record_frequency': 'recordFrequency',
+            'latched': 'latched',
+        }
+
+
 class OverrideOptions(ObjBase):
     """
     Override Options
     """
+    def __init__(self, topic_override_info: [TopicOverrideInfo], exclude_topics=None):
+        self.topic_override_info = topic_override_info
+        self.exclude_topics = exclude_topics
 
-    def __init__(self):
-        self.topic_override_info
+    def get_serialize_map(self):
+        return {}
+
+    def get_deserialize_map(self):
+        return {
+            'topic_override_info': 'topicOverrideInfo',
+            'exclude_topics': 'excludeTopics'
+        }
 
 
 class ROSBagOptions(ObjBase):
@@ -268,7 +309,8 @@ class ROSBagJob(ObjBase):
             'deploymentID': 'deployment_id',
             'name': 'name',
             'recordOptions': 'rosbag_options',
-            'uploadOptions': 'upload_options'
+            'uploadOptions': 'upload_options',
+            'overrideOptions': 'override_options'
         }
 
 
