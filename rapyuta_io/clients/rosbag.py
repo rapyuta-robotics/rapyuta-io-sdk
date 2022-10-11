@@ -134,7 +134,7 @@ class UploadOptions(ObjBase):
         return {
             'maxUploadRate': 'max_upload_rate',
             'purgeAfter': 'purge_after',
-            'uploadTye': 'upload_type',
+            'uploadType': 'upload_type',
             'onDemandOpts': 'on_demand_options'
         }
 
