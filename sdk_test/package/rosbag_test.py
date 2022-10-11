@@ -196,7 +196,7 @@ class ROSBagJobTest(PackageTest):
         job = self.config.client.create_rosbag_job(job_req)
 
         start_recording_duration = 8
-        split_duration = 45
+        split_duration = 60
 
         self.logger.info('sleeping for sometime for recording to continue')
         sleep(start_recording_duration + (split_duration * 2))
