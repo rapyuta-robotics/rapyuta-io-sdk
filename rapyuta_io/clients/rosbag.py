@@ -141,7 +141,14 @@ class UploadOptions(ObjBase):
 
 class TopicOverrideInfo(ObjBase):
     """
-    Topic override info
+    Topic Override Info
+
+    :ivar topic_name: topic to override
+    :vartype topic_name: str
+    :ivar record_frequency: Record frequency that overrides the default (publish) frequency
+    :vartype record_frequency: int
+    :ivar latched: whether to latch the topic or not
+    :vartype latched: bool
     """
     def __init__(self, topic_name=None, record_frequency=None, latched=None):
         self.validate(topic_name, record_frequency, latched)
@@ -174,6 +181,11 @@ class TopicOverrideInfo(ObjBase):
 class OverrideOptions(ObjBase):
     """
     Override Options
+
+    :ivar topic_override_info: List of topics to override with override specs
+    :vartype topic_override_info: :py:class:`~rapyuta_io.clients.rosbag.TopicOverrideInfo`
+    :ivar exclude_topics: Topics to exclude from being recorded
+    :vartype exclude_topics: list(str)
     """
     def __init__(self, topic_override_info: [TopicOverrideInfo], exclude_topics=None):
         self.topic_override_info = topic_override_info
