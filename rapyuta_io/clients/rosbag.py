@@ -150,6 +150,7 @@ class TopicOverrideInfo(ObjBase):
     :ivar latched: whether to latch the topic or not
     :vartype latched: bool
     """
+
     def __init__(self, topic_name=None, record_frequency=None, latched=None):
         self.validate(topic_name, record_frequency, latched)
         self.topic_name = topic_name
@@ -158,10 +159,12 @@ class TopicOverrideInfo(ObjBase):
 
     @staticmethod
     def validate(topic_name, record_frequency, latched):
-        if not isinstance(topic_name, str) and len(topic_name):
+        if not isinstance(topic_name, str) and not len(topic_name):
             raise InvalidParameterException('topic_name must be a non-empty string')
         if record_frequency and not isinstance(record_frequency, int):
-            raise InvalidParameterException('record_frequency must be an int')
+            raise InvalidParameterException('record_frequency must be a non-negative integer')
+        if record_frequency and record_frequency < 0:
+            raise InvalidParameterException('record_frequency must be a non-negative integer')
         if latched and not isinstance(latched, bool):
             raise InvalidParameterException('latched must be a boolean')
         if latched and record_frequency:
@@ -187,6 +190,7 @@ class OverrideOptions(ObjBase):
     :ivar exclude_topics: Topics to exclude from being recorded
     :vartype exclude_topics: list(str)
     """
+
     def __init__(self, topic_override_info: [TopicOverrideInfo], exclude_topics=None):
         self.topic_override_info = topic_override_info
         self.exclude_topics = exclude_topics
