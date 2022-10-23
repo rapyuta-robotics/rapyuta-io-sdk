@@ -84,7 +84,7 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
             'uploadOptions': {
                 'maxUploadRate': 1048576,
                 'purgeAfter': False,
-                'uploadTye': ROSBagUploadTypes.ON_DEMAND,
+                'uploadType': ROSBagUploadTypes.ON_DEMAND,
                 'onDemandOpts': {
                     'timeRange': {
                         'from': 0,

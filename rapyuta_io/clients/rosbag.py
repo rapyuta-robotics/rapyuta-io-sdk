@@ -207,7 +207,7 @@ class OverrideOptions(ObjBase):
 
     def get_deserialize_map(self):
         return {
-            'topic_override_info': enum_field('topicOverrideInfo', TopicOverrideInfo),
+            'topic_override_info': nested_field('topicOverrideInfo', TopicOverrideInfo),
             'exclude_topics': 'excludeTopics'
         }
 

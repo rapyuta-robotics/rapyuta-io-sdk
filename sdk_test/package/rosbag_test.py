@@ -6,8 +6,8 @@ import time
 from time import sleep
 
 from rapyuta_io import DeviceArch
-from rapyuta_io.clients.rosbag import ROSBagJob, ROSBagOptions, ROSBagJobStatus, \
-    UploadOptions, ROSBagUploadTypes, ROSBagOnDemandUploadOptions, ROSBagTimeRange, OverrideOptions, TopicOverrideInfo
+from rapyuta_io.clients.rosbag import ROSBagJob, ROSBagOptions, ROSBagJobStatus, UploadOptions, ROSBagUploadTypes, \
+    ROSBagOnDemandUploadOptions, ROSBagTimeRange, OverrideOptions, TopicOverrideInfo
 from rapyuta_io.utils.utils import generate_random_value
 from sdk_test.config import Configuration
 from sdk_test.package.package_test import PackageTest
@@ -70,8 +70,10 @@ class ROSBagJobTest(PackageTest):
     @classmethod
     def tearDownClass(cls):
         delete_package(cls.TALKER_CLOUD_DEVICE_PACKAGE, delete_builds=False)
-        delete_package(cls.ROSBAG_TALKER_PACKAGE)
+        delete_package(cls.ROSBAG_TALKER_PACKAGE, delete_builds=False)
         delete_package(cls.FAST_TALKER_DEVICE_WITH_ROSBAGS_MANIFEST)
+        delete_package(cls.THROTTLING_PACKAGE_NAME)
+        delete_package(cls.LATCHING_PACKAGE_NAME)
 
     def setUp(self):
         self.config = Configuration()
@@ -285,7 +287,7 @@ class ROSBagJobTest(PackageTest):
         uploaded_blobs = self.wait_till_blobs_are_uploaded(sleep_interval_in_sec=5,
                                                            job_ids=[self.throttling_rosbag_job.guid])
         self.logger.info('validating the uploaded rosbag blobs for the stopped jobs')
-        # self.assert_rosbag_blobs_of_device(uploaded_blobs) # this one is failing
+        # self.assert_rosbag_blobs_of_device(uploaded_blobs) # this one is failing because device had more blobs present
 
         self.assertEqual(len(uploaded_blobs), 1)
         uploaded_blob = uploaded_blobs[0]
