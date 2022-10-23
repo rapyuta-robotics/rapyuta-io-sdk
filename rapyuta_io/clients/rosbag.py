@@ -171,7 +171,11 @@ class TopicOverrideInfo(ObjBase):
             raise BadRequestError('topic {} can either be throttled or latched, not both'.format(topic_name))
 
     def get_serialize_map(self):
-        return {}
+        return {
+            'topicName': 'topic_name',
+            'recordFrequency': 'record_frequency',
+            'latched': 'latched'
+        }
 
     def get_deserialize_map(self):
         return {
@@ -196,11 +200,14 @@ class OverrideOptions(ObjBase):
         self.exclude_topics = exclude_topics
 
     def get_serialize_map(self):
-        return {}
+        return {
+            'topicOverrideInfo': 'topic_override_info',
+            'excludeTopics': 'exclude_topics'
+        }
 
     def get_deserialize_map(self):
         return {
-            'topic_override_info': 'topicOverrideInfo',
+            'topic_override_info': enum_field('topicOverrideInfo', TopicOverrideInfo),
             'exclude_topics': 'excludeTopics'
         }
 
