@@ -307,8 +307,8 @@ class ROSBagJobTest(PackageTest):
         topic3_metadata = next(filter(lambda topic: topic.name == '/topic3', topics), None)
 
         self.assertEqual(topic1_metadata.message_count, topic2_metadata.message_count)
-        self.assertGreater(topic3_metadata.message_count, record_duration*topic3_throttled_freq - 5)
-        self.assertLess(topic3_metadata.message_count, record_duration*topic3_throttled_freq + 5)
+        self.assertGreater(topic3_metadata.message_count, record_duration * topic3_throttled_freq - 5)
+        self.assertLess(topic3_metadata.message_count, record_duration * topic3_throttled_freq + 5)
 
     def test_10_rosbag_job_latching(self):
         self.logger.info('deploying latching package')
