@@ -71,8 +71,8 @@ class ROSBagJobTest(PackageTest):
     def tearDownClass(cls):
         delete_package(cls.TALKER_CLOUD_DEVICE_PACKAGE, delete_builds=False)
         delete_package(cls.ROSBAG_TALKER_PACKAGE, delete_builds=False)
-        delete_package(cls.FAST_TALKER_DEVICE_WITH_ROSBAGS_MANIFEST)
-        delete_package(cls.THROTTLING_PACKAGE_NAME)
+        delete_package(cls.FAST_TALKER_DEVICE_WITH_ROSBAGS_PACKAGE)
+        delete_package(cls.THROTTLING_PACKAGE_NAME, delete_builds=False)
         delete_package(cls.LATCHING_PACKAGE_NAME)
 
     def setUp(self):
