@@ -243,6 +243,15 @@ class ROSBagJobTest(PackageTest):
         self.deployment_with_fast_talker.deprovision()
 
     def test_09_rosbag_job_throttling(self):
+        """
+        Default publishing rate on channels
+        /topic1: 15
+        /topic2: 30
+        /topic3: 5
+        /topic4: 20
+        """
+        topic2_throttled_freq = 15
+        topic3_throttled_freq = 2
         self.logger.info('deploying throttling package')
         device_rosbag_job = ROSBagJob('device-init-job', ROSBagOptions(all_topics=True),
                                       upload_options=UploadOptions(upload_type=ROSBagUploadTypes.ON_STOP))
@@ -263,8 +272,8 @@ class ROSBagJobTest(PackageTest):
                                           upload_options=UploadOptions(upload_type=ROSBagUploadTypes.ON_STOP),
                                           override_options=OverrideOptions(
                                               topic_override_info=[
-                                                  TopicOverrideInfo('/topic2', 15, False),
-                                                  TopicOverrideInfo('/topic3', 2, False),
+                                                  TopicOverrideInfo('/topic2', topic2_throttled_freq, False),
+                                                  TopicOverrideInfo('/topic3', topic3_throttled_freq, False),
                                               ],
                                               exclude_topics=['/topic4']
                                           ))
@@ -275,9 +284,8 @@ class ROSBagJobTest(PackageTest):
         self.assert_rosbag_jobs_in_project(throttling_rosbag_job.name)
         self.wait_till_jobs_are_running(self.deployment_with_throttling.deploymentId,
                                         [self.throttling_rosbag_job.guid], sleep_interval_in_sec=5)
-        # introduce wait for 1 minute maybe time.sleep()
-        self.logger.info('sleeping for 15 seconds')
-        time.sleep(15)
+        self.logger.info('sleeping for 8 seconds')
+        time.sleep(8)
         self.config.client.stop_rosbag_jobs(self.deployment_with_throttling.deploymentId,
                                             guids=[self.throttling_rosbag_job.guid])
         self.assert_rosbag_jobs_present(self.deployment_with_throttling.deploymentId,
@@ -293,17 +301,14 @@ class ROSBagJobTest(PackageTest):
         uploaded_blob = uploaded_blobs[0]
         relevant_topics = ['/topic1', '/topic2', '/topic3', '/topic4']
         record_duration = uploaded_blob.info.duration
-        topics = filter(lambda topic: topic.name in relevant_topics, uploaded_blob.info.topics)
-        topic1_metadata = filter(lambda topic: topic.name == '/topic1', topics)[0]
-        topic2_metadata = filter(lambda topic: topic.name == '/topic2', topics)[0]
-        topic3_metadata = filter(lambda topic: topic.name == '/topic3', topics)[0]
-        topic4_metadata = filter(lambda topic: topic.name == '/topic4', topics)[0]
-        self.assertTrue(math.isclose(topic1_metadata.message_count, topic2_metadata.message_count, abs_tol=5))
-        self.assertTrue(math.isclose(
-            topic3_metadata.message_count,
-            round(2 * record_duration),
-            abs_tol=5
-        ))
+        topics = list(filter(lambda topic: topic.name in relevant_topics, uploaded_blob.info.topics))
+        topic1_metadata = next(filter(lambda topic: topic.name == '/topic1', topics), None)
+        topic2_metadata = next(filter(lambda topic: topic.name == '/topic2', topics), None)
+        topic3_metadata = next(filter(lambda topic: topic.name == '/topic3', topics), None)
+
+        self.assertEqual(topic1_metadata.message_count, topic2_metadata.message_count)
+        self.assertGreater(topic3_metadata.message_count, record_duration*topic3_throttled_freq - 5)
+        self.assertLess(topic3_metadata.message_count, record_duration*topic3_throttled_freq + 5)
 
     def test_10_rosbag_job_latching(self):
         self.logger.info('deploying latching package')
