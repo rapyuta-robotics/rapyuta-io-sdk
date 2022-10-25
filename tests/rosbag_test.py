@@ -64,6 +64,46 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
 
         self.assertEqual(str(e.exception), expected_err_msg)
 
+    def test_create_rosbag_job_topic_name_empty_string(self):
+        expected_err_msg = 'topic_name must be a non-empty string'
+        with self.assertRaises(InvalidParameterException) as e:
+            topic_override_info = [
+                TopicOverrideInfo('', 20, False),
+            ]
+        self.assertEqual(str(e.exception), expected_err_msg)
+
+    def test_create_rosbag_job_topic_name_invalid_value(self):
+        expected_err_msg = 'topic_name must be a non-empty string'
+        with self.assertRaises(InvalidParameterException) as e:
+            topic_override_info = [
+                TopicOverrideInfo(150, 20, False),
+            ]
+        self.assertEqual(str(e.exception), expected_err_msg)
+
+    def test_create_rosbag_job_record_frequency_invalid_type(self):
+        expected_err_msg = 'record_frequency must be a non-negative integer'
+        with self.assertRaises(InvalidParameterException) as e:
+            topic_override_info = [
+                TopicOverrideInfo('/teleone', "2", False),
+            ]
+        self.assertEqual(str(e.exception), expected_err_msg)
+
+    def test_create_rosbag_job_record_frequency_invalid_value(self):
+        expected_err_msg = 'record_frequency must be a non-negative integer'
+        with self.assertRaises(InvalidParameterException) as e:
+            topic_override_info = [
+                TopicOverrideInfo('/teleone', -1, False),
+            ]
+        self.assertEqual(str(e.exception), expected_err_msg)
+
+    def test_create_rosbag_job_latched_invalud_type(self):
+        expected_err_msg = 'latched must be a boolean'
+        with self.assertRaises(InvalidParameterException) as e:
+            topic_override_info = [
+                TopicOverrideInfo('/teleone', latched="False"),
+            ]
+        self.assertEqual(str(e.exception), expected_err_msg)
+
     def test_create_rosbag_job_latched_true_and_record_frequency_present(self):
         expected_err_msg = 'topic /teletwo can either be throttled or latched, not both'
         with self.assertRaises(BadRequestError) as e:

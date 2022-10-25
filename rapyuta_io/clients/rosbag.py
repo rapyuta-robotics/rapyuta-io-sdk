@@ -159,7 +159,7 @@ class TopicOverrideInfo(ObjBase):
 
     @staticmethod
     def validate(topic_name, record_frequency, latched):
-        if not isinstance(topic_name, str) and not len(topic_name):
+        if not isinstance(topic_name, str) or not len(topic_name):
             raise InvalidParameterException('topic_name must be a non-empty string')
         if record_frequency and not isinstance(record_frequency, int):
             raise InvalidParameterException('record_frequency must be a non-negative integer')
@@ -207,7 +207,7 @@ class OverrideOptions(ObjBase):
 
     def get_deserialize_map(self):
         return {
-            'topic_override_info': nested_field('topicOverrideInfo', TopicOverrideInfo),
+            'topic_override_info': 'topicOverrideInfo',
             'exclude_topics': 'excludeTopics'
         }
 
