@@ -2,7 +2,7 @@ name: Github Pages for Documentation
 on:
   push:
     branches:
-    - master
+      - master
 
 jobs:
   deploy:
@@ -31,5 +31,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/output/html
-            # cname: sdk.rapyuta.io
+          cname: sdk.rapyuta.io
           force_orphan: true
