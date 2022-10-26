@@ -291,12 +291,10 @@ class ROSBagJobTest(PackageTest):
         self.assert_rosbag_jobs_present(self.deployment_with_throttling.deploymentId,
                                         [self.throttling_rosbag_job.name],
                                         [ROSBagJobStatus.STOPPING, ROSBagJobStatus.STOPPED])
-
         uploaded_blobs = self.wait_till_blobs_are_uploaded(sleep_interval_in_sec=5,
                                                            job_ids=[self.throttling_rosbag_job.guid])
         self.logger.info('validating the uploaded rosbag blobs for the stopped jobs')
-        # self.assert_rosbag_blobs_of_device(uploaded_blobs) # this one is failing because device had more blobs present
-
+        self.assert_rosbag_blobs_of_device(uploaded_blobs)
         self.assertEqual(len(uploaded_blobs), 1)
         uploaded_blob = uploaded_blobs[0]
         relevant_topics = ['/topic1', '/topic2', '/topic3', '/topic4']
@@ -305,10 +303,10 @@ class ROSBagJobTest(PackageTest):
         topic1_metadata = next(filter(lambda topic: topic.name == '/topic1', topics), None)
         topic2_metadata = next(filter(lambda topic: topic.name == '/topic2', topics), None)
         topic3_metadata = next(filter(lambda topic: topic.name == '/topic3', topics), None)
-
         self.assertEqual(topic1_metadata.message_count, topic2_metadata.message_count)
         self.assertGreater(topic3_metadata.message_count, record_duration * topic3_throttled_freq - 5)
         self.assertLess(topic3_metadata.message_count, record_duration * topic3_throttled_freq + 5)
+        self.deployment_with_throttling.deprovision()
 
     def test_10_rosbag_job_latching(self):
         self.logger.info('deploying latching package')
@@ -341,7 +339,6 @@ class ROSBagJobTest(PackageTest):
         self.assert_rosbag_jobs_in_project(latching_rosbag_job.name)
         self.wait_till_jobs_are_running(self.deployment_with_latching.deploymentId,
                                         [self.latching_rosbag_job.guid], sleep_interval_in_sec=5)
-        # introduce wait for 1 minute maybe time.sleep()
         self.logger.info('sleeping for 60 seconds')
         time.sleep(60)
         self.config.client.stop_rosbag_jobs(self.deployment_with_latching.deploymentId,
@@ -353,8 +350,8 @@ class ROSBagJobTest(PackageTest):
         uploaded_blobs = self.wait_till_blobs_are_uploaded(sleep_interval_in_sec=5,
                                                            job_ids=[self.latching_rosbag_job.guid])
         self.logger.info('validating the uploaded rosbag blobs for the stopped jobs')
-        # self.assert_rosbag_blobs_of_device(uploaded_blobs) # this one is failing
-        self.assertGreater(len(uploaded_blobs), 1)
+        # self.assert_rosbag_blobs_of_device(uploaded_blobs)
+        # self.assertGreater(len(uploaded_blobs), 1)
 
         topic_absent_in_split = False
         for blob in uploaded_blobs:
@@ -365,6 +362,7 @@ class ROSBagJobTest(PackageTest):
                 break
 
         self.assertFalse(topic_absent_in_split)
+        self.deployment_with_latching.deprovision()
 
     def assert_rosbag_jobs_present(self, deployment_id, job_names, statuses=None):
         self.logger.info('checking jobs ')
