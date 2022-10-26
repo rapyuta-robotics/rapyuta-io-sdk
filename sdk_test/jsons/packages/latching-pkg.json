@@ -36,7 +36,6 @@
               "simulationOptions": {
                 "simulation": false
               },
-              "buildGUID": "build-nxvcrsqhgeuxriuxbqwmqmvt",
               "cmd": [
                 "roslaunch latching latch.launch"
               ]
