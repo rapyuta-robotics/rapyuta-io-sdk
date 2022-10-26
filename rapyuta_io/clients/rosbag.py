@@ -139,13 +139,77 @@ class UploadOptions(ObjBase):
         }
 
 
+class TopicOverrideInfo(ObjBase):
+    """
+    Topic Override Info
+
+    :ivar topic_name: topic to override
+    :vartype topic_name: str
+    :ivar record_frequency: Record frequency that overrides the default (publish) frequency
+    :vartype record_frequency: int
+    :ivar latched: whether to latch the topic or not
+    :vartype latched: bool
+    """
+
+    def __init__(self, topic_name=None, record_frequency=None, latched=None):
+        self.validate(topic_name, record_frequency, latched)
+        self.topic_name = topic_name
+        self.record_frequency = record_frequency
+        self.latched = latched
+
+    @staticmethod
+    def validate(topic_name, record_frequency, latched):
+        if not isinstance(topic_name, str) or not len(topic_name):
+            raise InvalidParameterException('topic_name must be a non-empty string')
+        if record_frequency and not isinstance(record_frequency, int):
+            raise InvalidParameterException('record_frequency must be a non-negative integer')
+        if record_frequency and record_frequency < 0:
+            raise InvalidParameterException('record_frequency must be a non-negative integer')
+        if latched and not isinstance(latched, bool):
+            raise InvalidParameterException('latched must be a boolean')
+        if latched and record_frequency:
+            raise BadRequestError('topic {} can either be throttled or latched, not both'.format(topic_name))
+
+    def get_serialize_map(self):
+        return {
+            'topicName': 'topic_name',
+            'recordFrequency': 'record_frequency',
+            'latched': 'latched'
+        }
+
+    def get_deserialize_map(self):
+        return {
+            'topic_name': 'topicName',
+            'record_frequency': 'recordFrequency',
+            'latched': 'latched',
+        }
+
+
 class OverrideOptions(ObjBase):
     """
     Override Options
+
+    :ivar topic_override_info: List of topics to override with override specs
+    :vartype topic_override_info: :py:class:`~rapyuta_io.clients.rosbag.TopicOverrideInfo`
+    :ivar exclude_topics: Topics to exclude from being recorded
+    :vartype exclude_topics: list(str)
     """
 
-    def __init__(self):
-        self.topic_override_info
+    def __init__(self, topic_override_info: [TopicOverrideInfo], exclude_topics=None):
+        self.topic_override_info = topic_override_info
+        self.exclude_topics = exclude_topics
+
+    def get_serialize_map(self):
+        return {
+            'topicOverrideInfo': 'topic_override_info',
+            'excludeTopics': 'exclude_topics'
+        }
+
+    def get_deserialize_map(self):
+        return {
+            'topic_override_info': 'topicOverrideInfo',
+            'exclude_topics': 'excludeTopics'
+        }
 
 
 class ROSBagOptions(ObjBase):
@@ -355,7 +419,8 @@ class ROSBagJob(ObjBase):
             'deploymentID': 'deployment_id',
             'name': 'name',
             'recordOptions': 'rosbag_options',
-            'uploadOptions': 'upload_options'
+            'uploadOptions': 'upload_options',
+            'overrideOptions': 'override_options'
         }
 
     def patch(self, upload_type=None, on_demand_options=None):

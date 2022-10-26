@@ -87,8 +87,8 @@ class Configuration(six.with_metaclass(_Singleton, object)):
         self.worker_threads = self._config['worker_threads']
 
     def validate(self):
-        if len(self.get_device_configs(arch=DeviceArch.AMD64, runtime='Preinstalled')) != 1:
-            raise InvalidConfig('One amd64 device with Preinstalled runtime is required')
+        # if len(self.get_device_configs(arch=DeviceArch.AMD64, runtime='Preinstalled')) != 1:
+        #     raise InvalidConfig('One amd64 device with Preinstalled runtime is required')
         if len(self.get_device_configs(arch=DeviceArch.AMD64, runtime='Dockercompose')) != 1:
             raise InvalidConfig('One amd64 device with Docker Compose runtime is required')
 

@@ -7,7 +7,8 @@ from mock import patch, Mock, call
 from pyfakefs import fake_filesystem_unittest
 
 from rapyuta_io.clients.rosbag import ROSBagJob, ROSBagOptions, ROSBagJobStatus, ROSBagBlobStatus, \
-    ROSBagCompression, UploadOptions, ROSBagUploadTypes, ROSBagTimeRange, ROSBagOnDemandUploadOptions
+    ROSBagCompression, UploadOptions, OverrideOptions, TopicOverrideInfo, ROSBagUploadTypes, ROSBagTimeRange, \
+    ROSBagOnDemandUploadOptions
 from rapyuta_io.utils.error import InvalidParameterException, ROSBagBlobError, BadRequestError
 from tests.utils.client import get_client, headers
 from tests.utils.rosbag_responses import ROSBAG_JOB_SUCCESS, ROSBAG_JOB_LIST_SUCCESS, \
@@ -28,7 +29,7 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
 
         self.assertEqual(str(e.exception), expected_err_msg)
 
-    def test_create_rosbag_job_options_absent(self):
+    def test_create_rosbag_job_rosbag_options_absent(self):
         expected_err_msg = 'rosbag_options must be a instance of ROSBagOptions'
         client = get_client()
         with self.assertRaises(InvalidParameterException) as e:
@@ -61,6 +62,55 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         with self.assertRaises(InvalidParameterException) as e:
             client.create_rosbag_job(ROSBagJob('name', rosbag_options, deployment_id='dep-id'))
 
+        self.assertEqual(str(e.exception), expected_err_msg)
+
+    def test_create_rosbag_job_topic_name_empty_string(self):
+        expected_err_msg = 'topic_name must be a non-empty string'
+        with self.assertRaises(InvalidParameterException) as e:
+            topic_override_info = [
+                TopicOverrideInfo('', 20, False),
+            ]
+        self.assertEqual(str(e.exception), expected_err_msg)
+
+    def test_create_rosbag_job_topic_name_invalid_value(self):
+        expected_err_msg = 'topic_name must be a non-empty string'
+        with self.assertRaises(InvalidParameterException) as e:
+            topic_override_info = [
+                TopicOverrideInfo(150, 20, False),
+            ]
+        self.assertEqual(str(e.exception), expected_err_msg)
+
+    def test_create_rosbag_job_record_frequency_invalid_type(self):
+        expected_err_msg = 'record_frequency must be a non-negative integer'
+        with self.assertRaises(InvalidParameterException) as e:
+            topic_override_info = [
+                TopicOverrideInfo('/teleone', "2", False),
+            ]
+        self.assertEqual(str(e.exception), expected_err_msg)
+
+    def test_create_rosbag_job_record_frequency_invalid_value(self):
+        expected_err_msg = 'record_frequency must be a non-negative integer'
+        with self.assertRaises(InvalidParameterException) as e:
+            topic_override_info = [
+                TopicOverrideInfo('/teleone', -1, False),
+            ]
+        self.assertEqual(str(e.exception), expected_err_msg)
+
+    def test_create_rosbag_job_latched_invalud_type(self):
+        expected_err_msg = 'latched must be a boolean'
+        with self.assertRaises(InvalidParameterException) as e:
+            topic_override_info = [
+                TopicOverrideInfo('/teleone', latched="False"),
+            ]
+        self.assertEqual(str(e.exception), expected_err_msg)
+
+    def test_create_rosbag_job_latched_true_and_record_frequency_present(self):
+        expected_err_msg = 'topic /teletwo can either be throttled or latched, not both'
+        with self.assertRaises(BadRequestError) as e:
+            topic_override_info = [
+                TopicOverrideInfo('/teleone', 2, False),
+                TopicOverrideInfo('/teletwo', 5, True),
+            ]
         self.assertEqual(str(e.exception), expected_err_msg)
 
     @patch('requests.request')
