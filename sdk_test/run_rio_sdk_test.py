@@ -96,7 +96,7 @@ class IntegrationSuite(testtools.ConcurrentTestSuite):
         Adds the device on the Platform and fetches the JWT Token to be used for the on-boarding of the Device.
         """
         url = self.config.api_server + '/api/device-manager/v0/auth-keys/?download_type=script'
-        payload = {'name': name, 'description': '', 'python_version': '2'}
+        payload = {'name': name, 'description': '', 'python_version': '3'}
         if runtime == 'Dockercompose':
             payload['config_variables'] = {
                 'runtime_docker': True,
