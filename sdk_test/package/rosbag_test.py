@@ -64,8 +64,16 @@ class ROSBagJobTest(PackageTest):
                         'talker-fast-device': {'talker': ('talker-build', 'talker.json')}
                     })
         add_build(cls.THROTTLE_LATCH_BUILD_MANIFEST, cls.THROTTLE_LATCH_BUILD_NAME)
-        add_package(cls.THROTTLING_PACKAGE_MANIFEST, cls.THROTTLING_PACKAGE_NAME)
-        add_package(cls.LATCHING_PACKAGE_MANIFEST, cls.LATCHING_PACKAGE_NAME)
+        add_package(cls.THROTTLING_PACKAGE_MANIFEST, cls.THROTTLING_PACKAGE_NAME,
+                    build_map={
+                        'throttling-component': {
+                            'throttling-executable': ('throttle-latch-build', 'throttle-latch-build.json')}
+                    })
+        add_package(cls.LATCHING_PACKAGE_MANIFEST, cls.LATCHING_PACKAGE_NAME,
+                    build_map={
+                        'latching-component': {
+                            'latching-executable': ('throttle-latch-build', 'throttle-latch-build.json')}
+                    })
 
     @classmethod
     def tearDownClass(cls):
