@@ -1,0 +1,66 @@
+{
+  "name": "throttling-pkg",
+  "packageVersion": "v1.0.0",
+  "description": "",
+  "bindable": true,
+  "plans": [
+    {
+      "name": "default",
+      "metadata": {
+
+      },
+      "singleton": false,
+      "components": [
+        {
+          "name": "throttling-component",
+          "description": "",
+          "ros": {
+            "topics": [
+
+            ],
+            "services": [
+
+            ],
+            "actions": [
+
+            ],
+            "isROS": true,
+            "ros_distro": "melodic"
+          },
+          "requiredRuntime": "device",
+          "restart_policy": "always",
+          "architecture": "amd64",
+          "executables": [
+            {
+              "name": "throttling-executable",
+              "simulationOptions": {
+                "simulation": false
+              },
+              "cmd": [
+                "roslaunch throttling throttle.launch"
+              ]
+            }
+          ],
+          "parameters": [
+
+          ],
+          "rosBagJobDefs": [
+
+          ]
+        }
+      ],
+      "includePackages": [
+
+      ],
+      "dependentDeployments": [
+
+      ],
+      "inboundROSInterfaces": {
+        "anyIncomingScopedOrTargetedRosConfig": false
+      },
+      "exposedParameters": [
+
+      ]
+    }
+  ]
+}
