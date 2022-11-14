@@ -8,7 +8,7 @@ from pyfakefs import fake_filesystem_unittest
 
 from rapyuta_io.clients.rosbag import ROSBagJob, ROSBagOptions, ROSBagJobStatus, ROSBagBlobStatus, \
     ROSBagCompression, UploadOptions, OverrideOptions, TopicOverrideInfo, ROSBagUploadTypes, ROSBagTimeRange, \
-    ROSBagOnDemandUploadOptions
+    ROSBagOnDemandUploadOptions, ROSBagMaxSplitDurationUnit
 from rapyuta_io.utils.error import InvalidParameterException, ROSBagBlobError, BadRequestError
 from tests.utils.client import get_client, headers
 from tests.utils.rosbag_responses import ROSBAG_JOB_SUCCESS, ROSBAG_JOB_LIST_SUCCESS, \
@@ -119,7 +119,9 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
             'recordOptions': {
                 'allTopics': True,
                 'topics': ['/teleone', '/teletwo'],
-                'compression': ROSBagCompression.BZ2
+                'compression': ROSBagCompression.BZ2,
+                'maxSplitDuration': 5,
+                'maxSplitDurationUnit': 'm'
             },
             'uploadOptions': {
                 'maxUploadRate': 1048576,
@@ -142,8 +144,13 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         mock_create_rosbag_job.status_code = requests.codes.OK
         mock_request.side_effect = [mock_create_rosbag_job]
         client = get_client()
-        rosbag_options = ROSBagOptions(all_topics=True, topics=['/teleone', '/teletwo'],
-                                       compression=ROSBagCompression.BZ2)
+        rosbag_options = ROSBagOptions(
+            all_topics=True,
+            topics=['/teleone', '/teletwo'],
+            compression=ROSBagCompression.BZ2,
+            max_split_duration=5,
+            max_split_duration_unit=ROSBagMaxSplitDurationUnit.Minute
+        )
         on_demand_options = ROSBagOnDemandUploadOptions(
             time_range=ROSBagTimeRange(from_time=0, to_time=0)
         )
@@ -230,6 +237,27 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         expected_err_msg = 'One of all_topics, topics, topic_include_regex, and node must be provided'
         with self.assertRaises(InvalidParameterException) as e:
             ROSBagOptions()
+
+        self.assertEqual(str(e.exception), expected_err_msg)
+
+    def test_create_rosbag_job_max_split_duration_invalid_value(self):
+        expected_err_msg = 'max_split_duration must be positive'
+        with self.assertRaises(InvalidParameterException) as e:
+            ROSBagOptions(
+                all_topics=True,
+                max_split_duration=0
+            )
+
+        self.assertEqual(str(e.exception), expected_err_msg)
+
+    def test_create_rosbag_job_max_split_duration_unit_invalid_value(self):
+        expected_err_msg = 'max_split_duration_unit must be "m" (minutes) or "h" (hours)'
+        with self.assertRaises(InvalidParameterException) as e:
+            ROSBagOptions(
+                all_topics=True,
+                max_split_duration=1,
+                max_split_duration_unit='invalid'
+            )
 
         self.assertEqual(str(e.exception), expected_err_msg)
 
