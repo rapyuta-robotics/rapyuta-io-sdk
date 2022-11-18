@@ -13,7 +13,7 @@ from rapyuta_io.clients.deployment import DeploymentPhaseConstants
 from rapyuta_io.clients.native_network import NativeNetwork
 from rapyuta_io.clients.device import SPACE_GUID, VOLUME_PACKAGE_ID, INSTANCE_ID, Device
 from rapyuta_io.clients.plan import Plan
-from rapyuta_io.clients.rosbag import ROSBagJob, ROSBagOptions, UploadOptions
+from rapyuta_io.clients.rosbag import ROSBagJob, ROSBagOptions, UploadOptions, OverrideOptions
 from rapyuta_io.clients.routed_network import RoutedNetwork
 from rapyuta_io.clients.static_route import StaticRoute
 from rapyuta_io.utils import ObjDict, to_objdict, OperationNotAllowedError, PlanNotFound, \
@@ -173,7 +173,7 @@ class Package(PartialMixin, ObjDict):
         self._update_auth_token([deployment])
         return deployment
 
-    def deployments(self,  phases=None, retry_limit=0):
+    def deployments(self, phases=None, retry_limit=0):
 
         """
         Get all the deployments of the package
@@ -199,7 +199,7 @@ class Package(PartialMixin, ObjDict):
         """
 
         deployment_list = ProvisionClient(self._host, self._auth_token, self._project) \
-            .deployments(self.packageId,  phases, retry_limit)
+            .deployments(self.packageId, phases, retry_limit)
         deployments = list()
         if deployment_list:
             for deployment in deployment_list:
@@ -278,9 +278,16 @@ class ProvisionConfiguration(ObjDict):
             job_defs = getattr(component, 'rosBagJobDefs', [])
             for job_def in job_defs:
                 rosbag_opts = ROSBagOptions.deserialize(job_def.recordOptions)
-                upload_opts = UploadOptions.deserialize(job_def.uploadOptions) if hasattr(job_def, 'uploadOptions')\
-                              else None
-                job = ROSBagJob(job_def.name, rosbag_options=rosbag_opts, upload_options=upload_opts)
+                upload_opts = UploadOptions.deserialize(job_def.uploadOptions) if hasattr(job_def, 'uploadOptions') \
+                    else None
+                override_opts = OverrideOptions.deserialize(job_def.overrideOptions) if \
+                    hasattr(job_def, 'overrideOptions') else None
+                job = ROSBagJob(
+                    job_def.name,
+                    rosbag_options=rosbag_opts,
+                    upload_options=upload_opts,
+                    override_options=override_opts
+                )
                 self.add_rosbag_job(component.name, job)
 
     def _validate_device_id(self, component_id):
@@ -361,6 +368,8 @@ class ProvisionConfiguration(ObjDict):
                        'recordOptions': rosbag_job.rosbag_options.serialize()}
         if rosbag_job.upload_options:
             rosbag_jobs['uploadOptions'] = rosbag_job.upload_options.serialize()
+        if rosbag_job.override_options:
+            rosbag_jobs['overrideOptions'] = rosbag_job.override_options.serialize()
         component_context['ros_bag_job_defs'].append(rosbag_jobs)
 
     def remove_rosbag_job(self, component_name, job_name):
@@ -374,7 +383,7 @@ class ProvisionConfiguration(ObjDict):
         """
         component_id = self.plan.get_component_id(component_name)
         component_context = self.context['component_context'][component_id]
-        component_context['ros_bag_job_defs'] =\
+        component_context['ros_bag_job_defs'] = \
             [job for job in component_context['ros_bag_job_defs'] if job['name'] != job_name]
 
     def add_routed_network(self, routed_network, network_interface=None):
@@ -727,10 +736,10 @@ class ProvisionConfiguration(ObjDict):
             if volume.get_status().phase != DeploymentPhaseConstants.SUCCEEDED.value:
                 raise OperationNotAllowedError('Dependent deployment is not running')
             if (mount_path is None and executable_mounts is None) or (
-                        mount_path is not None and executable_mounts is not None):
+                    mount_path is not None and executable_mounts is not None):
                 raise InvalidParameterException('One of mount_path or executable_mounts should be present')
             if executable_mounts is not None and ((not isinstance(executable_mounts, list)) or not all(
-                        isinstance(mount, ExecutableMount) for mount in executable_mounts)):
+                    isinstance(mount, ExecutableMount) for mount in executable_mounts)):
                 raise InvalidParameterException(
                     'executable_mounts must be a list of rapyuta_io.clients.package.ExecutableMount')
             self._add_dependency(volume.deploymentId, component_id, mount_path, executable_mounts=executable_mounts)
@@ -832,7 +841,7 @@ class ProvisionConfiguration(ObjDict):
         required_config = [x for x in device.config_variables if x.key == 'rosbag_mount_path'
                            and x.value != '']
         if not required_config:
-            raise InvalidParameterException('This device does not have ROSBag components installed.' 
+            raise InvalidParameterException('This device does not have ROSBag components installed.'
                                             ' Please re-onboard the device to use ROSBag features')
 
     def _validate_aliases(self):

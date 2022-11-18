@@ -207,8 +207,8 @@ class OverrideOptions(ObjBase):
 
     def get_deserialize_map(self):
         return {
-            'topic_override_info': 'topicOverrideInfo',
-            'exclude_topics': 'excludeTopics'
+            'topic_override_info': list_field('topicOverrideInfo', TopicOverrideInfo),
+            'exclude_topics': list_field('excludeTopics', str)
         }
 
 
