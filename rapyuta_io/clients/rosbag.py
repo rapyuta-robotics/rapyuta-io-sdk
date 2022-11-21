@@ -236,10 +236,8 @@ class ROSBagOptions(ObjBase):
     :vartype max_split_size: int
     :ivar chunk_size: Record to chunks of size KB before writing to disk
     :vartype chunk_size: int
-    :ivar max_split_duration: Specify the maximum duration of the recorded bag file
+    :ivar max_split_duration: Specify the maximum duration (in minutes) of the recorded bag file
     :vartype max_split_duration: int
-    ivar max_split_duration_unit: The unit of MaxSplitDuration. Can be m (minutes) or h (hours). Default is empty (seconds)
-    :vartype max_split_duration_unit: :py:class:`~rapyuta_io.clients.rosbag.ROSBagMaxSplitDurationUnit`
 
     :param all_topics: Record all topics
     :type all_topics: bool
@@ -261,18 +259,16 @@ class ROSBagOptions(ObjBase):
     :type max_split_size: int
     :param chunk_size: Record to chunks of size KB before writing to disk
     :type chunk_size: int
-    :param max_split_duration: Specify the maximum duration of the recorded bag file
+    :param max_split_duration: Specify the maximum duration (in minutes) of the recorded bag file.
     :type max_split_duration: int
-    :param max_split_duration_unit: The unit of MaxSplitDuration. Can be m (minutes) or h (hours). Default is empty (seconds)
-    :type max_split_duration_unit: :py:class:`~rapyuta_io.clients.rosbag.ROSBagMaxSplitDurationUnit`
     """
 
     def __init__(self, all_topics=None, topics=None, topic_include_regex=None,
                  topic_exclude_regex=None, max_message_count=None, node=None, compression=None,
                  max_splits=None, max_split_size=None, chunk_size=None,
-                 max_split_duration=None, max_split_duration_unit=''):
+                 max_split_duration=None):
         self.validate(all_topics, topics, topic_include_regex, topic_exclude_regex, node,
-                      compression, max_splits, max_split_duration, max_split_duration_unit)
+                      compression, max_splits, max_split_duration)
         self.all_topics = all_topics
         self.topics = topics
         self.topic_include_regex = topic_include_regex
@@ -284,12 +280,11 @@ class ROSBagOptions(ObjBase):
         self.max_split_size = max_split_size
         self.chunk_size = chunk_size
         self.max_split_duration = max_split_duration
-        self.max_split_duration_unit = max_split_duration_unit
 
     @staticmethod
     def validate(all_topics, topics, topic_include_regex,
                  topic_exclude_regex, node, compression,
-                 max_splits, max_split_duration, max_split_duration_unit):
+                 max_splits, max_split_duration):
         if all_topics and not isinstance(all_topics, bool):
             raise InvalidParameterException('all_topics must be a bool')
         if topics and (not isinstance(topics, list) or [x for x in topics if not isinstance(x, six.string_types)]):
@@ -309,9 +304,6 @@ class ROSBagOptions(ObjBase):
             raise InvalidParameterException('One of all_topics, topics, topic_include_regex, and node must be provided')
         if max_split_duration is not None and max_split_duration <= 0:
             raise InvalidParameterException('max_split_duration must be positive')
-        if max_split_duration_unit and \
-                max_split_duration_unit not in list(ROSBagMaxSplitDurationUnit.__members__.values()):
-            raise InvalidParameterException('max_split_duration_unit must be "m" (minutes) or "h" (hours)')
 
     def get_deserialize_map(self):
         return {
@@ -325,8 +317,7 @@ class ROSBagOptions(ObjBase):
             'max_splits': 'maxSplits',
             'max_split_size': 'maxSplitSize',
             'chunk_size': 'chunkSize',
-            'max_split_duration': 'maxSplitDuration',
-            'max_split_duration_unit': 'maxSplitDurationUnit'
+            'max_split_duration': 'maxSplitDuration'
         }
 
     def get_serialize_map(self):
@@ -341,8 +332,7 @@ class ROSBagOptions(ObjBase):
             'maxSplits': 'max_splits',
             'maxSplitSize': 'max_split_size',
             'chunkSize': 'chunk_size',
-            'maxSplitDuration': 'max_split_duration',
-            'maxSplitDurationUnit': 'max_split_duration_unit'
+            'maxSplitDuration': 'max_split_duration'
         }
 
 
@@ -498,20 +488,6 @@ class ROSBagCompression(str, enum.Enum):
 
     LZ4 = 'LZ4'
     BZ2 = 'BZ2'
-
-
-class ROSBagMaxSplitDurationUnit(str, enum.Enum):
-    """
-    Enumeration variables for the supported units for rosbag max split duration. Units may be 'm', or 'h' \n
-    ROSBagMaxSplitDurationUnit.Minute \n
-    ROSBagMaxSplitDurationUnit.Hour \n
-    """
-
-    def __str__(self):
-        return str(self.value)
-
-    Minute = 'm'
-    Hour = 'h'
 
 
 class ROSBagJobStatus(str, enum.Enum):
