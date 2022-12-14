@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.6.1...v1.7.0) (2022-12-14)
+
+
+### Features
+
+* **rosbags:** adds support for splitting rosbags by duration ([3770e00](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/3770e00a7d95d6ca8699185a96bf6941a29c3875))
+
 # [1.6.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.5.0...v1.6.0) (2022-10-27)
 ### Features
 - **device:** Added support for throttling and latching of rosbags
