@@ -207,8 +207,8 @@ class OverrideOptions(ObjBase):
 
     def get_deserialize_map(self):
         return {
-            'topic_override_info': 'topicOverrideInfo',
-            'exclude_topics': 'excludeTopics'
+            'topic_override_info': list_field('topicOverrideInfo', TopicOverrideInfo),
+            'exclude_topics': list_field('excludeTopics', str)
         }
 
 
@@ -236,6 +236,8 @@ class ROSBagOptions(ObjBase):
     :vartype max_split_size: int
     :ivar chunk_size: Record to chunks of size KB before writing to disk
     :vartype chunk_size: int
+    :ivar max_split_duration: Specify the maximum duration (in minutes) of the recorded bag file
+    :vartype max_split_duration: int
 
     :param all_topics: Record all topics
     :type all_topics: bool
@@ -257,13 +259,16 @@ class ROSBagOptions(ObjBase):
     :type max_split_size: int
     :param chunk_size: Record to chunks of size KB before writing to disk
     :type chunk_size: int
+    :param max_split_duration: Specify the maximum duration (in minutes) of the recorded bag file.
+    :type max_split_duration: int
     """
 
     def __init__(self, all_topics=None, topics=None, topic_include_regex=None,
                  topic_exclude_regex=None, max_message_count=None, node=None, compression=None,
-                 max_splits=None, max_split_size=None, chunk_size=None):
+                 max_splits=None, max_split_size=None, chunk_size=None,
+                 max_split_duration=None):
         self.validate(all_topics, topics, topic_include_regex, topic_exclude_regex, node,
-                      compression, max_splits)
+                      compression, max_splits, max_split_duration)
         self.all_topics = all_topics
         self.topics = topics
         self.topic_include_regex = topic_include_regex
@@ -274,11 +279,12 @@ class ROSBagOptions(ObjBase):
         self.max_splits = max_splits
         self.max_split_size = max_split_size
         self.chunk_size = chunk_size
+        self.max_split_duration = max_split_duration
 
     @staticmethod
     def validate(all_topics, topics, topic_include_regex,
                  topic_exclude_regex, node, compression,
-                 max_splits):
+                 max_splits, max_split_duration):
         if all_topics and not isinstance(all_topics, bool):
             raise InvalidParameterException('all_topics must be a bool')
         if topics and (not isinstance(topics, list) or [x for x in topics if not isinstance(x, six.string_types)]):
@@ -296,6 +302,8 @@ class ROSBagOptions(ObjBase):
             raise InvalidParameterException('max_splits must be a int')
         if not all_topics and not topics and not topic_include_regex and not node:
             raise InvalidParameterException('One of all_topics, topics, topic_include_regex, and node must be provided')
+        if max_split_duration is not None and max_split_duration <= 0:
+            raise InvalidParameterException('max_split_duration must be positive')
 
     def get_deserialize_map(self):
         return {
@@ -309,6 +317,7 @@ class ROSBagOptions(ObjBase):
             'max_splits': 'maxSplits',
             'max_split_size': 'maxSplitSize',
             'chunk_size': 'chunkSize',
+            'max_split_duration': 'maxSplitDuration'
         }
 
     def get_serialize_map(self):
@@ -323,6 +332,7 @@ class ROSBagOptions(ObjBase):
             'maxSplits': 'max_splits',
             'maxSplitSize': 'max_split_size',
             'chunkSize': 'chunk_size',
+            'maxSplitDuration': 'max_split_duration'
         }
 
 
