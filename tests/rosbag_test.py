@@ -21,6 +21,29 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
     def setUp(self):
         self.setUpPyfakefs()
 
+    @patch('requests.request')
+    def test_get_rosbag_job_success(self, mock_request):
+        expected_url = 'https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-jobs/job/job-guid'
+        mock_get_rosbag_job_request = Mock()
+        mock_get_rosbag_job_request.text = ROSBAG_JOB_SUCCESS
+        mock_get_rosbag_job_request.status_code = requests.codes.OK
+        mock_request.side_effect = [mock_get_rosbag_job_request]
+        client = get_client()
+        rosbag_job = client.get_rosbag_job('job-guid')
+        mock_request.assert_called_once_with(headers=headers,
+                                             json=None,
+                                             url=expected_url,
+                                             method='GET',
+                                             params=None)
+        self.assertEqual(rosbag_job.guid, 'job-guid')
+    
+    def test_get_rosbag_job_invalid_job_id(self):
+        expected_err = 'guid needs to be a non-empty string'
+        client = get_client()
+        with self.assertRaises(InvalidParameterException) as e:
+            client.get_rosbag_job(1)
+        self.assertEqual(str(e.exception), expected_err)
+
     def test_create_rosbag_job_invalid_rosbag_job_type(self):
         expected_err_msg = 'rosbag job must be non-empty and of type rapyuta_io.clients.rosbag.ROSBagJob'
         client = get_client()

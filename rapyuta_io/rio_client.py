@@ -1025,6 +1025,27 @@ class Client(object):
         """
         return self._catalog_client.rollback_build(buildOperation=buildOperation)
 
+    def get_rosbag_job(self, guid):
+        """
+        Get ROSBag Job
+
+        :param guid: ROSBag Job GUID
+        :type guid: str
+
+        Following example demonstrates how to fetch a ROSBag Job.
+
+            >>> from rapyuta_io import Client
+            >>> client = Client(auth_token='auth_token', project='project_guid')
+            >>> rosbag_job = client.get_rosbag_job('job-guid')
+
+        """
+        if not guid or not isinstance(guid, six.string_types):
+            raise InvalidParameterException('guid needs to be a non-empty string')
+        rosbag_job = self._catalog_client.get_rosbag_job(guid)
+        rosbag_job = ROSBagJob.deserialize(rosbag_job)
+        self._add_auth_token(rosbag_job)
+        return rosbag_job
+
     def create_rosbag_job(self, rosbag_job):
         """
         Create a ROSBag Job
