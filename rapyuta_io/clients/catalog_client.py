@@ -140,6 +140,11 @@ class CatalogClient(CatalogConfig):
         return self._execute(url, HttpMethod.PUT, payload=buildOperation)
 
     @response_validator(True)
+    def get_rosbag_job(self, guid):
+        url = self._catalog_api_host + '/rosbag-jobs/job/{}'.format(guid)
+        return self._execute(url, HttpMethod.GET)
+
+    @response_validator(True)
     def create_rosbag_job(self, rosbag_job):
         url = self._catalog_api_host + '/rosbag-jobs/{}'.format(rosbag_job.deployment_id)
         return self._execute(url, HttpMethod.POST, payload=rosbag_job.serialize())
