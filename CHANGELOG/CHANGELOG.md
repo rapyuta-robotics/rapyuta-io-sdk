@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.7.0...v1.8.0) (2023-02-07)
+
+
+### Features
+
+* **rosbag:** fetches rosbag job by guid ([3d93c6e](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/3d93c6e2f8c1d4e6bda7de2815b1ec3a1001bdc9))
+
 # [1.7.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.6.1...v1.7.0) (2022-12-14)
 
 

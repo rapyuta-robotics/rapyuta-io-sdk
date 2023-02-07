@@ -15,4 +15,4 @@ from .clients.secret import Secret, SecretConfigSourceSSHAuth, SecretConfigDocke
     SecretConfigSourceBasicAuth
 from .clients.rosbag import UploadOptions
 
-__version__ = "1.7.0"
+__version__ = "1.8.0"
