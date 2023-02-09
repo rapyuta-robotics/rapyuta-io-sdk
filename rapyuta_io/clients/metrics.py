@@ -189,7 +189,7 @@ class QueryMetricsRequest(ObjBase):
     :vartype step_interval: :py:class:`~rapyuta_io.clients.metrics.StepInterval`
     :ivar ~.metrics: list of metrics
     :vartype ~.metrics: list(:py:class:`~rapyuta_io.clients.metrics.MetricOperation`)
-    :ivar tags: key pair of tags (must include project_id and organization_id)
+    :ivar tags: key pair of tags (must include tenant_id and organization_id)
     :vartype tags: dict
     :ivar sort: ordering to sort the metrics
     :vartype sort: :py:class:`~rapyuta_io.clients.metrics.SortOrder`
@@ -204,7 +204,7 @@ class QueryMetricsRequest(ObjBase):
     :type step_interval: :py:class:`~rapyuta_io.clients.metrics.StepInterval`
     :param metrics: list of metrics
     :type metrics: list(:py:class:`~rapyuta_io.clients.metrics.MetricOperation`)
-    :param tags: key pair of tags (must include project_id and organization_id)
+    :param tags: key pair of tags (must include tenant_id and organization_id)
     :type tags: dict
     :param sort: ordering to sort the metrics
     :type sort: :py:class:`~rapyuta_io.clients.metrics.SortOrder`
@@ -212,7 +212,7 @@ class QueryMetricsRequest(ObjBase):
     :type groupby: list(str)
     """
 
-    PROJECT_ID_TAG = 'project_id'
+    TENANT_ID_TAG = 'tenant_id'
     ORGANIZATION_ID_TAG = 'organization_id'
 
     def __init__(self, from_datetime, to_datetime, step_interval, metrics, tags=None, sort=None, groupby=None):
