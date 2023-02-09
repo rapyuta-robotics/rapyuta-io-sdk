@@ -1636,17 +1636,23 @@ class Client(object):
                                             'of type rapyuta_io.clients.metrics.MetricsQueryRequest')
 
         default_tags = {}
-        if not query_metrics_request.tags.get(query_metrics_request.PROJECT_ID_TAG):
+        if not query_metrics_request.tags.get(query_metrics_request.TENANT_ID_TAG):
             project = self._core_api_client._project
             if not project:
                 raise InvalidParameterException('Either set project on client using client.set_project(), or '
-                                                'set {} in tags'.format(query_metrics_request.PROJECT_ID_TAG))
-            default_tags[query_metrics_request.PROJECT_ID_TAG] = project
+                                                'set {} in tags'.format(query_metrics_request.TENANT_ID_TAG))
+            default_tags[query_metrics_request.TENANT_ID_TAG] = {
+                "operator": "eq",
+                "value": project
+            }
 
         if not query_metrics_request.tags.get(query_metrics_request.ORGANIZATION_ID_TAG):
             user = self._core_api_client.get_user()
             organization_guid = user.organization.guid
-            default_tags[query_metrics_request.ORGANIZATION_ID_TAG] = organization_guid
+            default_tags[query_metrics_request.ORGANIZATION_ID_TAG] = {
+                "operator": "eq",
+                "value": organization_guid
+            }
 
         query_metrics_request.tags.update(default_tags)
 
