@@ -1,6 +1,8 @@
 # encoding: utf-8
 from __future__ import absolute_import
+
 from string import Template
+
 from tests.utils.package_responses import merge_dicts
 
 DEVICE_BASE = Template('''
@@ -812,5 +814,11 @@ CREATE_DIRECT_LINK_SUCCESS_RESPONSE = '''
             "url_uuid":"testurluuid"
         }
     }
+}
+'''
+
+PATCH_DAEMONS_SUCCESS = '''
+{
+    "success": true
 }
 '''

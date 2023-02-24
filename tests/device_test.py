@@ -2,31 +2,30 @@
 from __future__ import absolute_import
 
 import copy
-
-import requests
 import json
 import unittest
 from datetime import timedelta, datetime
 from time import time
 
+import requests
 from mock import patch, Mock, MagicMock, call
 from requests import Response
 
 from rapyuta_io import ROSDistro
 from rapyuta_io.clients.device import Device, DeviceConfig, DevicePythonVersion
-from rapyuta_io.utils import ObjDict, InvalidCommandException
 from rapyuta_io.clients.device_manager import DeviceArch
 from rapyuta_io.clients.model import Command, SharedURL
 from rapyuta_io.utils import DeviceNotFoundException, ParameterMissingException, \
     DeploymentRunningException, ResourceNotFoundError, BadRequestError, LogsUUIDNotFoundException, \
     InvalidParameterException, InternalServerError
+from rapyuta_io.utils import ObjDict, InvalidCommandException
 from tests.utils.client import get_client, headers
 from tests.utils.device_respones import DEVICE_LIST, DEVICE_INFO, DEVICE_LIST_EMPTY, \
     DEVICE_NOT_FOUND, EXECUTE_COMMAND_BAD_REQUEST, EXECUTE_COMMAND_OK, DELETE_DEVICE_BAD_REQUEST, \
     DELETE_DEVICE_OK, UPDATE_DEVICE_BAD_REQUEST, UPDATE_DEVICE_OK, DEVICE_SELECTION, APPLY_PARAMETERS_SUCCESS_RESPONSE, \
     CREATE_DIRECT_LINK_SUCCESS_RESPONSE, CREATE_DOCKERCOMPOSE_DEVICE_SUCCESS, GET_DOCKERCOMPOSE_DEVICE_SUCCESS, \
     CREATE_PREINSTALLED_DEVICE_SUCCESS, GET_PREINSTALLED_DEVICE_SUCCESS, UPGRADE_DOCKERCOMPOSE_DEVICE_SUCCESS, \
-    UPGRADE_DEVICE_BAD_REQUEST, CREATE_BOTH_RUNTIMES_DEVICE_SUCCESS
+    UPGRADE_DEVICE_BAD_REQUEST, CREATE_BOTH_RUNTIMES_DEVICE_SUCCESS, PATCH_DAEMONS_SUCCESS
 
 
 class DeviceTests(unittest.TestCase):
@@ -799,6 +798,33 @@ class DeviceTests(unittest.TestCase):
         client.delete_device('test-device-id')
         mock_request.assert_called_once_with(
             url=expected_url, method='DELETE', headers=headers, params={}, json=None)
+
+    def test_toggle_features_invalid_id_failure(self):
+        expected_msg = 'device_id needs to be a non empty string'
+        client = get_client()
+        with self.assertRaises(InvalidParameterException) as e:
+            client.toggle_features(1, [])
+        self.assertEqual(expected_msg, str(e.exception))
+
+    def test_toggle_features_invalid_features_failure(self):
+        expected_msg = 'device_id needs to be a non empty string'
+        client = get_client()
+        with self.assertRaises(InvalidParameterException) as e:
+            client.toggle_features(1, "features")
+        self.assertEqual(expected_msg, str(e.exception))
+
+    @patch('requests.request')
+    def test_toggle_features_success(self, mock_request):
+        expected_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/devices/test-device-id/daemons'
+        toggle_features_success = Mock()
+        toggle_features_success.text = PATCH_DAEMONS_SUCCESS
+        toggle_features_success.status_code = requests.codes.OK
+        mock_request.side_effect = [toggle_features_success]
+        client = get_client()
+        client.toggle_features('test-device-id', [('vpn', True)])
+        expected_payload = {"vpn": True}
+        mock_request.assert_called_once_with(
+            url=expected_url, method='PATCH', headers=headers, params={}, json=expected_payload)
 
     @patch('requests.request')
     def test_upgrade_device_dockercompose_success(self, mock_request):

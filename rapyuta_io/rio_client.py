@@ -1,33 +1,33 @@
 # encoding: utf-8
 from __future__ import absolute_import
+
 import json
 import os
 
+import six
+
 from rapyuta_io.clients import DeviceManagerClient, _ParamserverClient
+from rapyuta_io.clients.build import Build, BuildStatus
 from rapyuta_io.clients.catalog_client import CatalogClient
 from rapyuta_io.clients.core_api_client import CoreAPIClient
 from rapyuta_io.clients.deployment import Deployment
 from rapyuta_io.clients.device import Device
-from rapyuta_io.clients.native_network import NativeNetwork
-from rapyuta_io.clients.organization import Organization
-from rapyuta_io.clients.package import Package
-from rapyuta_io.clients.project import Project
-from rapyuta_io.clients.secret import Secret
-from rapyuta_io.clients.persistent_volumes import VolumeInstance
-from rapyuta_io.clients.rip_client import RIPClient
-from rapyuta_io.clients.routed_network import RoutedNetwork, Parameters
-from rapyuta_io.clients.build import Build, BuildStatus
-from rapyuta_io.clients.rosbag import ROSBagJob, ROSBagJobStatus, ROSBagBlob, ROSBagBlobStatus
-from rapyuta_io.clients.metrics import QueryMetricsRequest, StepInterval, SortOrder, \
-    MetricOperation, MetricFunction, QueryMetricsResponse, ListMetricsRequest, ListTagKeysRequest, \
+from rapyuta_io.clients.metrics import QueryMetricsRequest, MetricOperation, MetricFunction, QueryMetricsResponse, \
+    ListMetricsRequest, ListTagKeysRequest, \
     Metric, Tags, ListTagValuesRequest
+from rapyuta_io.clients.native_network import NativeNetwork
+from rapyuta_io.clients.package import Package
+from rapyuta_io.clients.package import Runtime, ROSDistro, RestartPolicy
+from rapyuta_io.clients.persistent_volumes import VolumeInstance
+from rapyuta_io.clients.project import Project
+from rapyuta_io.clients.rip_client import RIPClient
+from rapyuta_io.clients.rosbag import ROSBagJob, ROSBagJobStatus, ROSBagBlob, ROSBagBlobStatus
+from rapyuta_io.clients.routed_network import RoutedNetwork, Parameters
+from rapyuta_io.clients.secret import Secret
+from rapyuta_io.utils import InvalidAuthTokenException, InvalidParameterException
 from rapyuta_io.utils import to_objdict
 from rapyuta_io.utils.settings import VOLUME_PACKAGE_ID, default_host_config
-from rapyuta_io.utils import InvalidAuthTokenException, InvalidParameterException
-from rapyuta_io.clients.package import Runtime, ROSDistro, RestartPolicy
 from rapyuta_io.utils.utils import get_api_response_data, valid_list_elements
-from rapyuta_io.utils.partials import PartialMixin
-import six
 
 
 class Client(object):
@@ -455,6 +455,33 @@ class Client(object):
         if not device_id or not isinstance(device_id, six.string_types):
             raise InvalidParameterException('device_id needs to be a non empty string')
         return self._dmClient.delete_device(device_id)
+
+    def toggle_features(self, device_id, features):
+        """
+        Patch a device on rapyuta.io platform.
+
+        :param device_id: Device ID
+        :type device_id: str
+        :param features: A tuple of featues and their states
+        :type features: list<tuple>
+
+        Following example demonstrates how to toggle features a device.
+
+            >>> from rapyuta_io import Client
+            >>> client = Client(auth_token='auth_token', project='project_guid')
+            >>> client.toggle_features('device-id', [('vpn', True), ('tracing', False)])
+        """
+        if not device_id or not isinstance(device_id, six.string_types):
+            raise InvalidParameterException('device_id needs to be a non empty string')
+        if not features or not (isinstance(features, list) or isinstance(features, tuple)):
+            raise InvalidParameterException('features needs to be a list or tuple')
+
+        data = {}
+        for entry in features:
+            feature, state = entry
+            data[feature] = state
+
+        return self._dmClient.patch_daemons(device_id, data)
 
     def create_package_from_manifest(self, manifest_filepath, retry_limit=0):
         """
