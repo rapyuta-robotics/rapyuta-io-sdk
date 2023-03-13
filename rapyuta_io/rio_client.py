@@ -563,7 +563,7 @@ class Client(object):
         """
         return self._catalog_client.create_package(manifest, retry_limit)
 
-    def upload_configurations(self, rootdir, tree_names=None, delete_existing_trees=False):
+    def upload_configurations(self, rootdir, tree_names=None, delete_existing_trees=False, as_folder=False):
         """
         Traverses rootdir and uploads configurations following the same directory structure.
 
@@ -573,6 +573,8 @@ class Client(object):
         :type tree_names: list[str], optional
         :param delete_existing_trees: For each tree to upload, delete existing tree at the server. Defaults to False
         :type delete_existing_trees: bool, optional
+        :param as_folder: For each tree to upload, upload as an folder hierarchy
+        :as_folder: bool, optional
 
         Following example demonstrates how to use upload_configurations and handle errors.
 
@@ -589,7 +591,7 @@ class Client(object):
             ...     print 'failed file/directory read', e
 
         """
-        return self._paramserver_client.upload_configurations(rootdir, tree_names, delete_existing_trees)
+        return self._paramserver_client.upload_configurations(rootdir, tree_names, delete_existing_trees, as_folder)
 
     def download_configurations(self, rootdir, tree_names=None, delete_existing_trees=False):
         """
