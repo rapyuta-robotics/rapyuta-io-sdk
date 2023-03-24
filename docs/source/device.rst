@@ -14,7 +14,7 @@ Client Module
 -----------------
 
 .. autoclass:: rapyuta_io.rio_client.Client
-    :members: __init__, get_all_devices, get_device, create_device, delete_device
+    :members: __init__, get_all_devices, get_device, create_device, delete_device, apply_parameters, toggle_features
 
 
 
