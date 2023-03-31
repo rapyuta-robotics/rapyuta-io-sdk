@@ -1,7 +1,8 @@
 from __future__ import absolute_import
 from rapyuta_io import DeploymentStatusConstants, DeviceArch
 from rapyuta_io.clients.deployment import DeploymentPhaseConstants
-from rapyuta_io.clients.native_network import NativeNetwork, NativeNetworkLimits, Parameters
+from rapyuta_io.clients.native_network import NativeNetwork, Parameters
+from rapyuta_io.clients.common_models import Limits
 from rapyuta_io.clients.package import Runtime, ROSDistro
 from rapyuta_io.utils.utils import generate_random_value
 from sdk_test.config import Configuration
@@ -36,7 +37,7 @@ class NativeNetworkTest(PackageTest, DeviceTest):
         self.name = 'net-' + generate_random_value()
         self.ros_distro = ROSDistro.MELODIC
         self.runtime = Runtime.CLOUD
-        self.parameters = Parameters(NativeNetworkLimits.SMALL)
+        self.parameters = Parameters(Limits(cpu=1, memory=1024))
         self.device_runtime = Runtime.DEVICE
         self.docker_device = self.config.get_devices(arch=DeviceArch.AMD64, runtime='Dockercompose')[0]
         self.docker_device.refresh()

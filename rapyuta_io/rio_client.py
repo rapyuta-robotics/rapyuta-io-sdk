@@ -1629,7 +1629,6 @@ class Client(object):
         if not isinstance(native_network, NativeNetwork):
             raise InvalidParameterException("native_network must be non-empty and of type "
                                             "rapyuta_io.clients.native_network.NativeNetwork")
-
         native_network_response = self._catalog_client.create_native_network(native_network)
         return self.get_native_network(native_network_response['guid'])
 
