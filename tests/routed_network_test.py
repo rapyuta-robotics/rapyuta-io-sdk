@@ -3,7 +3,7 @@ import requests
 import unittest
 import json
 from mock import patch, Mock, call
-from rapyuta_io.clients.routed_network import RoutedNetwork, Parameters, RoutedNetworkLimits
+from rapyuta_io.clients.routed_network import RoutedNetwork, Parameters
 from rapyuta_io.clients.package import ROSDistro
 from rapyuta_io.clients.device import Device
 from rapyuta_io.utils import to_objdict, ResourceNotFoundError
@@ -14,7 +14,7 @@ from tests.utils.client import get_client, remove_auth_token, add_auth_token, he
 from tests.utils.routed_networks_responses import ROUTED_NETWORK_CREATE_SUCCESS, ROUTED_NETWORK_GET_SUCCESS, \
     ROUTED_NETWORK_LIST_SUCCESS, ROUTED_NETWORK_NOT_FOUND
 from six.moves import map
-
+from rapyuta_io.clients.common_models import Limits
 
 class RoutedNetworkTest(unittest.TestCase):
 
@@ -48,16 +48,6 @@ class RoutedNetworkTest(unittest.TestCase):
         with self.assertRaises(InvalidParameterException) as e:
             client.create_cloud_routed_network('test-network', ROSDistro.KINETIC,
                                                True, 'invalid parameters')
-
-        self.assertEqual(str(e.exception), expected_err_msg)
-
-    def test_create_cloud_routed_network_invalid_limits(self):
-        expected_err_msg = 'limits must be one of rapyuta_io.clients.routed_network.RoutedNetworkLimits'
-
-        client = get_client()
-        with self.assertRaises(InvalidParameterException) as e:
-            client.create_cloud_routed_network('test-network', ROSDistro.KINETIC,
-                                               True, Parameters('invalid limits'))
 
         self.assertEqual(str(e.exception), expected_err_msg)
 
@@ -236,7 +226,7 @@ class RoutedNetworkTest(unittest.TestCase):
             'runtime': 'cloud',
             'rosDistro': 'kinetic',
             'shared': True,
-            'parameters': {'limits': {'cpu': 2, 'memory': 8192}},
+            'parameters': {'limits': {'cpu': 1, 'memory': 1024}},
         }
         expected_url = 'https://gacatalog.apps.okd4v2.prod.rapyuta.io/routednetwork'
 
@@ -249,12 +239,12 @@ class RoutedNetworkTest(unittest.TestCase):
         mock_request.side_effect = [mock_create_network, mock_get_network]
         client = get_client()
         routed_network = client.create_cloud_routed_network('test-network', ROSDistro.KINETIC,
-                                                            True, Parameters(RoutedNetworkLimits.MEDIUM))
+                                                            True, Parameters(limits=Limits(1, 1024)))
 
         mock_request.assert_has_calls([
             call(headers=headers, json=expected_payload, url=expected_url, method='POST', params=None),
             call(headers=headers, json=None, url=expected_url + '/' + 'net-testguid', method='GET', params=None)
-        ])
+            ])
         self.assertEqual(routed_network.guid, 'net-testguid')
         self.assertEqual(routed_network.name, 'test-network')
         self.assertFalse(routed_network.is_partial)
