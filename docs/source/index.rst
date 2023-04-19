@@ -73,6 +73,7 @@ You can read the documentation for individual resource modules:
    Build <build>
    Package <package>
    Deployment <deployment>
+   Parameters <parameter>
    Persistent Volumes <volumes>
 
    Routed Network <routed_network>

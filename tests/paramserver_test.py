@@ -13,7 +13,8 @@ from tests.utils.client import get_client, headers
 from tests.utils.paramserver import UPLOAD_SUCCESS_TREE_PATHS, UPLOAD_SUCCESS_MOCK_CALLS, UPLOAD_FAILURE_400CASE_TREE_PATHS, \
     UPLOAD_FAILURE_400CASE_MOCK_CALLS, DOWNLOAD_TREES_RESPONSE, DOWNLOAD_TREE1_RESPONSE, DOWNLOAD_TREE2_RESPONSE, \
     UPLOAD_FAILURE_500CASE_TREE_PATHS, UPLOAD_FAILURE_500CASE_MOCK_CALLS, UPLOAD_SUCCESS_WITH_TREE_NAMES_MOCK_CALLS, \
-    UPLOAD_SUCCESS_DELETE_EXISTING_MOCK_CALLS, GET_BLOB_TREE, BINARY_DATA, BINARY_FILE_NODE, BYTE_ARRAY_DATA
+    UPLOAD_SUCCESS_DELETE_EXISTING_MOCK_CALLS, GET_BLOB_TREE, BINARY_DATA, BINARY_FILE_NODE, BYTE_ARRAY_DATA,\
+    UPLOAD_SUCCESS_FOLDER_MOCK_CALLS, UPLOAD_SUCCESS_WITH_TREE_NAMES_AS_FOLDER_MOCK_CALLS
 import six
 
 
@@ -21,6 +22,7 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
     FILE_NODE = 'FileNode'
     VALUE_NODE = 'ValueNode'
     ATTRIBUTE_NODE = 'AttributeNode'
+    FOLDER_NODE = 'FolderNode'
 
     URL_PREFIX = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/paramserver/tree'
 
@@ -69,6 +71,23 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
         self.assertEqual(len(expected_mock_calls), mock_request.call_count, 'extra request calls were made')
 
     @patch('requests.request')
+    def test_upload_configurations_as_folder_success(self, mock_request):
+        rootdir = '/upload/success'
+        self._create_fake_filesystem(rootdir, UPLOAD_SUCCESS_TREE_PATHS)
+        expected_mock_calls = UPLOAD_SUCCESS_FOLDER_MOCK_CALLS
+
+        def side_effect(*args, **kwargs):
+            mock_response = MagicMock(spec=Response)
+            mock_response.status_code = requests.codes.OK
+            mock_response.text = 'null'
+            return mock_response
+        mock_request.side_effect = side_effect
+
+        get_client().upload_configurations(rootdir, as_folder=True)
+        mock_request.assert_has_calls(expected_mock_calls, any_order=True)
+        self.assertEqual(len(expected_mock_calls), mock_request.call_count, 'extra request calls were made')
+
+    @patch('requests.request')
     def test_upload_configurations_success_with_tree_names(self, mock_request):
         rootdir = '/upload/success/with_tree_names'
         self._create_fake_filesystem(rootdir, UPLOAD_SUCCESS_TREE_PATHS)
@@ -82,6 +101,23 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
         mock_request.side_effect = side_effect
 
         get_client().upload_configurations(rootdir, tree_names=['tree2'])
+        mock_request.assert_has_calls(expected_mock_calls, any_order=True)
+        self.assertEqual(len(expected_mock_calls), mock_request.call_count, 'extra request calls were made')
+
+    @patch('requests.request')
+    def test_upload_configurations_success_as_folder_with_tree_names(self, mock_request):
+        rootdir = '/upload/success/with_tree_names'
+        self._create_fake_filesystem(rootdir, UPLOAD_SUCCESS_TREE_PATHS)
+        expected_mock_calls = UPLOAD_SUCCESS_WITH_TREE_NAMES_AS_FOLDER_MOCK_CALLS
+
+        def side_effect(*args, **kwargs):
+            mock_response = MagicMock(spec=Response)
+            mock_response.status_code = requests.codes.OK
+            mock_response.text = 'null'
+            return mock_response
+        mock_request.side_effect = side_effect
+
+        get_client().upload_configurations(rootdir, tree_names=['tree2'], as_folder=True)
         mock_request.assert_has_calls(expected_mock_calls, any_order=True)
         self.assertEqual(len(expected_mock_calls), mock_request.call_count, 'extra request calls were made')
 

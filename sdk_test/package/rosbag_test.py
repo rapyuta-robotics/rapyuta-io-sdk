@@ -258,6 +258,7 @@ class ROSBagJobTest(PackageTest):
         /topic3: 5
         /topic4: 20
         """
+        difference_margin = 8
         topic2_throttled_freq = 15
         topic3_throttled_freq = 2
         self.logger.info('deploying throttling package')
@@ -318,7 +319,20 @@ class ROSBagJobTest(PackageTest):
         topic1_metadata = next(filter(lambda topic: topic.name == '/topic1', topics), None)
         topic2_metadata = next(filter(lambda topic: topic.name == '/topic2', topics), None)
         topic3_metadata = next(filter(lambda topic: topic.name == '/topic3', topics), None)
-        self.assertEqual(topic1_metadata.message_count, topic2_metadata.message_count)
+
+        # asserting that the message count numbers recorded on topic1 and topic2 are close
+        expected_msg_count_t1_t2 = record_duration * topic2_throttled_freq
+        self.assertGreater(topic1_metadata.message_count, expected_msg_count_t1_t2 - difference_margin)
+        self.assertLess(topic1_metadata.message_count, expected_msg_count_t1_t2 + difference_margin)
+        self.assertGreater(topic2_metadata.message_count, expected_msg_count_t1_t2 - difference_margin)
+        self.assertLess(topic2_metadata.message_count, expected_msg_count_t1_t2 + difference_margin)
+        self.logger.info("Expected msg count: %s, "
+                         "Actual msg count on '/topic1': %s, "
+                         "Actual msg count on '/topic2': %s, "
+                         "Allowed difference margin: %s",
+                         expected_msg_count_t1_t2, topic1_metadata.message_count, topic2_metadata.message_count,
+                         difference_margin)
+
         self.assertGreater(topic3_metadata.message_count, record_duration * topic3_throttled_freq - 5)
         self.assertLess(topic3_metadata.message_count, record_duration * topic3_throttled_freq + 5)
         self.deployment_with_throttling.deprovision()

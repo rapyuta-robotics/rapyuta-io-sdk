@@ -22,7 +22,10 @@ class QueryMetricsTests(unittest.TestCase):
         self.from_datetime = datetime.now() - timedelta(days=1)
         self.to_datetime = datetime.now()
         self.metrics = [MetricOperation(MetricFunction.COUNT, 'cpu.usage_idle')]
-        self.tags = {'project_id': self.project, 'organization_id': self.organization}
+        self.tags = {
+            'tenant_id': {'operator': 'eq', 'value': 'test-project'},
+            'organization_id': {'operator': 'eq', 'value': 'test-organization'}
+        }
         super(QueryMetricsTests, self).setUp()
 
     def test_query_metrics_invalid_from_date(self):
@@ -163,7 +166,10 @@ class QueryMetricsTests(unittest.TestCase):
     @patch('requests.request')
     def test_query_metrics_success(self, mock_request):
         expected_payload = {'from': self.from_datetime.isoformat(),
-                            'tags': {'organization_id': 'test-organization', 'project_id': 'test-project'},
+                            'tags': {
+                                'organization_id': {'operator': 'eq', 'value': 'test-organization'},
+                                'tenant_id': {'operator': 'eq', 'value': 'test-project'}
+                            },
                             'metrics': [{'function': 'count', 'metric_name': 'cpu.usage_idle'}],
                             'to': self.to_datetime.isoformat(), 'step': '1m', 'sort': 'desc'}
 
@@ -188,12 +194,15 @@ class QueryMetricsTests(unittest.TestCase):
         self.assertEqual(len(response.columns) == len(response.rows), True)
         self.assertEqual(list(cols), ['timestamp', 'count(cpu.usage_user)'])
         self.assertEqual(list(rows), [(1612814880000000000, 0.7716360673079268),
-                                (1612814890000000000, 0.7716360673079268)])
+                                      (1612814890000000000, 0.7716360673079268)])
 
     @patch('requests.request')
     def test_query_metrics_success_with_groupby(self, mock_request):
         expected_payload = {'sort': 'asc', 'from': self.from_datetime.isoformat(),
-                            'tags': {'organization_id': 'test-organization', 'project_id': 'test-project'},
+                            'tags': {
+                                'organization_id': {'operator': 'eq', 'value': 'test-organization'},
+                                'tenant_id': {'operator': 'eq', 'value': 'test-project'}
+                            },
                             'metrics': [{'function': 'count', 'metric_name': 'cpu.usage_idle'}],
                             'to': self.to_datetime.isoformat(), 'step': '1m',
                             'groupby': ['device_id', 'host']}
@@ -230,13 +239,16 @@ class QueryMetricsTests(unittest.TestCase):
     @patch('requests.request')
     def test_query_metrics_success_without_project_in_tags(self, mock_request):
         expected_payload = {'from': self.from_datetime.isoformat(),
-                            'tags': {'organization_id': 'test-organization', 'project_id': 'test_project'},
+                            'tags': {
+                                'organization_id': {'operator': 'eq', 'value': 'test-organization'},
+                                'tenant_id': {'operator': 'eq', 'value': 'test_project'}
+                            },
                             'metrics': [{'function': 'count', 'metric_name': 'cpu.usage_idle'}],
                             'to': self.to_datetime.isoformat(), 'step': '1m', 'sort': 'desc'}
 
         query_metrics = QueryMetricsRequest(self.from_datetime, self.to_datetime,
                                             StepInterval.ONE_MINUTE, self.metrics,
-                                            tags={'organization_id': self.organization},
+                                            tags={'organization_id': {'operator': 'eq', 'value': self.organization}},
                                             sort=SortOrder.DESC)
         mock_query_metrics_request = Mock()
         mock_query_metrics_request.text = QUERY_METRICS_SUCCESS
@@ -257,18 +269,21 @@ class QueryMetricsTests(unittest.TestCase):
         self.assertEqual(len(response.columns) == len(response.rows), True)
         self.assertEqual(list(cols), ['timestamp', 'count(cpu.usage_user)'])
         self.assertEqual(list(rows), [(1612814880000000000, 0.7716360673079268),
-                                (1612814890000000000, 0.7716360673079268)])
+                                      (1612814890000000000, 0.7716360673079268)])
 
     @patch('requests.request')
     def test_query_metrics_success_without_organization_in_tags(self, mock_request):
         expected_payload = {'from': self.from_datetime.isoformat(),
-                            'tags': {'organization_id': 'test-organization', 'project_id': 'test-project'},
+                            'tags': {
+                                'organization_id': {'operator': 'eq', 'value': 'test-organization'},
+                                'tenant_id': {'operator': 'eq', 'value': 'test-project'}
+                            },
                             'metrics': [{'function': 'count', 'metric_name': 'cpu.usage_idle'}],
                             'to': self.to_datetime.isoformat(), 'step': '1m', 'sort': 'desc'}
 
         query_metrics = QueryMetricsRequest(self.from_datetime, self.to_datetime,
                                             StepInterval.ONE_MINUTE, self.metrics,
-                                            tags={'project_id': self.project},
+                                            tags={'tenant_id': {'operator': 'eq', 'value': self.project}},
                                             sort=SortOrder.DESC)
         mock_get_user_request = Mock()
         mock_get_user_request.text = GET_USER_RESPONSE
@@ -294,7 +309,7 @@ class QueryMetricsTests(unittest.TestCase):
         self.assertEqual(len(response.columns) == len(response.rows), True)
         self.assertEqual(list(cols), ['timestamp', 'count(cpu.usage_user)'])
         self.assertEqual(list(rows), [(1612814880000000000, 0.7716360673079268),
-                                (1612814890000000000, 0.7716360673079268)])
+                                      (1612814890000000000, 0.7716360673079268)])
 
     def test_list_metrics_invalid_entity(self):
         expected_err_msg = 'entity should be a member of Entity enum'
@@ -379,8 +394,9 @@ class QueryMetricsTests(unittest.TestCase):
         mock_list_metrics_request.text = LIST_METRICS_SUCCESS
         mock_list_metrics_request.status_code = requests.codes.OK
         mock_request.side_effect = [mock_list_metrics_request]
-        expected_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/metrics/v0/metrics/{}/{}'.format(Entity.PROJECT,
-                                                                                                 self.project)
+        expected_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/metrics/v0/metrics/{}/{}'.format(
+            Entity.PROJECT,
+            self.project)
 
         client = get_client()
         response = client.list_metrics(ListMetricsRequest(Entity.PROJECT, self.project,
@@ -431,7 +447,7 @@ class QueryMetricsTests(unittest.TestCase):
 
         with self.assertRaises(InvalidParameterException) as e:
             client.list_metrics(ListTagKeysRequest(Entity.PROJECT, self.project,
-                                                 'invalid_date', self.to_datetime))
+                                                   'invalid_date', self.to_datetime))
 
         self.assertEqual(str(e.exception), expected_err_msg)
 
@@ -482,8 +498,9 @@ class QueryMetricsTests(unittest.TestCase):
         mock_list_tag_keys_request.text = LIST_TAG_KEYS_SUCCESS
         mock_list_tag_keys_request.status_code = requests.codes.OK
         mock_request.side_effect = [mock_list_tag_keys_request]
-        expected_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/metrics/v0/tags/{}/{}'.format(Entity.PROJECT,
-                                                                                              self.project)
+        expected_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/metrics/v0/tags/{}/{}'.format(
+            Entity.PROJECT,
+            self.project)
 
         client = get_client()
         response = client.list_tag_keys(ListTagKeysRequest(Entity.PROJECT, self.project,
@@ -554,7 +571,7 @@ class QueryMetricsTests(unittest.TestCase):
 
         with self.assertRaises(InvalidParameterException) as e:
             client.list_tag_values(ListTagValuesRequest(Entity.PROJECT, self.project, 'tag',
-                                                      'invalid_data', self.to_datetime))
+                                                        'invalid_data', self.to_datetime))
 
         self.assertEqual(str(e.exception), expected_err_msg)
 
@@ -601,8 +618,9 @@ class QueryMetricsTests(unittest.TestCase):
     def test_list_tag_values_success(self, mock_request):
         tag = 'cpu'
         expected_params = {'start_date': self.from_datetime.isoformat(), 'end_date': self.to_datetime.isoformat()}
-        expected_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/metrics/v0/tags/{}/{}/{}'.format(Entity.PROJECT,
-                                                                                                 self.project, tag)
+        expected_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/metrics/v0/tags/{}/{}/{}'.format(
+            Entity.PROJECT,
+            self.project, tag)
         mock_list_tag_values_request = Mock()
         mock_list_tag_values_request.text = LIST_TAG_VALUES_SUCCESS
         mock_list_tag_values_request.status_code = requests.codes.OK
@@ -624,8 +642,9 @@ class QueryMetricsTests(unittest.TestCase):
         tag = 'cpu'
         from_datetime = datetime.now() - timedelta(days=7, minutes=1)
         expected_params = {'start_date': from_datetime.isoformat(), 'end_date': self.to_datetime.isoformat()}
-        expected_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/metrics/v0/tags/{}/{}/{}'.format(Entity.ORGANIZATION,
-                                                                                                 self.organization, tag)
+        expected_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/metrics/v0/tags/{}/{}/{}'.format(
+            Entity.ORGANIZATION,
+            self.organization, tag)
         mock_list_tag_values_request = Mock()
         mock_list_tag_values_request.text = LIST_TAG_VALUES_SUCCESS
         mock_list_tag_values_request.status_code = requests.codes.OK

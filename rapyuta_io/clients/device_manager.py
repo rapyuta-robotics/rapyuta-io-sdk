@@ -1,12 +1,13 @@
 # encoding: utf-8
 from __future__ import absolute_import
+
 from enum import Enum
 
 from rapyuta_io.clients.device import Device, DeviceStatus
-from rapyuta_io.utils import RestClient, to_objdict
+from rapyuta_io.utils import RestClient
 from rapyuta_io.utils.rest_client import HttpMethod
 from rapyuta_io.utils.settings import DEVICE_API_PATH, DEVICE_SELECTION_API_PATH, PARAMETERS_API_PATH, \
-    DEVICE_API_ADD_DEVICE_PATH
+    DEVICE_API_ADD_DEVICE_PATH, DAEMONS_PATH
 from rapyuta_io.utils.utils import create_auth_header, prepend_bearer_to_auth_token, get_api_response_data, \
     validate_list_of_strings
 
@@ -119,3 +120,9 @@ class DeviceManagerClient:
         url = self._device_api_host + DEVICE_API_PATH + device_id
         headers = create_auth_header(self._auth_token, self._project)
         return RestClient(url).method(HttpMethod.DELETE).headers(headers).execute()
+
+    def patch_daemons(self, device_id, payload):
+        url = self._device_api_host + DEVICE_API_PATH + device_id + DAEMONS_PATH
+        headers = create_auth_header(self._auth_token, self._project)
+        response = RestClient(url).method(HttpMethod.PATCH).headers(headers).execute(payload=payload)
+        return get_api_response_data(response, parse_full=True)

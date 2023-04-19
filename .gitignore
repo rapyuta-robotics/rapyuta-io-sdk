@@ -6,6 +6,7 @@ config.cfg
 .coverage
 cover/
 docs/build/
+docs/output/
 *.*~
 build/*
 dist/*

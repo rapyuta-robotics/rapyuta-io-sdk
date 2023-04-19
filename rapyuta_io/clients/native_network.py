@@ -11,7 +11,7 @@ from rapyuta_io.utils.utils import create_auth_header, get_api_response_data
 from rapyuta_io.utils.object_converter import ObjBase, enum_field, nested_field
 from rapyuta_io.utils.partials import PartialMixin
 import six
-
+from rapyuta_io.clients.common_models import Limits
 
 class NativeNetwork(PartialMixin, ObjBase):
     """
@@ -196,7 +196,7 @@ class Parameters(ObjBase):
     Parameters represents Native Network Parameters
 
     :ivar limits: Values corresponding to limits of the parameters
-    :vartype limits: :py:class:`~rapyuta_io.clients.native_network.NativeNetworkLimits`
+    :vartype limits: :py:class:`~rapyuta_io.clients.common_models.Limits`
     :ivar device_id: device_id of device on which the native network is deployed.
     :vartype device_id: str
     :ivar network_interface: network interface to which native network is binded.
@@ -205,7 +205,7 @@ class Parameters(ObjBase):
     :vartype restart_policy: enum :py:class:`~rapyuta_io.clients.package.RestartPolicy`
 
     :param limits: Values corresponding to limits of the parameters
-    :type limits: :py:class:`~rapyuta_io.clients.native_network.NativeNetworkLimits`
+    :type limits: :py:class:`~rapyuta_io.clients.common_models.Limits`
     :param device: device on which the native network is deployed.
     :type device: :py:class:`~rapyuta_io.clients.device.Device`
     :param network_interface: network interface to which native network is binded.
@@ -215,36 +215,32 @@ class Parameters(ObjBase):
     """
 
     def __init__(self, limits=None, device=None, network_interface=None, restart_policy=None):
-        self.validate(limits, device, network_interface, restart_policy)
+        self.validate(device, network_interface, restart_policy)
         self.limits = limits
         self.device_id = device and device.uuid
         self.network_interface = network_interface
         self.restart_policy = restart_policy
 
     @staticmethod
-    def validate(limits, device, network_interface, restart_policy):
-        if device is None:
-            if not isinstance(limits, _Limits):
-                raise InvalidParameterException('limits must be one of '
-                                                'rapyuta_io.clients.native_network.NativeNetworkLimits')
-            return
-        if not isinstance(device, rapyuta_io.clients.device.Device):
-            raise InvalidParameterException('device must be of type rapyuta_io.clients.device.Device')
-        if not device.get('uuid'):
-            raise InvalidParameterException('uuid field must be present in rapyuta_io.clients.device.Device object')
-        if not device.get('ip_interfaces'):
-            raise InvalidParameterException(
-                'ip_interfaces field must be present in rapyuta_io.clients.device.Device object')
-        ip_interfaces = device.ip_interfaces or {}
-        if network_interface not in list(ip_interfaces.keys()):
-            raise InvalidParameterException('NETWORK_INTERFACE should be in {}'.format(list(ip_interfaces.keys())))
-        if restart_policy is not None and (
-                restart_policy not in list(rapyuta_io.clients.package.RestartPolicy.__members__.values())):
-            raise InvalidParameterException('RestartPolicy must be one of rapyuta_io.clients.package.RestartPolicy')
+    def validate(device, network_interface, restart_policy):
+        if device:
+            if not isinstance(device, rapyuta_io.clients.device.Device):
+                raise InvalidParameterException('device must be of type rapyuta_io.clients.device.Device')
+            if not device.get('uuid'):
+                raise InvalidParameterException('uuid field must be present in rapyuta_io.clients.device.Device object')
+            if not device.get('ip_interfaces'):
+                raise InvalidParameterException(
+                    'ip_interfaces field must be present in rapyuta_io.clients.device.Device object')
+            ip_interfaces = device.ip_interfaces or {}
+            if network_interface not in list(ip_interfaces.keys()):
+                raise InvalidParameterException('NETWORK_INTERFACE should be in {}'.format(list(ip_interfaces.keys())))
+            if restart_policy is not None and (
+                    restart_policy not in list(rapyuta_io.clients.package.RestartPolicy.__members__.values())):
+                raise InvalidParameterException('RestartPolicy must be one of rapyuta_io.clients.package.RestartPolicy')
 
     def get_deserialize_map(self):
         return {
-            'limits': nested_field('limits', _Limits),
+            'limits': nested_field('limits', Limits),
             'device_id': 'device_id',
             'network_interface': 'NETWORK_INTERFACE',
             'restart_policy': enum_field('restart_policy', rapyuta_io.clients.package.RestartPolicy),
@@ -257,58 +253,3 @@ class Parameters(ObjBase):
             'NETWORK_INTERFACE': 'network_interface',
             'restart_policy': 'restart_policy'
         }
-
-
-class _Limits(ObjBase):
-    """
-    Limits represents cpu, memory details of the parameter
-
-    :ivar cpu: cpu
-    :vartype cpu: Union [float, integer]
-    :ivar memory: memory
-    :vartype memory: integer
-
-    :param cpu: cpu
-    :type cpu: Union [float, integer]
-    :param memory: memory
-    :type memory: integer
-    """
-
-    def __init__(self, cpu, memory):
-        self.validate(cpu, memory)
-        self.cpu = cpu
-        self.memory = memory
-
-    @staticmethod
-    def validate(cpu, memory):
-        if (not isinstance(cpu, float) and not isinstance(cpu, six.integer_types)) or cpu <= 0:
-            raise InvalidParameterException('cpu must be a positive float or integer')
-        if not isinstance(memory, six.integer_types) or memory <= 0:
-            raise InvalidParameterException('memory must be a positive integer')
-
-    def get_deserialize_map(self):
-        return {
-            'cpu': 'cpu',
-            'memory': 'memory'
-        }
-
-    def get_serialize_map(self):
-        return {
-            'cpu': 'cpu',
-            'memory': 'memory'
-        }
-
-
-class NativeNetworkLimits(object):
-    """
-    NativeNetworkLimits may be one of: \n
-    NativeNetworkLimits.X_SMALL (cpu: 0.5core, memory: 2GB) \n
-    NativeNetworkLimits.SMALL (cpu: 1core, memory: 4GB) \n
-    NativeNetworkLimits.MEDIUM (cpu: 2cores, memory: 8GB) \n
-    NativeNetworkLimits.LARGE (cpu: 4cores, memory: 16GB) \n
-    """
-
-    X_SMALL = _Limits(0.5, 2048)
-    SMALL = _Limits(1, 4096)
-    MEDIUM = _Limits(2, 8192)
-    LARGE = _Limits(4, 16384)

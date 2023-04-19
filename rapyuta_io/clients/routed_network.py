@@ -10,7 +10,7 @@ from rapyuta_io.utils.rest_client import HttpMethod
 from rapyuta_io.utils.utils import create_auth_header, get_api_response_data
 from rapyuta_io.utils.error import InvalidParameterException
 from rapyuta_io.utils.partials import PartialMixin
-
+from rapyuta_io.clients.common_models import Limits
 
 class RoutedNetwork(PartialMixin, ObjDict):
     """
@@ -147,51 +147,7 @@ class Parameters(ObjDict):
     :type limits: :py:class:`~rapyuta_io.clients.routed_network.RoutedNetworkLimits`
     """
 
-    def __init__(self, limits):
-        self.validate(limits)
+    def __init__(self, limits = None):
         super(ObjDict, self).__init__(limits=limits)
 
-    @staticmethod
-    def validate(limits):
-        if not isinstance(limits, _Limits):
-            raise InvalidParameterException('limits must be one of '
-                                            'rapyuta_io.clients.routed_network.RoutedNetworkLimits')
 
-
-class _Limits(ObjDict):
-    """
-    Limits represents cpu, memory details of the parameter
-
-    :ivar cpu: cpu
-    :vartype cpu: Union [float, integer]
-    :ivar memory: memory
-    :vartype memory: integer
-
-    :param cpu: cpu
-    :type cpu: Union [float, integer]
-    :param memory: memory
-    :type memory: integer
-    """
-
-    def __init__(self, cpu, memory):
-        self.validate(cpu, memory)
-        super(ObjDict, self).__init__(cpu=cpu, memory=memory)
-
-    @staticmethod
-    def validate(cpu, memory):
-        if (not isinstance(cpu, float) and not isinstance(cpu, six.integer_types)) or cpu <= 0:
-            raise InvalidParameterException('cpu must be a positive float or integer')
-        if not isinstance(memory, six.integer_types) or memory <= 0:
-            raise InvalidParameterException('memory must be a positive integer')
-
-
-class RoutedNetworkLimits(object):
-    """
-    RoutedNetworkLimits may be one of: \n
-    RoutedNetworkLimits.SMALL (cpu: 1core, memory: 4GB) \n
-    RoutedNetworkLimits.MEDIUM (cpu: 2cores, memory: 8GB) \n
-    RoutedNetworkLimits.LARGE (cpu: 4cores, memory: 16GB) \n
-    """
-    SMALL = _Limits(1, 4096)
-    MEDIUM = _Limits(2, 8192)
-    LARGE = _Limits(4, 16384)

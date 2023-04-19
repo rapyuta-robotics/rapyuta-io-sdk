@@ -13,6 +13,7 @@ PARAMSERVER_API_TREEBLOBS_PATH = PARAMSERVER_API_BASE_PATH + 'treeblobs'
 PARAMSERVER_API_FILENODE_PATH = PARAMSERVER_API_BASE_PATH + 'filenode/'
 # Device selection API host Config
 SHARED_URL_PATH = '/logs/sharedurl'
+DAEMONS_PATH = '/daemons'
 DEVICE_API_BASE_PATH = '/api/device-manager/v0/'
 DEVICE_PATH = 'device/'
 DEVICE_API_PATH = DEVICE_API_BASE_PATH + 'devices/'

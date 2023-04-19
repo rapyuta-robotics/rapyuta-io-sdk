@@ -30,7 +30,7 @@ Client Module
     :members: __init__
 
 Organization Module
------------------
+-------------------
 
 .. automodule:: rapyuta_io.clients.organization
     :members:

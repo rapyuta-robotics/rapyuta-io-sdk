@@ -7,8 +7,8 @@ from sdk_test.config import Configuration
 from sdk_test.device.device_test import DeviceTest
 from sdk_test.package.package_test import PackageTest
 from sdk_test.util import get_logger, add_package, delete_package, get_package
-from rapyuta_io.clients.routed_network import Parameters, RoutedNetworkLimits
-
+from rapyuta_io.clients.routed_network import Parameters
+from rapyuta_io.clients.common_models import Limits
 
 class RoutedNetworkTest(PackageTest, DeviceTest):
 
@@ -33,7 +33,7 @@ class RoutedNetworkTest(PackageTest, DeviceTest):
         self.routed_network = None
         self.docker_device = self.config.get_devices(arch=DeviceArch.AMD64, runtime='Dockercompose')[0]
         self.supervisor_device = self.config.get_devices(arch=DeviceArch.AMD64, runtime='Preinstalled')[0]
-        self.parameters = Parameters(RoutedNetworkLimits.SMALL)
+        self.parameters = Parameters(Limits(cpu=0.5, memory=1024))
 
     def create_routed_network(self, runtime, parameters):
         if runtime == Runtime.CLOUD:
@@ -125,7 +125,7 @@ class RoutedNetworkTest(PackageTest, DeviceTest):
 
     def test_create_cloud_routed_network_with_parameters(self):
         self.logger.info('Started creating cloud routed network with parameters')
-        self.create_routed_network(Runtime.CLOUD, Parameters(RoutedNetworkLimits.SMALL))
+        self.create_routed_network(Runtime.CLOUD, Parameters(Limits(cpu=0.5, memory=1024)))
         routed_network = self.config.client.get_routed_network(self.routed_network.guid)
         self.assertEqual(self.routed_network.runtime, 'cloud')
         self.assertEqual(routed_network.guid, self.routed_network.guid)

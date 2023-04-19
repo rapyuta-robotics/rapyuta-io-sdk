@@ -1,33 +1,33 @@
 # encoding: utf-8
 from __future__ import absolute_import
+
 import json
 import os
 
+import six
+
 from rapyuta_io.clients import DeviceManagerClient, _ParamserverClient
+from rapyuta_io.clients.build import Build, BuildStatus
 from rapyuta_io.clients.catalog_client import CatalogClient
 from rapyuta_io.clients.core_api_client import CoreAPIClient
 from rapyuta_io.clients.deployment import Deployment
 from rapyuta_io.clients.device import Device
-from rapyuta_io.clients.native_network import NativeNetwork
-from rapyuta_io.clients.organization import Organization
-from rapyuta_io.clients.package import Package
-from rapyuta_io.clients.project import Project
-from rapyuta_io.clients.secret import Secret
-from rapyuta_io.clients.persistent_volumes import VolumeInstance
-from rapyuta_io.clients.rip_client import RIPClient
-from rapyuta_io.clients.routed_network import RoutedNetwork, Parameters
-from rapyuta_io.clients.build import Build, BuildStatus
-from rapyuta_io.clients.rosbag import ROSBagJob, ROSBagJobStatus, ROSBagBlob, ROSBagBlobStatus
-from rapyuta_io.clients.metrics import QueryMetricsRequest, StepInterval, SortOrder, \
-    MetricOperation, MetricFunction, QueryMetricsResponse, ListMetricsRequest, ListTagKeysRequest, \
+from rapyuta_io.clients.metrics import QueryMetricsRequest, MetricOperation, MetricFunction, QueryMetricsResponse, \
+    ListMetricsRequest, ListTagKeysRequest, \
     Metric, Tags, ListTagValuesRequest
+from rapyuta_io.clients.native_network import NativeNetwork
+from rapyuta_io.clients.package import Package
+from rapyuta_io.clients.package import Runtime, ROSDistro, RestartPolicy
+from rapyuta_io.clients.persistent_volumes import VolumeInstance
+from rapyuta_io.clients.project import Project
+from rapyuta_io.clients.rip_client import RIPClient
+from rapyuta_io.clients.rosbag import ROSBagJob, ROSBagJobStatus, ROSBagBlob, ROSBagBlobStatus
+from rapyuta_io.clients.routed_network import RoutedNetwork, Parameters
+from rapyuta_io.clients.secret import Secret
+from rapyuta_io.utils import InvalidAuthTokenException, InvalidParameterException
 from rapyuta_io.utils import to_objdict
 from rapyuta_io.utils.settings import VOLUME_PACKAGE_ID, default_host_config
-from rapyuta_io.utils import InvalidAuthTokenException, InvalidParameterException
-from rapyuta_io.clients.package import Runtime, ROSDistro, RestartPolicy
 from rapyuta_io.utils.utils import get_api_response_data, valid_list_elements
-from rapyuta_io.utils.partials import PartialMixin
-import six
 
 
 class Client(object):
@@ -456,6 +456,33 @@ class Client(object):
             raise InvalidParameterException('device_id needs to be a non empty string')
         return self._dmClient.delete_device(device_id)
 
+    def toggle_features(self, device_id, features):
+        """
+        Patch a device on rapyuta.io platform.
+
+        :param device_id: Device ID
+        :type device_id: str
+        :param features: A tuple of featues and their states
+        :type features: list<tuple>
+
+        Following example demonstrates how to toggle features a device.
+
+            >>> from rapyuta_io import Client
+            >>> client = Client(auth_token='auth_token', project='project_guid')
+            >>> client.toggle_features('device-id', [('vpn', True), ('tracing', False)])
+        """
+        if not device_id or not isinstance(device_id, six.string_types):
+            raise InvalidParameterException('device_id needs to be a non empty string')
+        if not features or not (isinstance(features, list) or isinstance(features, tuple)):
+            raise InvalidParameterException('features needs to be a list or tuple')
+
+        data = {}
+        for entry in features:
+            feature, state = entry
+            data[feature] = state
+
+        return self._dmClient.patch_daemons(device_id, data)
+
     def create_package_from_manifest(self, manifest_filepath, retry_limit=0):
         """
         Create package from a manifest file
@@ -536,7 +563,7 @@ class Client(object):
         """
         return self._catalog_client.create_package(manifest, retry_limit)
 
-    def upload_configurations(self, rootdir, tree_names=None, delete_existing_trees=False):
+    def upload_configurations(self, rootdir, tree_names=None, delete_existing_trees=False, as_folder=False):
         """
         Traverses rootdir and uploads configurations following the same directory structure.
 
@@ -546,6 +573,8 @@ class Client(object):
         :type tree_names: list[str], optional
         :param delete_existing_trees: For each tree to upload, delete existing tree at the server. Defaults to False
         :type delete_existing_trees: bool, optional
+        :param as_folder: For each tree to upload, upload as an folder hierarchy
+        :as_folder: bool, optional
 
         Following example demonstrates how to use upload_configurations and handle errors.
 
@@ -562,7 +591,7 @@ class Client(object):
             ...     print 'failed file/directory read', e
 
         """
-        return self._paramserver_client.upload_configurations(rootdir, tree_names, delete_existing_trees)
+        return self._paramserver_client.upload_configurations(rootdir, tree_names, delete_existing_trees, as_folder)
 
     def download_configurations(self, rootdir, tree_names=None, delete_existing_trees=False):
         """
@@ -1600,7 +1629,6 @@ class Client(object):
         if not isinstance(native_network, NativeNetwork):
             raise InvalidParameterException("native_network must be non-empty and of type "
                                             "rapyuta_io.clients.native_network.NativeNetwork")
-
         native_network_response = self._catalog_client.create_native_network(native_network)
         return self.get_native_network(native_network_response['guid'])
 
@@ -1657,17 +1685,23 @@ class Client(object):
                                             'of type rapyuta_io.clients.metrics.MetricsQueryRequest')
 
         default_tags = {}
-        if not query_metrics_request.tags.get(query_metrics_request.PROJECT_ID_TAG):
+        if not query_metrics_request.tags.get(query_metrics_request.TENANT_ID_TAG):
             project = self._core_api_client._project
             if not project:
                 raise InvalidParameterException('Either set project on client using client.set_project(), or '
-                                                'set {} in tags'.format(query_metrics_request.PROJECT_ID_TAG))
-            default_tags[query_metrics_request.PROJECT_ID_TAG] = project
+                                                'set {} in tags'.format(query_metrics_request.TENANT_ID_TAG))
+            default_tags[query_metrics_request.TENANT_ID_TAG] = {
+                "operator": "eq",
+                "value": project
+            }
 
         if not query_metrics_request.tags.get(query_metrics_request.ORGANIZATION_ID_TAG):
             user = self._core_api_client.get_user()
             organization_guid = user.organization.guid
-            default_tags[query_metrics_request.ORGANIZATION_ID_TAG] = organization_guid
+            default_tags[query_metrics_request.ORGANIZATION_ID_TAG] = {
+                "operator": "eq",
+                "value": organization_guid
+            }
 
         query_metrics_request.tags.update(default_tags)
 

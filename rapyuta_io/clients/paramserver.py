@@ -27,13 +27,14 @@ class _Node(str, enum.Enum):
     File = 'FileNode'
     Value = 'ValueNode'
     Attribute = 'AttributeNode'
-
+    Folder = 'FolderNode'
 
 class _ParamserverClient:
     """
     Internal client for paramserver. Not for public use.
     """
     yaml_content_type = 'text/yaml'
+    json_content_type = 'application/json'
     default_binary_content_type = "application/octet-stream"
 
     def __init__(self, auth_token, project, core_api_host):
@@ -50,9 +51,10 @@ class _ParamserverClient:
         md5_hash.update(data)
         return md5_hash.hexdigest()
 
-    def create_file(self, tree_path, filedata, retry_limit=0):
+    def create_file(self, tree_path, filedata, retry_limit=0, content_type=None):
+        content_type = content_type if content_type else self.yaml_content_type
         url = self._core_api_host + PARAMSERVER_API_TREE_PATH + tree_path
-        payload = {'type': _Node.File, 'data': filedata, 'contentType': self.yaml_content_type}
+        payload = {'type': _Node.File, 'data': filedata, 'contentType': content_type}
         response = RestClient(url).method(HttpMethod.PUT).headers(self._headers).retry(retry_limit).execute(payload)
         return get_api_response_data(response, parse_full=True)
 
@@ -79,6 +81,12 @@ class _ParamserverClient:
     def create_value(self, tree_path, retry_limit=0):
         url = self._core_api_host + PARAMSERVER_API_TREE_PATH + tree_path
         payload = {'type': _Node.Value}
+        response = RestClient(url).method(HttpMethod.PUT).headers(self._headers).retry(retry_limit).execute(payload)
+        return get_api_response_data(response, parse_full=True)
+
+    def create_folder(self, tree_path, retry_limit=0):
+        url = self._core_api_host + PARAMSERVER_API_TREE_PATH + tree_path
+        payload = {'type': _Node.Folder}
         response = RestClient(url).method(HttpMethod.PUT).headers(self._headers).retry(retry_limit).execute(payload)
         return get_api_response_data(response, parse_full=True)
 
@@ -126,13 +134,39 @@ class _ParamserverClient:
                     with open(full_path, 'r') as f:
                         data = f.read()
                     future = executor.submit(self.create_file, new_tree_path, data)
+                elif file_name.endswith('.json'):
+                    with open(full_path, 'r') as f:
+                        data = f.read()
+                    future = executor.submit(self.create_file, new_tree_path, data, content_type=self.json_content_type)
                 else:
                     future = executor.submit(self.create_binary_file, new_tree_path, full_path)
                 file_futures[future] = new_tree_path
         return dir_futures, file_futures
 
-    def upload_configurations(self, rootdir, tree_names, delete_existing_trees):
-        self.validate_args(rootdir, tree_names, delete_existing_trees)
+    def process_folder(self, executor, rootdir, tree_path, level, dir_futures, file_futures):
+        for name in listdir(join(rootdir, tree_path)):
+            full_path = join(rootdir, tree_path, name)
+            new_tree_path = join(tree_path, name)
+            if isdir(full_path):
+                future = executor.submit(self.create_folder, new_tree_path)
+                dir_futures[future] = (new_tree_path, level + 1)
+            else:
+                file_name = os.path.basename(full_path)
+                if file_name.endswith('.yaml'):
+                    with open(full_path, 'r') as f:
+                        data = f.read()
+                    future = executor.submit(self.create_file, new_tree_path, data)
+                elif file_name.endswith('.json'):
+                    with open(full_path, 'r') as f:
+                        data = f.read()
+                    future = executor.submit(self.create_file, new_tree_path, data, content_type=self.json_content_type)
+                else:
+                    future = executor.submit(self.create_binary_file, new_tree_path, full_path)
+                file_futures[future] = new_tree_path
+        return dir_futures, file_futures
+
+    def upload_configurations(self, rootdir, tree_names, delete_existing_trees, as_folder = False):
+        self.validate_args(rootdir, tree_names, delete_existing_trees, as_folder)
         with futures.ThreadPoolExecutor(max_workers=15) as executor:
             dir_futures = self.process_root_dir(executor, rootdir, tree_names, delete_existing_trees)
             file_futures = {}
@@ -146,8 +180,8 @@ class _ParamserverClient:
                     exc.tree_path = tree_path
                     raise exc
 
-                dir_futures, file_futures = self.process_dir(executor, rootdir, tree_path, level, dir_futures,
-                                                             file_futures)
+                processor_func = self.process_dir if not as_folder else self.process_folder
+                dir_futures, file_futures = processor_func(executor, rootdir, tree_path, level, dir_futures, file_futures)
                 done = futures.wait(dir_futures, return_when=futures.FIRST_COMPLETED).done
                 future = done.pop() if len(done) else None
 
@@ -208,14 +242,15 @@ class _ParamserverClient:
                 f.write(chunk)
 
     @staticmethod
-    def validate_args(rootdir, tree_names, delete_existing_trees):
+    def validate_args(rootdir, tree_names, delete_existing_trees, as_folder = False):
         if not isinstance(rootdir, six.string_types):
             raise InvalidParameterException('rootdir must be a string')
         if tree_names:
             validate_list_of_strings(tree_names, 'tree_names')
         if not isinstance(delete_existing_trees, bool):
             raise InvalidParameterException('delete_existing_trees must be a boolean')
-
+        if not isinstance(as_folder, bool):
+            raise InvalidParameterException('as_folder must be a boolean')
     def download_configurations(self, rootdir, tree_names, delete_existing_trees):
         self.validate_args(rootdir, tree_names, delete_existing_trees)
         self._safe_makedirs(rootdir)

@@ -39,6 +39,36 @@ def _get_mock_calls(tree_paths, ignore_tree_paths=None, delete_existing_trees=Fa
         mock_calls.append(call(url=url, method='PUT', headers=headers, params={}, json=json))
     return mock_calls
 
+def _get_folder_mock_calls(tree_paths, ignore_tree_paths=None, delete_existing_trees=False):
+    """
+    Creates request mock calls from tree paths.
+
+    ignore_tree_paths is a list of tree paths to not create mock call for.
+    """
+    mock_calls = []
+    for tree_path, value in six.iteritems(tree_paths):
+        if ignore_tree_paths and tree_path in ignore_tree_paths:
+            continue
+        api_prefix = 'tree'
+        content_type = 'text/yaml'
+        if value and '.yaml' not in tree_path:
+            _add_mock_binary_file_mock_call(mock_calls, tree_path)
+            continue
+        url = _URL_PREFIX + api_prefix + '/' + tree_path
+        slash_count = tree_path.count('/')
+        if delete_existing_trees and slash_count == 0:
+            mock_calls.append(call(url=url, method='DELETE', headers=headers, params={}, json=None))
+
+        if value is None:
+            if slash_count == 0:
+                json = {'type': 'ValueNode'}
+            else:
+                json = {'type': 'FolderNode'}
+        else:
+            json = {'type': 'FileNode', 'data': value, 'contentType': content_type}
+        mock_calls.append(call(url=url, method='PUT', headers=headers, params={}, json=json))
+    return mock_calls
+
 
 def _add_mock_binary_file_mock_call(mock_calls, tree_path):
     headers_copy = headers.copy()
@@ -74,8 +104,13 @@ UPLOAD_SUCCESS_TREE_PATHS = OrderedDict([
 ])
 
 UPLOAD_SUCCESS_MOCK_CALLS = _get_mock_calls(UPLOAD_SUCCESS_TREE_PATHS)
+UPLOAD_SUCCESS_FOLDER_MOCK_CALLS = _get_folder_mock_calls(UPLOAD_SUCCESS_TREE_PATHS)
 
 UPLOAD_SUCCESS_WITH_TREE_NAMES_MOCK_CALLS = _get_mock_calls(UPLOAD_SUCCESS_TREE_PATHS,
+                                                            ignore_tree_paths=['tree1', 'tree1/config.yaml',
+                                                                               'tree1/attr'])
+
+UPLOAD_SUCCESS_WITH_TREE_NAMES_AS_FOLDER_MOCK_CALLS = _get_folder_mock_calls(UPLOAD_SUCCESS_TREE_PATHS,
                                                             ignore_tree_paths=['tree1', 'tree1/config.yaml',
                                                                                'tree1/attr'])
 

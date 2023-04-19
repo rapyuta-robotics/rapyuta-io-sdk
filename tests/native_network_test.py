@@ -7,10 +7,10 @@ from rapyuta_io.utils import ResourceNotFoundError
 from rapyuta_io.utils.error import InvalidParameterException
 from tests.utils.client import get_client, headers, add_auth_token
 from rapyuta_io.clients.package import Runtime, ROSDistro, Device
-from rapyuta_io.clients.native_network import NativeNetwork, Parameters, NativeNetworkLimits
+from rapyuta_io.clients.native_network import NativeNetwork, Parameters
 from tests.utils.native_network_responses import NATIVE_NETWORK_CREATE_SUCCESS, NATIVE_NETWORK_LIST_SUCCESS, \
     NATIVE_NETWORK_GET_SUCCESS, NATIVE_NETWORK_FAILURE, NATIVE_NETWORK_NOT_FOUND
-
+from rapyuta_io.clients.common_models import Limits
 
 class NativeNetworkTests(unittest.TestCase):
     def setUp(self):
@@ -76,14 +76,6 @@ class NativeNetworkTests(unittest.TestCase):
         with self.assertRaises(InvalidParameterException) as e:
             client.create_native_network(NativeNetwork('native_network_name', Runtime.CLOUD, ROSDistro.MELODIC,
                                                        'invalid_parameters'))
-        self.assertEqual(str(e.exception), expected_err_msg)
-
-    def test_create_native_network_parameters_invalid_limits(self):
-        expected_err_msg = 'limits must be one of rapyuta_io.clients.native_network.NativeNetworkLimits'
-        client = get_client()
-        with self.assertRaises(InvalidParameterException) as e:
-            client.create_native_network(
-                NativeNetwork('native_network_name', Runtime.CLOUD, ROSDistro.MELODIC, Parameters("")))
         self.assertEqual(str(e.exception), expected_err_msg)
 
     def test_create_native_network_device_runtime_parameters_invalid_device(self):
@@ -191,8 +183,7 @@ class NativeNetworkTests(unittest.TestCase):
         expected_payload = {
             "name": "native_network_name",
             "runtime": 'cloud',
-            "rosDistro": 'noetic',
-            "parameters": {"limits": {"cpu": 1, "memory": 4096}}
+            "rosDistro": 'noetic'
         }
         expected_url = 'https://gacatalog.apps.okd4v2.prod.rapyuta.io/nativenetwork'
         mock_create_native_network = Mock()
@@ -204,10 +195,11 @@ class NativeNetworkTests(unittest.TestCase):
         mock_request.side_effect = [mock_create_native_network, mock_get_native_network]
 
         client = get_client()
-        native_network_parameters = Parameters(NativeNetworkLimits.SMALL)
+        native_network_parameters = None
         native_network_payload = NativeNetwork("native_network_name", Runtime.CLOUD, ROSDistro.NOETIC,
                                                native_network_parameters)
         native_network_response = client.create_native_network(native_network_payload)
+        print(headers, expected_payload, expected_url, 'POST', None)
         mock_request.assert_has_calls([
             call(headers=headers, json=expected_payload, url=expected_url, method='POST', params=None),
             call(headers=headers, json=None, url=expected_url + '/' + 'net-guid', method='GET', params=None)
@@ -222,7 +214,7 @@ class NativeNetworkTests(unittest.TestCase):
             "name": "native_network_name",
             "runtime": 'cloud',
             "rosDistro": 'kinetic',
-            "parameters": {"limits": {"cpu": 1, "memory": 4096}}
+            "parameters": {"limits": {"cpu": 1, "memory": 1024}}
         }
         expected_url = 'https://gacatalog.apps.okd4v2.prod.rapyuta.io/nativenetwork'
         mock_create_native_network = Mock()
@@ -234,7 +226,7 @@ class NativeNetworkTests(unittest.TestCase):
         mock_request.side_effect = [mock_create_native_network, mock_get_native_network]
 
         client = get_client()
-        native_network_parameters = Parameters(NativeNetworkLimits.SMALL)
+        native_network_parameters = Parameters(limits=Limits(1,1024))
         native_network_payload = NativeNetwork("native_network_name", Runtime.CLOUD, ROSDistro.KINETIC,
                                                native_network_parameters)
         native_network_response = client.create_native_network(native_network_payload)
