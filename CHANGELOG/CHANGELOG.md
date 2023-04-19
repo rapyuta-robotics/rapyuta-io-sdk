@@ -1,3 +1,18 @@
+# [1.9.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.8.0...v1.9.0) (2023-04-19)
+
+
+### Bug Fixes
+
+* **metrics:** tags schema and its unit tests ([6cf652b](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/6cf652b177fb7c722a037ff9498c845ee12a6ff1))
+* **rosbags:** integration-test for throttling ([3cd2cd6](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/3cd2cd6d1ed1ca3a6b4beb050865dcedb56b4c45))
+
+
+### Features
+
+* **device:** adds API to toggle features ([39860fc](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/39860fc05a7a261862a2738ca1d9c7af546a0f6f))
+* **network:** allows custom resource limits for cloud networks ([e58f0c5](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/e58f0c5c33ddd0f860210cc9a74cb6e6cf9ef6b9))
+* **parameters:** adds the option to upload arbitrary directories as config ([4c95e96](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/4c95e96db054bbc5fba615edafd586d65a9b7a5a))
+
 # [1.8.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.7.0...v1.8.0) (2023-02-07)
 
 
