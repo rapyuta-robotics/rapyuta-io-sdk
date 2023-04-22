@@ -12,7 +12,8 @@ from rapyuta_io.clients.catalog_client import CatalogClient
 from rapyuta_io.clients.core_api_client import CoreAPIClient
 from rapyuta_io.clients.deployment import Deployment
 from rapyuta_io.clients.device import Device
-from rapyuta_io.clients.metrics import QueryMetricsRequest, MetricOperation, MetricFunction, QueryMetricsResponse, \
+from rapyuta_io.clients.metrics import QueryMetricsRequest, MetricOperation, \
+    MetricFunction, QueryMetricsResponse, \
     ListMetricsRequest, ListTagKeysRequest, \
     Metric, Tags, ListTagValuesRequest
 from rapyuta_io.clients.native_network import NativeNetwork
@@ -20,11 +21,13 @@ from rapyuta_io.clients.package import Package
 from rapyuta_io.clients.package import Runtime, ROSDistro, RestartPolicy
 from rapyuta_io.clients.persistent_volumes import VolumeInstance
 from rapyuta_io.clients.project import Project
-from rapyuta_io.clients.rip_client import RIPClient
-from rapyuta_io.clients.rosbag import ROSBagJob, ROSBagJobStatus, ROSBagBlob, ROSBagBlobStatus
+from rapyuta_io.clients.rip_client import RIPClient, AuthTokenLevel
+from rapyuta_io.clients.rosbag import ROSBagJob, ROSBagJobStatus, ROSBagBlob, \
+    ROSBagBlobStatus
 from rapyuta_io.clients.routed_network import RoutedNetwork, Parameters
 from rapyuta_io.clients.secret import Secret
-from rapyuta_io.utils import InvalidAuthTokenException, InvalidParameterException
+from rapyuta_io.utils import InvalidAuthTokenException, \
+    InvalidParameterException
 from rapyuta_io.utils import to_objdict
 from rapyuta_io.utils.settings import VOLUME_PACKAGE_ID, default_host_config
 from rapyuta_io.utils.utils import get_api_response_data, valid_list_elements
@@ -78,7 +81,7 @@ class Client(object):
         setattr(obj, '_project', self._catalog_client._project)
 
     @staticmethod
-    def get_auth_token(email, password):
+    def get_auth_token(email, password, token_level=AuthTokenLevel.LOW):
         """
         Generate and fetch a new API Authentication Token.
 
@@ -86,16 +89,19 @@ class Client(object):
         :type email: str
         :param password: User password for the account.
         :type password: str
+        :param token_level: Level of the token. This corresponds to token validity
+        :type token_level: AuthTokenLevel
         :return: str
 
         Following example demonstrates how to get auth token
 
             >>> from rapyuta_io import Client
-            >>> auth_token = Client.get_auth_token('email@example.com', 'password')
+            >>> from rapyuta_io.clients.rip_client import AuthTokenLevel
+            >>> auth_token = Client.get_auth_token('email@example.com', 'password', AuthTokenLevel.MED)
             >>> client = Client(auth_token, 'project-id')
         """
         rip_client = RIPClient(rip_host=Client._get_api_endpoints('rip_host'))
-        return rip_client.get_auth_token(email, password)
+        return rip_client.get_auth_token(email, password, token_level)
 
     def set_project(self, project_guid):
         """
