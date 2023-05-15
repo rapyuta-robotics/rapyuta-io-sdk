@@ -5,6 +5,7 @@
   "hwil_user": "USER",
   "hwil_password": "PASSWORD",
   "auth_token": "Bearer AUTH_TOKEN",
+  "organization_guid": "org_guid",
   "devices": [
     {
       "name":  "NAME",
