@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.9.0...v1.10.0) (2023-05-31)
+
+
+### Features
+
+* **rip:** adds support for token_level in get_auth_token ([88fcc69](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/88fcc697842de856a031a370f8ab630047532f49))
+
 # [1.9.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.8.0...v1.9.0) (2023-04-19)
 
 
