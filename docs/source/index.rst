@@ -4,7 +4,7 @@ Welcome to Rapyuta.io SDK Documentation!
 Rapyuta.io Python SDK enables you to access platform services and resources in
 your python applications.
 
-The SDK supports Python 3.6+. For older Python 2.x support, you can use the
+The SDK supports Python 3.7+. For older Python 2.x support, you can use the
 0.x.x `releases <https://pypi.org/project/rapyuta-io/#history>`_ from Pypi.
 
 Installation

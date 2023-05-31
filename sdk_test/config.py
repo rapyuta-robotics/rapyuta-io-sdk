@@ -1,12 +1,16 @@
 from __future__ import absolute_import
+
 import json
 import os
 
-from rapyuta_io import Client, SecretConfigSourceSSHAuth, SecretConfigDocker, DeviceArch, Secret, Project
-from rapyuta_io.utils.utils import create_auth_header, prepend_bearer_to_auth_token, generate_random_value
-from rapyuta_io.utils.error import InvalidParameterException
-from six.moves import filter
 import six
+from six.moves import filter
+
+from rapyuta_io import Client, SecretConfigSourceSSHAuth, SecretConfigDocker, \
+    DeviceArch, Secret, Project
+from rapyuta_io.utils.error import InvalidParameterException
+from rapyuta_io.utils.utils import create_auth_header, \
+    prepend_bearer_to_auth_token, generate_random_value
 
 
 class _Singleton(type):
@@ -14,7 +18,8 @@ class _Singleton(type):
 
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
-            cls._instances[cls] = super(_Singleton, cls).__call__(*args, **kwargs)
+            cls._instances[cls] = super(_Singleton, cls).__call__(*args,
+                                                                  **kwargs)
         return cls._instances[cls]
 
 
@@ -47,6 +52,7 @@ class Configuration(six.with_metaclass(_Singleton, object)):
             "hwil_user": "user",
             "hwil_password": "password",
             "auth_token": "<AUTH>",
+            "organization_guid": "<org_guid>",
             "devices": [
                 {
                     "name": "DEVICE_NAME",
@@ -85,6 +91,7 @@ class Configuration(six.with_metaclass(_Singleton, object)):
         if not isinstance(self.test_files, list):
             raise InvalidParameterException('test_files must be a list of test file names')
         self.worker_threads = self._config['worker_threads']
+        self.organization_guid = self._config.get('organization_guid')
 
     def validate(self):
         # if len(self.get_device_configs(arch=DeviceArch.AMD64, runtime='Preinstalled')) != 1:
@@ -105,7 +112,8 @@ class Configuration(six.with_metaclass(_Singleton, object)):
     def create_project(self):
         # Project name needs to be between 3 and 15 Characters
         name = 'test-{}'.format(generate_random_value(8))
-        self._project = self.client.create_project(Project(name))
+        self._project = self.client.create_project(
+            Project(name, organization_guid=self.organization_guid))
         self.set_project(self._project.guid)
 
     def delete_project(self):
