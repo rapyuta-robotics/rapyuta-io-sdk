@@ -15,11 +15,10 @@ setup(
     author="Rapyuta Robotics",
     author_email="opensource@rapyuta-robotics.com",
     packages=find_packages(include=["rapyuta_io*"]),
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     license="Apache 2.0",
     classifiers=[
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
