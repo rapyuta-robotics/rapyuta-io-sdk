@@ -30,6 +30,11 @@ LIST_METRICS_API_QUERY_PATH = METRICS_API_BASE_PATH + '/v0/metrics/{}/{}'
 LIST_TAGS_KEY_API_QUERY_PATH = METRICS_API_BASE_PATH + '/v0/tags/{}/{}'
 LIST_TAGS_VALUE_API_QUERY_PATH = METRICS_API_BASE_PATH + '/v0/tags/{}/{}/{}'
 
+# UserGroups
+LIST_USER_GROUP_PATH = '/api/group/list'
+GET_USER_GROUP_PATH = '/api/group/{group_guid}/get'
+DELETE_USER_GROUP_PATH = '/api/group/delete'
+
 GET_USER_PATH = '/api/user/me/get'
 
 TOPIC_STATUS = '/status'

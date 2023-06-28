@@ -1,12 +1,14 @@
 from rapyuta_io.clients.project import Project, User
 from rapyuta_io.clients.secret import Secret
+from rapyuta_io.clients.user_group import UserGroup
 from rapyuta_io.utils.utils import prepend_bearer_to_auth_token, create_auth_header, get_api_response_data
 from rapyuta_io.utils.rest_client import HttpMethod
 from rapyuta_io.utils import RestClient, to_objdict
 from rapyuta_io.clients.static_route import StaticRoute
 from rapyuta_io.utils.error import ResourceNotFoundError
 from rapyuta_io.utils.settings import METRICS_API_QUERY_PATH, LIST_METRICS_API_QUERY_PATH, \
-    LIST_TAGS_KEY_API_QUERY_PATH, LIST_TAGS_VALUE_API_QUERY_PATH, GET_USER_PATH
+    LIST_TAGS_KEY_API_QUERY_PATH, LIST_TAGS_VALUE_API_QUERY_PATH, GET_USER_PATH, \
+    LIST_USER_GROUP_PATH, GET_USER_GROUP_PATH, DELETE_USER_GROUP_PATH
 
 
 class CoreAPIClient:
@@ -247,3 +249,35 @@ class CoreAPIClient:
         data = get_api_response_data(response, parse_full=True)
         user = User.deserialize(data)
         return user.organizations
+
+    def list_usergroups(self, org_guid):
+        url = self._core_api_host + LIST_USER_GROUP_PATH
+        headers = create_auth_header(self._auth_token, self._project)
+        headers['organization'] = org_guid
+        response = RestClient(url).method(HttpMethod.GET).headers(headers).execute()
+        data = get_api_response_data(response, parse_full=True)
+        usergroups = []
+        for usergroup_data in data:
+            usergroup = UserGroup.deserialize(usergroup_data)
+            self._add_header_fields(usergroup)
+            usergroups.append(usergroup)
+
+        return usergroups
+
+    def get_usergroup(self, org_guid, group_guid):
+        url = self._core_api_host + GET_USER_GROUP_PATH.format(group_guid=group_guid)
+        headers = create_auth_header(self._auth_token, self._project)
+        headers['organization'] = org_guid
+        response = RestClient(url).method(HttpMethod.GET).headers(headers).execute()
+        data = get_api_response_data(response, parse_full=True)
+        usergroup = UserGroup.deserialize(data)
+        self._add_header_fields(usergroup)
+        return usergroup
+
+    def delete_usergroup(self, org_guid, group_guid):
+        url = self._core_api_host + DELETE_USER_GROUP_PATH
+        headers = create_auth_header(self._auth_token, self._project)
+        headers['organization'] = org_guid
+        payload = {'guid': group_guid}
+        response = RestClient(url).method(HttpMethod.DELETE).headers(headers).execute(payload)
+        return get_api_response_data(response, parse_full=True)

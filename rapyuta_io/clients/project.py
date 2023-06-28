@@ -132,6 +132,7 @@ class User(ObjBase):
     :ivar organizations: List of organizations that the user is part of
     :vartype organizations:  list(:py:class:`~rapyuta_io.clients.organization.Organization`)
     """
+
     def __init__(self):
         self.guid = None
         self.first_name = None

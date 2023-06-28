@@ -1800,3 +1800,13 @@ class Client(object):
 
         response = self._core_api_client.list_tag_values(list_tag_values_request)
         return response.get('tags_values', [])
+
+    def list_usergroups(self, org_guid):
+        return self._core_api_client.list_usergroups(org_guid)
+
+    def get_usergroup(self, org_guid, group_guid):
+        return self._core_api_client.get_usergroup(org_guid, group_guid)
+
+    def delete_usergroup(self, org_guid, group_guid):
+        return self._core_api_client.delete_usergroup(org_guid, group_guid)
+
