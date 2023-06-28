@@ -67,7 +67,8 @@ You can read the documentation for individual resource modules:
    Organization <organization>
    Project <project>
    Secret  <secret>
-   
+   User Group <user_group>
+
    Device <device>
 
    Build <build>

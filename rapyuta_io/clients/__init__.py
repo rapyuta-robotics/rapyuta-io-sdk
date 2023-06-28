@@ -6,3 +6,4 @@ from .package import ROSDistro
 from .build import Build, BuildStatus, StrategyType, SimulationOptions, CatkinOption, BuildOptions
 from .buildoperation import BuildOperation, BuildOperationInfo
 from .device import Device
+from .user_group import UserGroup
