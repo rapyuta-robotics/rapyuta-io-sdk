@@ -1810,3 +1810,9 @@ class Client(object):
     def delete_usergroup(self, org_guid, group_guid):
         return self._core_api_client.delete_usergroup(org_guid, group_guid)
 
+    def create_usergroup(self, org_guid, usergroup):
+        return self._core_api_client.create_usergroup(org_guid, usergroup)
+
+    def update_usergroup(self, org_guid, group_guid, usergroup):
+        return self._core_api_client.update_usergroup(org_guid, group_guid, usergroup)
+

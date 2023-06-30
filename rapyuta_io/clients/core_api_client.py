@@ -8,7 +8,7 @@ from rapyuta_io.clients.static_route import StaticRoute
 from rapyuta_io.utils.error import ResourceNotFoundError
 from rapyuta_io.utils.settings import METRICS_API_QUERY_PATH, LIST_METRICS_API_QUERY_PATH, \
     LIST_TAGS_KEY_API_QUERY_PATH, LIST_TAGS_VALUE_API_QUERY_PATH, GET_USER_PATH, \
-    LIST_USER_GROUP_PATH, GET_USER_GROUP_PATH, DELETE_USER_GROUP_PATH
+    LIST_USER_GROUP_PATH, GET_USER_GROUP_PATH, DELETE_USER_GROUP_PATH, CREATE_USER_GROUP_PATH, UPDATE_USER_GROUP_PATH
 
 
 class CoreAPIClient:
@@ -280,4 +280,18 @@ class CoreAPIClient:
         headers['organization'] = org_guid
         payload = {'guid': group_guid}
         response = RestClient(url).method(HttpMethod.DELETE).headers(headers).execute(payload)
+        return get_api_response_data(response, parse_full=True)
+
+    def create_usergroup(self, org_guid, usergroup_payload):
+        url = self._core_api_host + CREATE_USER_GROUP_PATH
+        headers = create_auth_header(self._auth_token, self._project)
+        headers['organization'] = org_guid
+        response = RestClient(url).method(HttpMethod.POST).headers(headers).execute(usergroup_payload)
+        return get_api_response_data(response, parse_full=True)
+
+    def update_usergroup(self, org_guid, group_guid, usergroup_payload):
+        url = self._core_api_host + UPDATE_USER_GROUP_PATH.format(group_guid=group_guid)
+        headers = create_auth_header(self._auth_token, self._project)
+        headers['organization'] = org_guid
+        response = RestClient(url).method(HttpMethod.PUT).headers(headers).execute(usergroup_payload)
         return get_api_response_data(response, parse_full=True)

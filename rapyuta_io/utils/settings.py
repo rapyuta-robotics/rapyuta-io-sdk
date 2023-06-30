@@ -34,6 +34,8 @@ LIST_TAGS_VALUE_API_QUERY_PATH = METRICS_API_BASE_PATH + '/v0/tags/{}/{}/{}'
 LIST_USER_GROUP_PATH = '/api/group/list'
 GET_USER_GROUP_PATH = '/api/group/{group_guid}/get'
 DELETE_USER_GROUP_PATH = '/api/group/delete'
+CREATE_USER_GROUP_PATH = '/api/group/create'
+UPDATE_USER_GROUP_PATH = '/api/group/{group_guid}/update'
 
 GET_USER_PATH = '/api/user/me/get'
 
