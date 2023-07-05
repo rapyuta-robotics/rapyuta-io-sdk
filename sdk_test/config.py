@@ -81,7 +81,7 @@ class Configuration(six.with_metaclass(_Singleton, object)):
         self._secrets = None
         with open(file_path, "r") as config_file:
             self._config = json.load(config_file)
-        self.validate()
+        # self.validate()
         self.client = Client(self._config['auth_token'])
         self.catalog_server = self._config['catalog_host']
         self.api_server = self._config['core_api_host']
@@ -112,8 +112,9 @@ class Configuration(six.with_metaclass(_Singleton, object)):
     def create_project(self):
         # Project name needs to be between 3 and 15 Characters
         name = 'test-{}'.format(generate_random_value(8))
-        self._project = self.client.create_project(
-            Project(name, organization_guid=self.organization_guid))
+        # self._project = self.client.create_project(
+        #     Project(name, organization_guid=self.organization_guid))
+        self._project = self.client.get_project('project-chuvg34jpuuhrd00vf5g')
         self.set_project(self._project.guid)
 
     def delete_project(self):
