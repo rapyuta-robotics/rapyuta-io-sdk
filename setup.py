@@ -5,7 +5,6 @@ import rapyuta_io
 with open("README.md", encoding="utf-8") as f:
     long_desc = f.read()
 
-
 setup(
     name="rapyuta_io",
     version=rapyuta_io.__version__,
@@ -31,6 +30,7 @@ setup(
         "python-dateutil>=2.8.2",
         "pytz",
         "setuptools",
+        "jsonschema==4.0.0",
     ],
     extras_require={
         "dev": ["sphinx", "furo"],

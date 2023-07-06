@@ -18,7 +18,7 @@ Client Module
 -----------------
 
 .. autoclass:: rapyuta_io.rio_client.Client
-    :members: __init__, get_deployment, get_all_deployments
+    :members: __init__, get_deployment, get_all_deployments, update_deployment
 
 
 

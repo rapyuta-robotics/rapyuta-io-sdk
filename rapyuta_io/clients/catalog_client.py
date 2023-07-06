@@ -67,6 +67,12 @@ class CatalogClient(CatalogConfig):
         return self._execute(url, HttpMethod.GET, retry_limit)
 
     @response_validator(True)
+    def update_deployment(self, payload, retry_limit):
+        path = '/v2/service_instances/{}'.format(payload['deployment_id'])
+        url = self._catalog_api_host + path
+        return self._execute(url, HttpMethod.PATCH, retry_limit, payload=payload)
+
+    @response_validator(True)
     def deployment_list(self, phases, device_id, retry_limit):
         url = self._catalog_api_host + '/deployment/list'
         query_params = {}

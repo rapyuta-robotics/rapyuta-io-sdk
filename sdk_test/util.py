@@ -24,7 +24,7 @@ def get_manifest_file(manifest_name, manifest_type):
     """
     get_manifest_file generates the filepath relative to the current executable for the Manifest (JSON files).
 
-    manifest_name: Name of the manifest file (Package/Build) with the extension
+    manifest_name: Name of the manifest file (Package/Build/Deployment) with the extension
     manifest_type: Type of the manifest. Possible Values: Package, Build
     """
     global _JSON_PATH
@@ -36,6 +36,8 @@ def get_manifest_file(manifest_name, manifest_type):
         path = os.path.join(_JSON_PATH, 'packages')
     elif manifest_type == 'Build':
         path = os.path.join(_JSON_PATH, 'builds')
+    elif manifest_type == 'Deployment':
+        path = os.path.join(_JSON_PATH, 'deployment')
     else:
         raise Exception('Invalid manifest type')
 

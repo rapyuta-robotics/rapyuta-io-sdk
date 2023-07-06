@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 import json
+import jsonschema
 import os
 
 import six
@@ -32,6 +33,7 @@ from rapyuta_io.utils import InvalidAuthTokenException, \
 from rapyuta_io.utils import to_objdict
 from rapyuta_io.utils.settings import VOLUME_PACKAGE_ID, default_host_config
 from rapyuta_io.utils.utils import get_api_response_data, valid_list_elements
+from rapyuta_io.clients.validation_schema import UPDATE_DEPLOYMENT_SCHEMA
 
 
 class Client(object):
@@ -336,6 +338,26 @@ class Client(object):
             self._add_auth_token(deployment_object)
             deployments.append(deployment_object)
         return deployments
+
+    def update_deployment(self, payload, retry_limit=0):
+        """
+        Update a deployment
+
+        :type payload: json
+        :type retry_limit: int
+        :return: list of instances of class :py:class:`Deployment`:
+        :raises: :py:class:`APIError`: If the API returns an error, a status code
+            of anything other than 200/201 is returned.
+
+        The following example demonstrates how to update a deployment
+
+            >>> from rapyuta_io import Client, DeploymentPhaseConstants
+            >>> client = Client(auth_token='auth_token', project='project_guid')
+            >>> status = client.update_deployment(payload)
+
+        """
+        jsonschema.validate(instance=payload, schema=UPDATE_DEPLOYMENT_SCHEMA)
+        return self._catalog_client.update_deployment(payload, retry_limit)
 
     def get_authenticated_user(self):
         """
@@ -1906,4 +1928,3 @@ class Client(object):
 
         """
         return self._core_api_client.update_usergroup(org_guid, group_guid, usergroup)
-

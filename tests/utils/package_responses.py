@@ -786,6 +786,28 @@ DEPLOYMENT_STATUS_STOPPED = '''{
   "status": "Deployment not running"
 }'''
 
+UPDATE_DEPLOYMENT = '''{
+    "deployment_id": "dep-xyiwwwfongcfhpkhqlohtbee",
+    "service_id": "pkg-cuawbyybxongczkrmsccceru",
+    "plan_id": "plan-tqzmxluchpahnhdaysvtnvxn",
+    "context": {
+        "component_context": {
+            "nudqrokhjkxlqcqlzysrzsbj": {
+                "update_deployment": true,
+                "component": {  
+                    "executables": [
+                        {
+                            "id": "exec-ghggywcxovmyklbovnhkxkrg",
+                            "name": "exe",
+                            "docker": "nginx"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}'''
+
 DEPLOYMENT_LIST = '''
 [
   {
