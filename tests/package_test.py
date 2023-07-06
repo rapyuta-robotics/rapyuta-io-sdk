@@ -58,6 +58,7 @@ class PackageTests(unittest.TestCase):
                                     deployment_info]
         client = get_client()
         device = client.get_device('test_device_id')
+        device.status = DeviceStatus.OFFLINE
         self.assertIsInstance(device, Device, 'Object should be an instance of class Device')
         pkg = client.get_package('my_package')
         provision_config = pkg.get_provision_configuration('test-plan')
@@ -306,26 +307,6 @@ class PackageTests(unittest.TestCase):
         with self.assertRaises(PlanNotFound):
             pkg.get_provision_configuration('test-plan1')
         self.assertEqual(mock_request.call_count, 1)
-
-    @patch('requests.request')
-    def test_package_provision_device_not_online_failure(self, mock_request):
-        get_device = Mock()
-        get_device.text = DEVICE_INFO
-        get_device.status_code = requests.codes.OK
-        get_package = Mock()
-        get_package.text = PACKAGE_OK_VALIDATE_DEVICE
-        get_package.status_code = requests.codes.OK
-        mock_request.side_effect = [get_device, get_package]
-        client = get_client()
-        device = client.get_device('test_device_id')
-        self.assertIsInstance(device, Device, 'Object should be an instance of class Device')
-        device.status = DeviceStatus.OFFLINE
-        pkg = client.get_package('my_package')
-        provision_config = pkg.get_provision_configuration('test-plan')
-        ignore_device_config = ['ros_workspace']
-        with self.assertRaises(OperationNotAllowedError):
-            provision_config.add_device('ros-talker', device, ignore_device_config)
-        self.assertEqual(mock_request.call_count, 2)
 
     @patch('requests.request')
     def test_package_provision_empty_ros_workspace_failure(self, mock_request):
@@ -637,30 +618,6 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(mock_request.call_count, 3)
 
     @patch('requests.request')
-    def test_package_add_device_volume_to_provision_config_device_offline(self, mock_request):
-        get_device = Mock()
-        get_device.text = DOCKER_DEVICE
-        get_device.status_code = requests.codes.OK
-        config_variable = Mock()
-        config_variable.text = DOCKER_CONFIG_VARIABLES
-        config_variable.status_code = requests.codes.OK
-        get_package = Mock()
-        get_package.text = PACKAGE_OK_VALIDATE_DEVICE_DOCKER
-        get_package.status_code = requests.codes.OK
-        mock_request.side_effect = [get_package, get_device, config_variable]
-        client = get_client()
-        pkg = client.get_package('my_package')
-        device = client.get_device('test-dev')
-        prov_config = pkg.get_provision_configuration('test-plan')
-        prov_config.add_device('ros-talker', device, ['ros_workspace'])
-        executable_mounts = [ExecutableMount(exec_name='ros-talker', mount_path='/test_path', sub_path='/data')]
-        device.status = DeviceStatus.OFFLINE.value
-        with self.assertRaises(OperationNotAllowedError) as e:
-            prov_config.mount_volume('ros-talker', device=device, mount_path=None, executable_mounts=executable_mounts)
-        self.assertEqual("Device should be online", str(e.exception))
-        self.assertEqual(mock_request.call_count, 3)
-
-    @patch('requests.request')
     def test_package_add_device_volume_to_provision_config_preinstalled_runtime(self, mock_request):
         get_device = Mock()
         get_device.text = DEVICE_INFO
@@ -740,6 +697,7 @@ class PackageTests(unittest.TestCase):
         client = get_client()
         pkg = client.get_package('my_package')
         device = client.get_device('test-dev')
+        device.status = DeviceStatus.OFFLINE.value
         prov_config = pkg.get_provision_configuration('test-plan')
         prov_config.add_device('ros-talker', device, ['ros_workspace'])
         executable_mounts = [ExecutableMount(exec_name='ros-talker', mount_path='/test_path', sub_path='/data')]

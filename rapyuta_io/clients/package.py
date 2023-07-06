@@ -549,8 +549,6 @@ class ProvisionConfiguration(ObjDict):
 
         """
         ignore_device_config = ignore_device_config or []
-        if not device.is_online():
-            raise OperationNotAllowedError('Device should be online')
 
         device_runtime = device.get_runtime()
         device_docker_enabled = device.is_docker_enabled()
@@ -719,8 +717,6 @@ class ProvisionConfiguration(ObjDict):
                     isinstance(mount, ExecutableMount) for mount in executable_mounts):
                 raise InvalidParameterException(
                     'executable_mounts must be a list of rapyuta_io.clients.package.ExecutableMount')
-            if not device.is_online():
-                raise OperationNotAllowedError('Device should be online')
             if device.get_runtime() != Device.DOCKER_COMPOSE and not device.is_docker_enabled():
                 raise OperationNotAllowedError('Device must be a {} device'.format(Device.DOCKER_COMPOSE))
             component_params = self.parameters.get(component_id)
