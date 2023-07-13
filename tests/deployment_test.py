@@ -1,17 +1,19 @@
 from __future__ import absolute_import
 import requests
 import unittest
+import json
 
-from mock import Mock, patch, MagicMock
+from mock import Mock, patch, MagicMock, call
 from requests import Response
 
 from rapyuta_io import DeploymentPhaseConstants
 from rapyuta_io.utils import InternalServerError, RetriesExhausted, InvalidParameterException
 from rapyuta_io.utils.rest_client import HttpMethod
+from sdk_test.util import get_manifest_file
 from tests.utils.client import get_client, headers
 from tests.utils.package_responses import DEPLOYMENT_INFO, \
     DEPLOYMENT_STATUS_RUNNING, DEPLOYMENT_BINDING_OK, DEPLOYMENT_LIST, DEPLOYMENT_STATUS_PENDING, \
-    DEPLOYMENT_STATUS_RUNNING_PHASE_PROVISIONING
+    DEPLOYMENT_STATUS_RUNNING_PHASE_PROVISIONING, UPDATE_DEPLOYMENT
 
 
 class DeploymentTest(unittest.TestCase):
@@ -64,7 +66,6 @@ class DeploymentTest(unittest.TestCase):
         second_deployment_status_response.status_code = requests.codes.OK
         mock_request.side_effect = [deployment_info_response, first_deployment_status_response,
                                     second_deployment_status_response]
-
         deployment = get_client().get_deployment('deployment_id')
         deployment_status = deployment.poll_deployment_till_ready(retry_count=2, sleep_interval=0)
 
@@ -217,3 +218,15 @@ class DeploymentTest(unittest.TestCase):
         self.assertEqual(deployments[0].status, 'Running')
         self.assertEqual(deployments[0].phase, 'Succeeded')
         self.assertEqual(mock_request.call_count, 2)
+
+    @patch('rapyuta_io.clients.catalog_client.CatalogClient._execute')
+    def test_update_deployment_success(self, catalog_mock_execute):
+        catalog_mock_execute.return_value = MagicMock()
+        catalog_mock_execute.return_value.status_code = 200
+        catalog_mock_execute.return_value.text = UPDATE_DEPLOYMENT
+        payload = json.loads(UPDATE_DEPLOYMENT)
+        get_client().update_deployment(payload, 0)
+        catalog_mock_execute.assert_has_calls([call(
+            'https://gacatalog.apps.okd4v2.prod.rapyuta.io/v2/service_instances/dep-xyiwwwfongcfhpkhqlohtbee',
+            HttpMethod.PATCH, 0,
+            payload=payload)])

@@ -12,7 +12,7 @@ import six
 from six.moves import range
 
 
-def _poll_till_ready(instance, retry_count, sleep_interval):
+def _poll_till_ready(instance, retry_count, sleep_interval, ready_phases=None):
     # TODO: convert into DeploymentPollerMixin (pollers.py)
     """
 
@@ -21,9 +21,15 @@ def _poll_till_ready(instance, retry_count, sleep_interval):
     :param sleep_interval: Parameter to specify the interval between retries.
 
     """
+    if ready_phases is None:
+        ready_phases = []
+
     dep_status = None
     for _ in range(retry_count):
         dep_status = instance.get_status()
+
+        if dep_status.phase in ready_phases:
+            return dep_status
 
         if dep_status.phase == DeploymentPhaseConstants.SUCCEEDED.value:
             if dep_status.status in [DeploymentStatusConstants.RUNNING.value,
@@ -250,7 +256,7 @@ class Deployment(PartialMixin, ObjDict):
         return credentials
 
     def poll_deployment_till_ready(self, retry_count=DEPLOYMENT_STATUS_RETRY_COUNT,
-                                   sleep_interval=DEFAULT_SLEEP_INTERVAL):
+                                   sleep_interval=DEFAULT_SLEEP_INTERVAL, ready_phases=None):
         """
 
         Wait for the deployment to be ready
@@ -287,7 +293,7 @@ class Deployment(PartialMixin, ObjDict):
 
 
         """
-        return _poll_till_ready(self, retry_count, sleep_interval)
+        return _poll_till_ready(self, retry_count, sleep_interval, ready_phases)
 
     def get_component_instance_id(self, component_name):
         for component_info in self.componentInfo:

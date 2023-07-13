@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 import json
+import jsonschema
 import os
 
 import six
@@ -26,11 +27,13 @@ from rapyuta_io.clients.rosbag import ROSBagJob, ROSBagJobStatus, ROSBagBlob, \
     ROSBagBlobStatus
 from rapyuta_io.clients.routed_network import RoutedNetwork, Parameters
 from rapyuta_io.clients.secret import Secret
+from rapyuta_io.clients.user_group import UserGroup
 from rapyuta_io.utils import InvalidAuthTokenException, \
     InvalidParameterException
 from rapyuta_io.utils import to_objdict
 from rapyuta_io.utils.settings import VOLUME_PACKAGE_ID, default_host_config
 from rapyuta_io.utils.utils import get_api_response_data, valid_list_elements
+from rapyuta_io.clients.validation_schema import UPDATE_DEPLOYMENT_SCHEMA
 
 
 class Client(object):
@@ -335,6 +338,26 @@ class Client(object):
             self._add_auth_token(deployment_object)
             deployments.append(deployment_object)
         return deployments
+
+    def update_deployment(self, payload, retry_limit=0):
+        """
+        Update a deployment
+
+        :type payload: json
+        :type retry_limit: int
+        :return: list of instances of class :py:class:`Deployment`:
+        :raises: :py:class:`APIError`: If the API returns an error, a status code
+            of anything other than 200/201 is returned.
+
+        The following example demonstrates how to update a deployment
+
+            >>> from rapyuta_io import Client, DeploymentPhaseConstants
+            >>> client = Client(auth_token='auth_token', project='project_guid')
+            >>> status = client.update_deployment(payload)
+
+        """
+        jsonschema.validate(instance=payload, schema=UPDATE_DEPLOYMENT_SCHEMA)
+        return self._catalog_client.update_deployment(payload, retry_limit)
 
     def get_authenticated_user(self):
         """
@@ -1800,3 +1823,108 @@ class Client(object):
 
         response = self._core_api_client.list_tag_values(list_tag_values_request)
         return response.get('tags_values', [])
+
+    def list_usergroups(self, org_guid):
+        """
+        List usergroups in an organization
+
+        :param org_guid: Organization GUID
+        :type org_guid: str
+        :return: A list of all Usergroups in the organization
+        :rtype: list(:py:class:`~rapyuta_io.clients.user_group.UserGroup`)
+
+        Following example demonstrates how to list usergroups
+
+            >>> client = Client(auth_token='auth_token', project='project_guid')
+            >>> user = self._core_api_client.get_user()
+            >>> organization_guid = user.organization.guid
+            >>> client.list_usergroups(organization_guid)
+
+        """
+        return self._core_api_client.list_usergroups(org_guid)
+
+    def get_usergroup(self, org_guid, group_guid):
+        """
+        Get usergroup using its GUID
+
+        :param org_guid: Organization GUID
+        :type org_guid: str
+        :param group_guid: Usergroup GUID
+        :type group_guid: str
+        :return: A usergroup
+        :rtype: :py:class:`~rapyuta_io.clients.user_group.UserGroup`
+
+        Following example demonstrates how to fetch a usergroup using its GUID
+
+            >>> client = Client(auth_token='auth_token', project='project_guid')
+            >>> user = self._core_api_client.get_user()
+            >>> organization_guid = user.organization.guid
+            >>> client.get_usergroup(organization_guid, 'group-guid')
+
+        """
+        return self._core_api_client.get_usergroup(org_guid, group_guid)
+
+    def delete_usergroup(self, org_guid, group_guid):
+        """
+        Delete usergroup using its GUID
+
+        :param org_guid: Organization GUID
+        :type org_guid: str
+        :param group_guid: Usergroup GUID
+        :type group_guid: str
+
+        Following example demonstrates how to delete a usergroup using its GUID
+
+            >>> client = Client(auth_token='auth_token', project='project_guid')
+            >>> user = self._core_api_client.get_user()
+            >>> organization_guid = user.organization.guid
+            >>> client.delete_usergroup(organization_guid, 'group-guid')
+
+        """
+        return self._core_api_client.delete_usergroup(org_guid, group_guid)
+
+    def create_usergroup(self, org_guid, usergroup):
+        """
+        Create usergroup in organization
+
+        :param org_guid: Organization GUID
+        :type org_guid: str
+        :param usergroup: usergroup object
+        :type usergroup: py:class:`~rapyuta_io.clients.user_group.UserGroup`
+        :return: Usergroup object
+        :rtype: :py:class:`~rapyuta_io.clients.user_group.UserGroup`
+
+        Following example demonstrates how to create usergroup in an organization
+
+            >>> client = Client(auth_token='auth_token', project='project_guid')
+            >>> user = self._core_api_client.get_user()
+            >>> organization_guid = user.organization.guid
+            >>> usergroup = UserGroup(name='test-usergroup', description='test-description', creator=user.guid)
+            >>> usergroup = client.create_usergroup(organization_guid, usergroup)
+
+        """
+        return self._core_api_client.create_usergroup(org_guid, usergroup)
+
+    def update_usergroup(self, org_guid, group_guid, usergroup):
+        """
+        Update usergroup in organization
+
+        :param org_guid: Organization GUID
+        :type org_guid: str
+        :param group_guid: Usergroup GUID
+        :type group_guid: str
+        :param usergroup: Usergroup object
+        :type usergroup: py:class:`~rapyuta_io.clients.user_group.UserGroup`
+        :return: Usergroup object
+        :rtype: :py:class:`~rapyuta_io.clients.user_group.UserGroup`
+
+        Following example demonstrates how to update usergroup
+
+            >>> client = Client(auth_token='auth_token', project='project_guid')
+            >>> user = self._core_api_client.get_user()
+            >>> organization_guid = user.organization.guid
+            >>> usergroup = UserGroup(name='test-usergroup-updated', description='test-description-updated', creator=user.guid)
+            >>> usergroup = client.update_usergroup(organization_guid, 'group-guid', usergroup)
+
+        """
+        return self._core_api_client.update_usergroup(org_guid, group_guid, usergroup)
