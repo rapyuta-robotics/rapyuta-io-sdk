@@ -1,3 +1,11 @@
+# [1.11.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.10.0...v1.11.0) (2023-07-14)
+
+### Features
+
+* **deployment**: adds update_deployment API ([51c14af74c3377585c56c025cb99af12bc90910d](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/51c14af74c3377585c56c025cb99af12bc90910d))
+* **deployment**: made poll deployment till ready phase configurable ([763716c](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/763716c47c426a513f4f9eb522419086a37349bc))
+* **usergroup**: implements usergroup APIS ([6d9037e](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/6d9037eb162e8854e0595dcf4caf3caf11c7980a))
+
 # [1.10.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.9.0...v1.10.0) (2023-05-31)
 
 
