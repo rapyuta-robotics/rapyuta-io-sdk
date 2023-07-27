@@ -741,7 +741,7 @@ class ProvisionConfiguration(ObjDict):
             self._add_dependency(volume.deploymentId, component_id, mount_path, executable_mounts=executable_mounts)
         return self
 
-    def add_dependent_deployment(self, deployment):
+    def add_dependent_deployment(self, deployment, ready_phases=[DeploymentPhaseConstants.SUCCEEDED.value]):
         """
         Add dependent deployments. \n
         `deployment.refresh()` is called to get the latest deployment status.
@@ -751,8 +751,8 @@ class ProvisionConfiguration(ObjDict):
         :return: Updated instance of class :py:class:`ProvisionConfiguration`:
         """
         deployment.refresh()
-        if deployment.phase != DeploymentPhaseConstants.SUCCEEDED.value:
-            raise OperationNotAllowedError('Dependent deployment is not running')
+        if deployment.phase not in ready_phases:
+            raise OperationNotAllowedError('dependent deployment is not ready')
         self._update_dependency_seen_aliases_set(deployment)
         self._add_dependency(deployment_id=deployment.deploymentId)
 
