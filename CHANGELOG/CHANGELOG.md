@@ -1,3 +1,10 @@
+## [1.11.1](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.11.0...v1.11.1) (2023-07-27)
+
+
+### Bug Fixes
+
+* **package:** makes dependent deployment ready phase configurable ([e0df4ec](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/e0df4ecab55a2defd47cae6446dda7f48e7e9f42))
+
 # [1.11.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.10.0...v1.11.0) (2023-07-14)
 
 ### Features
