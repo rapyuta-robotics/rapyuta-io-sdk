@@ -84,7 +84,7 @@ def get_component_context(component_info):
 
         if len(executables) > 0:
             result[component["componentID"]] = comp
-            comp["executables"] = executables
+            comp["component"] = {"executables": executables}
             comp["update_deployment"] = True
 
     return result
