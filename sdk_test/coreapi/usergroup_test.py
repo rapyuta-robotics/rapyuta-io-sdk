@@ -1,6 +1,5 @@
 import unittest
 
-from build.lib.rapyuta_io.utils.utils import generate_random_value
 from rapyuta_io import UserGroup, Project
 
 from sdk_test.config import Configuration
