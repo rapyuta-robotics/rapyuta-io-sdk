@@ -35,6 +35,7 @@ class UserGroup(ObjBase):
         self.members = members
         self.admins = admins
         self.projects = projects
+        self.role_in_projects = []
 
     @staticmethod
     def validate(self, guid, name, description, creator, members, admins, projects):
@@ -58,7 +59,8 @@ class UserGroup(ObjBase):
             'creator': 'creator',
             'members': 'members',
             'admins': 'admins',
-            'projects': 'projects'
+            'projects': 'projects',
+            'userGroupRoleInProjects': 'role_in_projects',
         }
 
     def get_deserialize_map(self):
@@ -69,5 +71,6 @@ class UserGroup(ObjBase):
             'creator': 'creator',
             'members': list_field('members', User),
             'admins': list_field('admins', User),
-            'projects': list_field('projects', Project)
+            'projects': list_field('projects', Project),
+            'role_in_projects': 'userGroupRoleInProjects'
         }
