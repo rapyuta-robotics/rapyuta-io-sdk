@@ -71,14 +71,16 @@ class TestTransformerWithDockerDevice(PackageTest):
                                                        ignored_device_configs)
         self.assert_dependent_deployment(self.listener_deployment, [self.cloud_transform_deployment])
 
-    def test_deploy_transformer_with_docker_device(self):
-        self.logger.info('Started transformer with docker device test case')
-        self.deploy_talker_package(self.device)
-        self.talker_deployment.poll_deployment_till_ready()
-        self.assert_deployment_status(self.talker_deployment)
-        self.deploy_cloud_transform_package()
-        self.cloud_transform_deployment.poll_deployment_till_ready()
-        self.assert_deployment_status(self.cloud_transform_deployment)
-        self.deploy_listener_package(self.device)
-        self.listener_deployment.poll_deployment_till_ready()
-        self.assert_deployment_status(self.listener_deployment)
+    # TODO(senapati): This test is commented as its using build based package
+    # which is not supported anymore
+    # def test_deploy_transformer_with_docker_device(self):
+    #     self.logger.info('Started transformer with docker device test case')
+    #     self.deploy_talker_package(self.device)
+    #     self.talker_deployment.poll_deployment_till_ready()
+    #     self.assert_deployment_status(self.talker_deployment)
+    #     self.deploy_cloud_transform_package()
+    #     self.cloud_transform_deployment.poll_deployment_till_ready()
+    #     self.assert_deployment_status(self.cloud_transform_deployment)
+    #     self.deploy_listener_package(self.device)
+    #     self.listener_deployment.poll_deployment_till_ready()
+    #     self.assert_deployment_status(self.listener_deployment)

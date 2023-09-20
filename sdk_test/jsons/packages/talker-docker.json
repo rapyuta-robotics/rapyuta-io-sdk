@@ -2,6 +2,7 @@
   "name": "talker-docker",
   "packageVersion": "v1.0.0",
   "description": "talker-docker sdk test package",
+  "bindable": true,
   "plans": [
     {
       "name": "default",
@@ -26,24 +27,25 @@
             "ros_distro": "melodic"
           },
           "requiredRuntime": "device",
+          "restart_policy": "no",
           "architecture": "amd64",
           "executables": [
             {
               "name": "talkerExec",
-              "gitExecutable": {
-                "repository": "https://github.com/bhuvanchandra/ros_talker_py.git",
-                "strategyType": "Source",
-                "dockerFilePath": "",
-                "contextDir": ""
+              "simulationOptions": {
+                "simulation": false
               },
               "cmd": [
                 "roslaunch talker talker.launch"
-              ]
+              ],
+              "docker": "quay.io/rapyuta/io_tutorials:latest"
             }
           ],
-          "parameters": []
+          "parameters": [],
+          "rosBagJobDefs": []
         }
       ],
+      "includePackages": [],
       "dependentDeployments": [],
       "exposedParameters": [],
       "inboundROSInterfaces": {
