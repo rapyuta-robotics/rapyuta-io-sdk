@@ -82,11 +82,13 @@ class StaticRouteTest(PackageTest):
         route = self.config.client.get_static_route_by_name('temp')
         self.assertIsNone(route)
 
-    def test_get_static_route_by_name_success(self):
-        self._create_static_routes()
-        route = self.config.client.get_static_route_by_name(self.STATIC_ROUTE_1)
-        route_name = route['urlPrefix'].split('-')[0]
-        self.assertEqual(route_name, self.STATIC_ROUTE_1)
+    # TODO(senapati): This test is commented because filter static route
+    # API is deprecated in v1 api server.
+    # def test_get_static_route_by_name_success(self):
+    #     self._create_static_routes()
+    #     route = self.config.client.get_static_route_by_name(self.STATIC_ROUTE_1)
+    #     route_name = route['urlPrefix'].split('-')[0]
+    #     self.assertEqual(route_name, self.STATIC_ROUTE_1)
 
     def test_delete_static_route_success(self):
         route1 = self.config.client.create_static_route(self.STATIC_ROUTE_1)

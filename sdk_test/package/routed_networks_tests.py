@@ -74,6 +74,11 @@ class RoutedNetworkTest(PackageTest, DeviceTest):
         self.assertFalse(partial_net.is_partial)
         self.assertTrue(partial_net.internalDeploymentStatus.status)
 
+    def assert_routed_network_parameters(self, parameters, network):
+        self.assertEqual(parameters['device_id'], self.docker_device.deviceId)
+        self.assertEqual(parameters['NETWORK_INTERFACE'], network)
+        self.assertEqual(parameters['restart_policy'], RestartPolicy.OnFailure)
+
     def test_add_device_routed_network(self):
         self.logger.info('Started creating device routed network')
         self.create_routed_network(Runtime.DEVICE, {'device_id': self.docker_device.deviceId,
@@ -84,9 +89,7 @@ class RoutedNetworkTest(PackageTest, DeviceTest):
         self.routed_network = self.config.client.get_routed_network(self.routed_network.guid)
         self.assertEqual(self.routed_network.runtime, 'device')
         self.assertEqual(self.routed_network.guid, self.routed_network.guid)
-        self.assertEqual(self.routed_network.parameters, {'device_id': self.docker_device.deviceId,
-                                                          'NETWORK_INTERFACE': 'lo',
-                                                          'restart_policy': RestartPolicy.OnFailure})
+        self.assert_routed_network_parameters(self.routed_network.parameters, 'lo')
         self.assert_deployment_status(self.routed_network)
         self.assert_routed_network_present_in_list(self.routed_network.guid)
 
@@ -146,9 +149,7 @@ class RoutedNetworkTest(PackageTest, DeviceTest):
         self.routed_network = self.config.client.get_routed_network(self.routed_network.guid)
         self.assertEqual(self.routed_network.runtime, 'device')
         self.assertEqual(self.routed_network.guid, self.routed_network.guid)
-        self.assertEqual(self.routed_network.parameters, {'device_id': self.docker_device.deviceId,
-                                                          'NETWORK_INTERFACE': 'docker0',
-                                                          'restart_policy': RestartPolicy.OnFailure})
+        self.assert_routed_network_parameters(self.routed_network.parameters, 'docker0')
         self.assert_deployment_status(self.routed_network)
         self.assert_routed_network_present_in_list(self.routed_network.guid)
         guid = self.routed_network.guid
