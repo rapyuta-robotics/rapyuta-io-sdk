@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.11.1...v1.12.0) (2023-09-26)
+
+
+### Features
+
+* **usergroup:** supports user group role in projects ([4f6c34f](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/4f6c34fd713cb493c6b44225d566e90afe8f88fa))
+
 ## [1.11.1](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.11.0...v1.11.1) (2023-07-27)
 
 
