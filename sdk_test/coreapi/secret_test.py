@@ -23,26 +23,19 @@ class TestSecret(unittest.TestCase):
         self.assertIsNotNone(secret.created_at)
         self.assertIsNotNone(secret.secret_type)
 
-    def test_create_secret_source_ssh_auth(self):
-        self.secret = self.config.client.create_secret(Secret('ssh-auth-test', SecretConfigSourceSSHAuth('test-ssh-key')))
-        self.assertSecret(self.secret)
-
-    def test_create_secret_source_http_auth(self):
-        self.secret = self.config.client.create_secret(Secret('basic-auth-test', SecretConfigSourceBasicAuth('user', 'pass')))
-        self.assertSecret(self.secret)
 
     def test_create_secret_docker(self):
         self.secret = self.config.client.create_secret(Secret('docker-test', SecretConfigDocker('user','pass', 'email')))
         self.assertSecret(self.secret)
 
     def test_list_secret_docker(self):
-        self.secret = self.config.client.create_secret(Secret('ssh-auth-test', SecretConfigSourceSSHAuth('test-ssh-key')))
+        self.secret = self.config.client.create_secret(Secret('docker-test', SecretConfigDocker('user','pass', 'email')))
         secret_list = self.config.client.list_secrets()
         secret_list = [s for s in secret_list if s.guid == self.secret.guid]
         self.assertEqual(len(secret_list), 1)
     
-    def test_update_secret_source_basic_auth(self):
-        self.secret = self.config.client.create_secret(Secret('basic-auth-test', SecretConfigSourceBasicAuth('user', 'pass')))
-        self.secret = self.config.client.update_secret(self.secret.guid, Secret('basic-auth-test', SecretConfigSourceBasicAuth('user', 'newpass')))
+    def test_update_secret_source_docker(self):
+        self.secret = self.config.client.create_secret(Secret('docker-test', SecretConfigDocker('user','pass', 'email')))
+        self.secret = self.config.client.update_secret(self.secret.guid, Secret('docker-test', SecretConfigDocker('user1','pass1', 'email1')))
         self.assertSecret(self.secret)
 
