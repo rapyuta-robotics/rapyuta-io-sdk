@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.12.0...v1.13.0) (2023-12-13)
+
+
+### Features
+
+* **device:** accepts feature config in toggle_features ([#70](https://github.com/rapyuta-robotics/rapyuta-io-sdk/issues/70)) ([a293787](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/a2937874d500633c79497cfc8414ed5f09e32137))
+
 # [1.12.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.11.1...v1.12.0) (2023-09-26)
 
 
