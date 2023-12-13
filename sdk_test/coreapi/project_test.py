@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 import unittest
 
-from rapyuta_io import Client, Project, Secret, SecretConfigSourceSSHAuth
+from rapyuta_io import Client, Project, Secret, SecretConfigDocker
 from rapyuta_io.utils import BadRequestError
 from rapyuta_io.utils.utils import generate_random_value
 from sdk_test.config import Configuration
@@ -46,6 +46,7 @@ class TestProject(unittest.TestCase):
         self.assertRaises(
             BadRequestError,
             lambda: client.create_secret(
-                Secret('test-secret', SecretConfigSourceSSHAuth('test'))
+                Secret('test-secret', SecretConfigDocker(username='username', password='password', email='test@example.com',
+                                           registry='quay.io'))
             )
         )

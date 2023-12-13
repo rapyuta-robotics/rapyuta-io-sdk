@@ -29,7 +29,7 @@ class Secret(ObjBase):
     :param name: Name of the Secret
     :type name: str
     :param secret_config: Secret Configuration
-    :type secret_config: Union[:py:class:`~rapyuta_io.clients.secret.SecretConfigSourceSSHAuth`, :py:class:`~rapyuta_io.clients.secret.SecretConfigSourceBasicAuth`, :py:class:`~rapyuta_io.clients.secret.SecretConfigDocker`]
+    :type secret_config: Union[:py:class:`~rapyuta_io.clients.secret.SecretConfigDocker`]
     """
     SECRET_PATH = '/api/secret'
 
@@ -111,8 +111,6 @@ class SecretType(str, enum.Enum):
         return str(self.value)
 
     DOCKER = 'kubernetes.io/dockercfg'
-    SOURCE_BASIC_AUTH = 'kubernetes.io/basic-auth'
-    SOURCE_SSH_AUTH = 'kubernetes.io/ssh-auth'
 
 
 class _SecretConfigBase(six.with_metaclass(ABCMeta, ObjBase)):
@@ -130,77 +128,6 @@ class _SecretConfigBase(six.with_metaclass(ABCMeta, ObjBase)):
 
     def get_serialize_map(self):
         pass
-
-
-class SecretConfigSourceSSHAuth(_SecretConfigBase):
-    """
-    SecretConfigSSHAuth represents Source Secret with SSH Authentication. This type of secrets can be used to access
-    private Git repositories using SSH, for building the Docker images from Source Code.
-
-    :param ssh_key: Private SSH key for authenticating with the Git repository hosting
-    :type ssh_key: str
-    """
-
-    def __init__(self, ssh_key):
-        self.validate(ssh_key)
-        self.ssh_key = ssh_key
-
-    @staticmethod
-    def validate(ssh_key):
-        if not (isinstance(ssh_key, str) or isinstance(ssh_key, six.string_types)) or ssh_key == '':
-            raise InvalidParameterException('ssh_key cannot be empty')
-
-    @classmethod
-    def get_type(cls):
-        return SecretType.SOURCE_SSH_AUTH
-
-    def serialize(self):
-        return {
-            'ssh-privatekey': base64.b64encode(self.ssh_key.encode()).decode()
-        }
-
-
-class SecretConfigSourceBasicAuth(_SecretConfigBase):
-    """
-    SecretConfigSourceBasicAuth represents Source Secret with Basic Authentication. This type of secrets can be used to
-    access private Git repositories exposing HTTP interface, for building the Docker images from Source Code.
-
-    :param username: Username for the Git repository hosting
-    :type username: str
-    :param password: Password for the Git repository hosting
-    :type password: str
-    :param ca_cert: If the Git repository is using self-signed certificates, a CA Root Certificate can optionally be provided.
-    :type ca_cert: str
-    """
-
-    def __init__(self, username, password, ca_cert=None):
-        self.validate(username, password, ca_cert)
-        self.username = username
-        self.password = password
-        self.ca_cert = ca_cert
-
-    @staticmethod
-    def validate(username, password, ca_cert):
-        if not isinstance(username, six.string_types) or username == '':
-            raise InvalidParameterException('username cannot be empty')
-        if not isinstance(password, six.string_types) or password == '':
-            raise InvalidParameterException('password cannot be empty')
-        if ca_cert is not None and (not isinstance(ca_cert, six.string_types) or ca_cert == ''):
-            raise InvalidParameterException('ca_cert cannot be empty')
-
-    @classmethod
-    def get_type(cls):
-        return SecretType.SOURCE_BASIC_AUTH
-
-    def serialize(self):
-        ret = {
-            'username': base64.b64encode(self.username.encode()).decode(),
-            'password': base64.b64encode(self.password.encode()).decode(),
-        }
-        if self.ca_cert is not None:
-            ret['ca.crt'] = base64.b64encode(self.ca_cert.encode()).decode()
-
-        return ret
 
 
 class SecretConfigDocker(_SecretConfigBase):

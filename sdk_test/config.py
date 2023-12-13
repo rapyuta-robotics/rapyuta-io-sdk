@@ -6,7 +6,7 @@ import os
 import six
 from six.moves import filter
 
-from rapyuta_io import Client, SecretConfigSourceSSHAuth, SecretConfigDocker, \
+from rapyuta_io import Client, SecretConfigDocker, \
     DeviceArch, Secret, Project
 from rapyuta_io.utils.error import InvalidParameterException
 from rapyuta_io.utils.utils import create_auth_header, \
@@ -154,12 +154,10 @@ class Configuration(six.with_metaclass(_Singleton, object)):
             self._devices = list(filter(filter_devices_by_name(), devices))
 
     def create_secrets(self):
-        ssh_key = self._config['git']['ssh-key']
-        git_secret = self.client.create_secret(Secret('git-secret', SecretConfigSourceSSHAuth(ssh_key)))
         docker = self._config['docker']
         docker_secret = self.client.create_secret(Secret('docker-secret', SecretConfigDocker(
             docker['username'], docker['password'], docker['email'])))
-        self._secrets = {'git': git_secret, 'docker': docker_secret}
+        self._secrets = {'docker': docker_secret}
 
     def delete_secrets(self):
         for secret in self._secrets.values():
