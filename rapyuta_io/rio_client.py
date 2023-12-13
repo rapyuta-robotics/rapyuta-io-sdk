@@ -485,7 +485,7 @@ class Client(object):
             raise InvalidParameterException('device_id needs to be a non empty string')
         return self._dmClient.delete_device(device_id)
 
-    def toggle_features(self, device_id, features):
+    def toggle_features(self, device_id, features, config=None):
         """
         Patch a device on rapyuta.io platform.
 
@@ -493,12 +493,14 @@ class Client(object):
         :type device_id: str
         :param features: A tuple of featues and their states
         :type features: list<tuple>
+        :param config: A dict of additional feature configuration
+        :type config: dict
 
         Following example demonstrates how to toggle features a device.
 
             >>> from rapyuta_io import Client
             >>> client = Client(auth_token='auth_token', project='project_guid')
-            >>> client.toggle_features('device-id', [('vpn', True), ('tracing', False)])
+            >>> client.toggle_features('device-id', [('vpn', True), ('tracing', False)], config={'vpn': {'advertise_routes': True}})
         """
         if not device_id or not isinstance(device_id, six.string_types):
             raise InvalidParameterException('device_id needs to be a non empty string')
@@ -509,6 +511,9 @@ class Client(object):
         for entry in features:
             feature, state = entry
             data[feature] = state
+
+        if config is not None:
+            data['config'] = config
 
         return self._dmClient.patch_daemons(device_id, data)
 
