@@ -1,8 +1,7 @@
 from __future__ import absolute_import
 import unittest
 
-from rapyuta_io import Secret, SecretConfigSourceSSHAuth, SecretConfigSourceBasicAuth, \
-    SecretConfigDocker
+from rapyuta_io import Secret, SecretConfigDocker
 from sdk_test.config import Configuration
 from sdk_test.util import get_logger
 

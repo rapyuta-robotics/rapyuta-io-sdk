@@ -11,8 +11,7 @@ from .clients.build import Build, BuildStatus, StrategyType, SimulationOptions, 
     BuildOptions
 from .clients.buildoperation import BuildOperation, BuildOperationInfo
 from .clients.project import Project
-from .clients.secret import Secret, SecretConfigSourceSSHAuth, SecretConfigDocker, \
-    SecretConfigSourceBasicAuth
+from .clients.secret import Secret, SecretConfigDocker
 from .clients.rosbag import UploadOptions
 from .clients.user_group import UserGroup
 
