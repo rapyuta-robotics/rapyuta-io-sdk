@@ -643,16 +643,18 @@ class Client(object):
         Following example demonstrates how to use download_configurations and handle errors.
 
             >>> from rapyuta_io import Client
-            >>> from rapyuta_io.utils.error import APIError, InternalServerError
+            >>> from rapyuta_io.utils.error import APIError, InternalServerError, ConfigNotFoundException
             >>> client = Client(auth_token='auth_token', project='project_guid')
             >>> try:
             ...     client.download_configurations('path/to/destination_dir',
             ...                                    tree_names=['config_tree1', 'config_tree2'],
             ...                                    delete_existing_trees=True)
             ... except (APIError, InternalServerError) as e:
-            ...     print 'failed API request', e.tree_path, e
+            ...     print('failed API request', e.tree_path, e)
+                except ConfigNotFoundException as e:
+                    print ('config not found')
             ... except (IOError, OSError) as e:
-            ...     print 'failed file/directory creation', e
+            ...     print('failed file/directory creation', e)
 
         """
         return self._paramserver_client.download_configurations(rootdir, tree_names, delete_existing_trees)

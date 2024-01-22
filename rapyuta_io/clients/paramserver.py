@@ -11,13 +11,12 @@ import os
 import hashlib
 import mimetypes
 
-from rapyuta_io.utils import RestClient, InvalidParameterException
+from rapyuta_io.utils import RestClient, InvalidParameterException, ConfigNotFoundException
 from rapyuta_io.utils.rest_client import HttpMethod
 from rapyuta_io.utils.settings import PARAMSERVER_API_TREE_PATH, PARAMSERVER_API_TREEBLOBS_PATH, PARAMSERVER_API_FILENODE_PATH
 from rapyuta_io.utils.utils import create_auth_header, prepend_bearer_to_auth_token, get_api_response_data, \
     validate_list_of_strings
 import six
-
 
 class _Node(str, enum.Enum):
 
@@ -36,6 +35,8 @@ class _ParamserverClient:
     yaml_content_type = 'text/yaml'
     json_content_type = 'application/json'
     default_binary_content_type = "application/octet-stream"
+    max_non_binary_size = 128 * 1024
+
 
     def __init__(self, auth_token, project, core_api_host):
         self._auth_token = auth_token
@@ -68,6 +69,11 @@ class _ParamserverClient:
                 content_type = guessed_content_type[0]
             if guessed_content_type[1]:
                 headers['Content-Encoding'] = guessed_content_type[1]
+
+        # Override Content-Type for JSON and YAML to allow creating Binary files.
+        # This is required for large YAML/JSON files.
+        if content_type in (self.json_content_type, self.yaml_content_type):
+            content_type = self.default_binary_content_type
 
         headers.update({'X-Rapyuta-Params-Version': "0",
                         'Content-Type': content_type})
@@ -129,7 +135,10 @@ class _ParamserverClient:
                 future = executor.submit(func, new_tree_path)
                 dir_futures[future] = (new_tree_path, level + 1)
             elif not in_attribute_dir:  # ignore files in attribute directories
+                file_stat = os.stat(full_path)
                 file_name = os.path.basename(full_path)
+                if file_stat.st_size > self.max_non_binary_size:
+                    future = executor.submit(self.create_binary_file, new_tree_path, full_path)
                 if file_name.endswith('.yaml'):
                     with open(full_path, 'r') as f:
                         data = f.read()
@@ -151,8 +160,11 @@ class _ParamserverClient:
                 future = executor.submit(self.create_folder, new_tree_path)
                 dir_futures[future] = (new_tree_path, level + 1)
             else:
+                file_stat = os.stat(full_path)
                 file_name = os.path.basename(full_path)
-                if file_name.endswith('.yaml'):
+                if file_stat.st_size > self.max_non_binary_size:
+                    future = executor.submit(self.create_binary_file, new_tree_path, full_path)
+                elif file_name.endswith('.yaml'):
                     with open(full_path, 'r') as f:
                         data = f.read()
                     future = executor.submit(self.create_file, new_tree_path, data)
@@ -265,6 +277,9 @@ class _ParamserverClient:
 
         if tree_names:
             api_tree_names = [tree_name for tree_name in api_tree_names if tree_name in tree_names]
+
+        if not api_tree_names:
+            raise ConfigNotFoundException('One or more trees not found')
 
         blob_temp_dir = tempfile.mkdtemp()
 
