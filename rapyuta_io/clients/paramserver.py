@@ -11,7 +11,7 @@ import os
 import hashlib
 import mimetypes
 
-from rapyuta_io.utils import RestClient, InvalidParameterException
+from rapyuta_io.utils import RestClient, InvalidParameterException, ConfigNotFoundException
 from rapyuta_io.utils.rest_client import HttpMethod
 from rapyuta_io.utils.settings import PARAMSERVER_API_TREE_PATH, PARAMSERVER_API_TREEBLOBS_PATH, PARAMSERVER_API_FILENODE_PATH
 from rapyuta_io.utils.utils import create_auth_header, prepend_bearer_to_auth_token, get_api_response_data, \
@@ -277,6 +277,9 @@ class _ParamserverClient:
 
         if tree_names:
             api_tree_names = [tree_name for tree_name in api_tree_names if tree_name in tree_names]
+
+        if not api_tree_names:
+            raise ConfigNotFoundException('One or more trees not found')
 
         blob_temp_dir = tempfile.mkdtemp()
 
