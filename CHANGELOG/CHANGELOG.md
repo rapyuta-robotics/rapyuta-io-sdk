@@ -1,3 +1,10 @@
+# [1.15.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.14.0...v1.15.0) (2024-02-27)
+
+
+### Features
+
+* **deployment:** adds support for host subpath uid/gid/perm ([d2ee458](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/d2ee458f2ff1e51b9718059e07a57b4f18614d8c))
+
 # [1.14.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.13.0...v1.14.0) (2024-01-22)
 
 
