@@ -875,6 +875,12 @@ class ExecutableMount(object):
     :vartype mount_path: str
     :ivar sub_path: Subpath of the executable
     :vartype sub_path: str
+    :ivar uid: Userid to which subpath belongs to
+    :vartype uid: int
+    :ivar gid: Groupid to which subpath belongs to
+    :vartype gid: int
+    :ivar perm: Permissions for subpath
+    :vartype perm: int
 
     :param exec_name: Name of the executable.
     :type exec_name: str
@@ -882,22 +888,37 @@ class ExecutableMount(object):
     :type mount_path: str
     :param sub_path: Subpath of the executable
     :type sub_path: str
+    :param uid: userid of subpath
+    :type uid: int
+    :param gid: groupid of subpath
+    :type gid: int
+    :param perm: permissions of subpath
+    :type perm: int
     """
 
-    def __init__(self, exec_name, mount_path, sub_path=None):
-        self.validate(exec_name, mount_path, sub_path)
+    def __init__(self, exec_name, mount_path, sub_path=None, uid=None, gid=None, perm=None):
+        self.validate(exec_name, mount_path, sub_path, uid, gid, perm)
         self.exec_name = exec_name
         self.mount_path = mount_path
         self.sub_path = sub_path
+        self.uid = uid
+        self.gid = gid
+        self.perm = perm
 
     @staticmethod
-    def validate(exec_name, mount_path, sub_path=None):
+    def validate(exec_name, mount_path, sub_path=None, uid=None, gid=None, perm=None):
         if not isinstance(exec_name, six.string_types):
             raise InvalidParameterException('exec_name must be a non-empty string')
         if not isinstance(mount_path, six.string_types):
             raise InvalidParameterException('mount_path must be a non-empty string')
         if sub_path is not None and not isinstance(sub_path, six.string_types):
             raise InvalidParameterException('sub_path must be a non-empty string')
+        if uid is not None and not isinstance(uid, six.integer_types):
+            raise InvalidParameterException('uid must be a non-empty integer')
+        if gid is not None and not isinstance(gid, six.integer_types):
+            raise InvalidParameterException('gid must be a non-empty integer')
+        if perm is not None and not isinstance(perm, six.integer_types):
+            raise InvalidParameterException('perm must be a non-empty integer')
 
 
 class RestartPolicy(str, enum.Enum):
