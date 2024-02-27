@@ -1,0 +1,1136 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="#" /><link rel="search" title="Search" href="search.html" />
+
+    <link rel="shortcut icon" href="_static/favicon.ico"/><meta name="generator" content="sphinx-4.2.0, furo 2021.10.09"/><title>Index - Rapyuta.io SDK documentation</title>
+<link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=0254c309f5cadf746f1a613e7677379ac9c8cdcd" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
+    <link rel="stylesheet" type="text/css" href="_static/css/rio-sphinx.css" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  body[data-theme="dark"] {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+</style></head>
+  <body>
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" />
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">Rapyuta.io SDK  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="_static/logo-light-mode.png" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="_static/logo-dark-mode.png" alt="Dark Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">Rapyuta.io SDK  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="auth.html">Authentication</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="organization.html">Organization</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="project.html">Project</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="secret.html">Secret</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="user_group.html">User Group</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="device.html">Device</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="build.html">Build</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="package.html">Package</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="deployment.html">Deployment</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="parameter.html">Parameters</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="volumes.html">Persistent Volumes</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="routed_network.html">Routed Network</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="native_network.html">Native Network</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="static_route.html">Static Route</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rosbag.html">Rosbag</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" role="switch" type="checkbox"/><label for="toctree-checkbox-15"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="configuration.html">Configuration</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" role="switch" type="checkbox"/><label for="toctree-checkbox-16"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="metrics.html">Metrics</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" role="switch" type="checkbox"/><label for="toctree-checkbox-17"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          
+<section class="genindex-section">
+  <h1 id="index">Index</h1>
+  <div class="genindex-jumpbox"><a href="#_"><strong>_</strong></a> | <a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#Q"><strong>Q</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#V"><strong>V</strong></a></div>
+</section>
+<section id="_" class="genindex-section">
+  <h2>_</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="auth.html#rapyuta_io.rio_client.Client.__init__">__init__() (Client method)</a>, <a href="build.html#rapyuta_io.rio_client.Client.__init__">[1]</a>, <a href="configuration.html#rapyuta_io.rio_client.Client.__init__">[2]</a>, <a href="deployment.html#rapyuta_io.rio_client.Client.__init__">[3]</a>, <a href="device.html#rapyuta_io.rio_client.Client.__init__">[4]</a>, <a href="metrics.html#rapyuta_io.rio_client.Client.__init__">[5]</a>, <a href="native_network.html#rapyuta_io.rio_client.Client.__init__">[6]</a>, <a href="organization.html#rapyuta_io.rio_client.Client.__init__">[7]</a>, <a href="package.html#rapyuta_io.rio_client.Client.__init__">[8]</a>, <a href="parameter.html#rapyuta_io.rio_client.Client.__init__">[9]</a>, <a href="project.html#rapyuta_io.rio_client.Client.__init__">[10]</a>, <a href="rosbag.html#rapyuta_io.rio_client.Client.__init__">[11]</a>, <a href="routed_network.html#rapyuta_io.rio_client.Client.__init__">[12]</a>, <a href="secret.html#rapyuta_io.rio_client.Client.__init__">[13]</a>, <a href="static_route.html#rapyuta_io.rio_client.Client.__init__">[14]</a>, <a href="user_group.html#rapyuta_io.rio_client.Client.__init__">[15]</a>, <a href="volumes.html#rapyuta_io.rio_client.Client.__init__">[16]</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="A" class="genindex-section">
+  <h2>A</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.add_config_variable">add_config_variable() (Device method)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.clients.package.ProvisionConfiguration.add_dependent_deployment">add_dependent_deployment() (ProvisionConfiguration method)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.clients.package.ProvisionConfiguration.add_device">add_device() (ProvisionConfiguration method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.add_label">add_label() (Device method)</a>
+
+        <ul>
+          <li><a href="package.html#rapyuta_io.clients.package.ProvisionConfiguration.add_label">(ProvisionConfiguration method)</a>
+</li>
+        </ul></li>
+        <li><a href="package.html#rapyuta_io.clients.package.ProvisionConfiguration.add_native_network">add_native_network() (ProvisionConfiguration method)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.clients.package.ProvisionConfiguration.add_native_networks">add_native_networks() (ProvisionConfiguration method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="package.html#rapyuta_io.clients.package.ProvisionConfiguration.add_parameter">add_parameter() (ProvisionConfiguration method)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.clients.package.ProvisionConfiguration.add_restart_policy">add_restart_policy() (ProvisionConfiguration method)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.clients.package.ProvisionConfiguration.add_rosbag_job">add_rosbag_job() (ProvisionConfiguration method)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.clients.package.ProvisionConfiguration.add_routed_network">add_routed_network() (ProvisionConfiguration method)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.clients.package.ProvisionConfiguration.add_routed_networks">add_routed_networks() (ProvisionConfiguration method)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.clients.package.ProvisionConfiguration.add_static_route">add_static_route() (ProvisionConfiguration method)</a>
+</li>
+        <li><a href="project.html#rapyuta_io.rio_client.Client.add_user_to_project">add_user_to_project() (Client method)</a>
+</li>
+        <li><a href="configuration.html#rapyuta_io.rio_client.Client.apply_parameters">apply_parameters() (Client method)</a>, <a href="device.html#rapyuta_io.rio_client.Client.apply_parameters">[1]</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="B" class="genindex-section">
+  <h2>B</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="build.html#rapyuta_io.clients.build.Build">Build (class in rapyuta_io.clients.build)</a>
+</li>
+        <li><a href="build.html#rapyuta_io.clients.buildoperation.BuildOperation">BuildOperation (class in rapyuta_io.clients.buildoperation)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="build.html#rapyuta_io.clients.buildoperation.BuildOperationInfo">BuildOperationInfo (class in rapyuta_io.clients.buildoperation)</a>
+</li>
+        <li><a href="build.html#rapyuta_io.clients.build.BuildOptions">BuildOptions (class in rapyuta_io.clients.build)</a>
+</li>
+        <li><a href="build.html#rapyuta_io.clients.build.BuildStatus">BuildStatus (class in rapyuta_io.clients.build)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="C" class="genindex-section">
+  <h2>C</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.cancel_log_file_upload">cancel_log_file_upload() (Device method)</a>
+</li>
+        <li><a href="build.html#rapyuta_io.clients.build.CatkinOption">CatkinOption (class in rapyuta_io.clients.build)</a>
+</li>
+        <li><a href="auth.html#rapyuta_io.rio_client.Client">Client (class in rapyuta_io.rio_client)</a>, <a href="build.html#rapyuta_io.rio_client.Client">[1]</a>, <a href="configuration.html#rapyuta_io.rio_client.Client">[2]</a>, <a href="deployment.html#rapyuta_io.rio_client.Client">[3]</a>, <a href="device.html#rapyuta_io.rio_client.Client">[4]</a>, <a href="metrics.html#rapyuta_io.rio_client.Client">[5]</a>, <a href="native_network.html#rapyuta_io.rio_client.Client">[6]</a>, <a href="organization.html#rapyuta_io.rio_client.Client">[7]</a>, <a href="package.html#rapyuta_io.rio_client.Client">[8]</a>, <a href="parameter.html#rapyuta_io.rio_client.Client">[9]</a>, <a href="project.html#rapyuta_io.rio_client.Client">[10]</a>, <a href="rosbag.html#rapyuta_io.rio_client.Client">[11]</a>, <a href="routed_network.html#rapyuta_io.rio_client.Client">[12]</a>, <a href="secret.html#rapyuta_io.rio_client.Client">[13]</a>, <a href="static_route.html#rapyuta_io.rio_client.Client">[14]</a>, <a href="user_group.html#rapyuta_io.rio_client.Client">[15]</a>, <a href="volumes.html#rapyuta_io.rio_client.Client">[16]</a>
+</li>
+        <li><a href="metrics.html#rapyuta_io.clients.metrics.Column">Column (class in rapyuta_io.clients.metrics)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.model.Command">Command (class in rapyuta_io.clients.model)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.clients.rosbag.ComponentType">ComponentType (class in rapyuta_io.clients.rosbag)</a>
+</li>
+        <li><a href="organization.html#rapyuta_io.clients.organization.Country">Country (class in rapyuta_io.clients.organization)</a>
+</li>
+        <li><a href="build.html#rapyuta_io.rio_client.Client.create_build">create_build() (Client method)</a>
+</li>
+        <li><a href="routed_network.html#rapyuta_io.rio_client.Client.create_cloud_routed_network">create_cloud_routed_network() (Client method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.rio_client.Client.create_device">create_device() (Client method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="routed_network.html#rapyuta_io.rio_client.Client.create_device_routed_network">create_device_routed_network() (Client method)</a>
+</li>
+        <li><a href="native_network.html#rapyuta_io.rio_client.Client.create_native_network">create_native_network() (Client method)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.rio_client.Client.create_package">create_package() (Client method)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.rio_client.Client.create_package_from_manifest">create_package_from_manifest() (Client method)</a>
+</li>
+        <li><a href="project.html#rapyuta_io.rio_client.Client.create_project">create_project() (Client method)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.rio_client.Client.create_rosbag_job">create_rosbag_job() (Client method)</a>
+</li>
+        <li><a href="secret.html#rapyuta_io.rio_client.Client.create_secret">create_secret() (Client method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.create_shared_url">create_shared_url() (Device method)</a>
+</li>
+        <li><a href="static_route.html#rapyuta_io.rio_client.Client.create_static_route">create_static_route() (Client method)</a>
+</li>
+        <li><a href="user_group.html#rapyuta_io.rio_client.Client.create_usergroup">create_usergroup() (Client method)</a>
+</li>
+        <li><a href="volumes.html#rapyuta_io.clients.persistent_volumes.PersistentVolumes.create_volume_instance">create_volume_instance() (PersistentVolumes method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="D" class="genindex-section">
+  <h2>D</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="build.html#rapyuta_io.clients.build.Build.delete">delete() (Build method)</a>
+
+        <ul>
+          <li><a href="device.html#rapyuta_io.clients.device.Device.delete">(Device method)</a>
+</li>
+          <li><a href="native_network.html#rapyuta_io.clients.native_network.NativeNetwork.delete">(NativeNetwork method)</a>
+</li>
+          <li><a href="package.html#rapyuta_io.clients.package.Package.delete">(Package method)</a>
+</li>
+          <li><a href="project.html#rapyuta_io.clients.project.Project.delete">(Project method)</a>
+</li>
+          <li><a href="rosbag.html#rapyuta_io.clients.rosbag.ROSBagBlob.delete">(ROSBagBlob method)</a>
+</li>
+          <li><a href="routed_network.html#rapyuta_io.clients.routed_network.RoutedNetwork.delete">(RoutedNetwork method)</a>
+</li>
+          <li><a href="secret.html#rapyuta_io.clients.secret.Secret.delete">(Secret method)</a>
+</li>
+          <li><a href="static_route.html#rapyuta_io.clients.static_route.StaticRoute.delete">(StaticRoute method)</a>
+</li>
+        </ul></li>
+        <li><a href="build.html#rapyuta_io.rio_client.Client.delete_build">delete_build() (Client method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.delete_config_variable">delete_config_variable() (Device method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.rio_client.Client.delete_device">delete_device() (Client method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.delete_label">delete_label() (Device method)</a>
+</li>
+        <li><a href="native_network.html#rapyuta_io.rio_client.Client.delete_native_network">delete_native_network() (Client method)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.rio_client.Client.delete_package">delete_package() (Client method)</a>
+</li>
+        <li><a href="project.html#rapyuta_io.rio_client.Client.delete_project">delete_project() (Client method)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.rio_client.Client.delete_rosbag_blob">delete_rosbag_blob() (Client method)</a>
+</li>
+        <li><a href="routed_network.html#rapyuta_io.rio_client.Client.delete_routed_network">delete_routed_network() (Client method)</a>
+</li>
+        <li><a href="secret.html#rapyuta_io.rio_client.Client.delete_secret">delete_secret() (Client method)</a>
+</li>
+        <li><a href="static_route.html#rapyuta_io.rio_client.Client.delete_static_route">delete_static_route() (Client method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.delete_uploaded_log_file">delete_uploaded_log_file() (Device method)</a>
+</li>
+        <li><a href="user_group.html#rapyuta_io.rio_client.Client.delete_usergroup">delete_usergroup() (Client method)</a>
+</li>
+        <li><a href="deployment.html#rapyuta_io.clients.deployment.Deployment">Deployment (class in rapyuta_io.clients.deployment)</a>
+</li>
+        <li><a href="deployment.html#rapyuta_io.clients.deployment.DeploymentPhaseConstants">DeploymentPhaseConstants (class in rapyuta_io.clients.deployment)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.clients.package.Package.deployments">deployments() (Package method)</a>
+</li>
+        <li><a href="deployment.html#rapyuta_io.clients.deployment.DeploymentStatus">DeploymentStatus (class in rapyuta_io.clients.deployment)</a>
+</li>
+        <li><a href="deployment.html#rapyuta_io.clients.deployment.DeploymentStatusConstants">DeploymentStatusConstants (class in rapyuta_io.clients.deployment)</a>
+</li>
+        <li><a href="deployment.html#rapyuta_io.clients.deployment.Deployment.deprovision">deprovision() (Deployment method)</a>
+</li>
+        <li><a href="volumes.html#rapyuta_io.clients.persistent_volumes.VolumeInstance.destroy_volume_instance">destroy_volume_instance() (VolumeInstance method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device">Device (class in rapyuta_io.clients.device)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device_manager.DeviceArch">DeviceArch (class in rapyuta_io.clients.device_manager)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.model.DeviceConfig">DeviceConfig (class in rapyuta_io.clients.model)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.DevicePythonVersion">DevicePythonVersion (class in rapyuta_io.clients.device)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.DeviceRuntime">DeviceRuntime (class in rapyuta_io.clients.device)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.DeviceRuntimeKeys">DeviceRuntimeKeys (class in rapyuta_io.clients.device)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.DeviceStatus">DeviceStatus (class in rapyuta_io.clients.device)</a>
+</li>
+        <li><a href="volumes.html#rapyuta_io.clients.persistent_volumes.DiskCapacity">DiskCapacity (class in rapyuta_io.clients.persistent_volumes)</a>
+</li>
+        <li><a href="volumes.html#rapyuta_io.clients.persistent_volumes.DiskType">DiskType (class in rapyuta_io.clients.persistent_volumes)</a>
+</li>
+        <li><a href="configuration.html#rapyuta_io.rio_client.Client.download_configurations">download_configurations() (Client method)</a>, <a href="parameter.html#rapyuta_io.rio_client.Client.download_configurations">[1]</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.download_log_file">download_log_file() (Device method)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.rio_client.Client.download_rosbag_blob">download_rosbag_blob() (Client method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="E" class="genindex-section">
+  <h2>E</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="metrics.html#rapyuta_io.clients.metrics.Entity">Entity (class in rapyuta_io.clients.metrics)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="package.html#rapyuta_io.clients.package.ExecutableMount">ExecutableMount (class in rapyuta_io.clients.package)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.execute_command">execute_command() (Device method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="F" class="genindex-section">
+  <h2>F</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="device.html#rapyuta_io.clients.device.OnboardScript.full_command">full_command() (OnboardScript method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="G" class="genindex-section">
+  <h2>G</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="deployment.html#rapyuta_io.rio_client.Client.get_all_deployments">get_all_deployments() (Client method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.rio_client.Client.get_all_devices">get_all_devices() (Client method)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.rio_client.Client.get_all_packages">get_all_packages() (Client method)</a>
+</li>
+        <li><a href="routed_network.html#rapyuta_io.rio_client.Client.get_all_routed_networks">get_all_routed_networks() (Client method)</a>
+</li>
+        <li><a href="static_route.html#rapyuta_io.rio_client.Client.get_all_static_routes">get_all_static_routes() (Client method)</a>
+</li>
+        <li><a href="volumes.html#rapyuta_io.clients.persistent_volumes.PersistentVolumes.get_all_volume_instances">get_all_volume_instances() (PersistentVolumes method)</a>
+</li>
+        <li><a href="auth.html#rapyuta_io.rio_client.Client.get_auth_token">get_auth_token() (Client static method)</a>
+</li>
+        <li><a href="auth.html#rapyuta_io.rio_client.Client.get_authenticated_user">get_authenticated_user() (Client method)</a>
+</li>
+        <li><a href="build.html#rapyuta_io.rio_client.Client.get_build">get_build() (Client method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.get_config_variables">get_config_variables() (Device method)</a>
+</li>
+        <li><a href="deployment.html#rapyuta_io.rio_client.Client.get_deployment">get_deployment() (Client method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.get_deployments">get_deployments() (Device method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.rio_client.Client.get_device">get_device() (Client method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.get_labels">get_labels() (Device method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.get_log_upload_status">get_log_upload_status() (Device method)</a>
+</li>
+        <li><a href="native_network.html#rapyuta_io.rio_client.Client.get_native_network">get_native_network() (Client method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="package.html#rapyuta_io.rio_client.Client.get_package">get_package() (Client method)</a>
+</li>
+        <li><a href="volumes.html#rapyuta_io.rio_client.Client.get_persistent_volume">get_persistent_volume() (Client method)</a>
+</li>
+        <li><a href="project.html#rapyuta_io.rio_client.Client.get_project">get_project() (Client method)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.clients.package.Package.get_provision_configuration">get_provision_configuration() (Package method)</a>
+</li>
+        <li><a href="routed_network.html#rapyuta_io.rio_client.Client.get_routed_network">get_routed_network() (Client method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.get_runtime">get_runtime() (Device method)</a>
+</li>
+        <li><a href="secret.html#rapyuta_io.rio_client.Client.get_secret">get_secret() (Client method)</a>
+</li>
+        <li><a href="deployment.html#rapyuta_io.clients.deployment.Deployment.get_service_binding">get_service_binding() (Deployment method)</a>
+</li>
+        <li><a href="static_route.html#rapyuta_io.rio_client.Client.get_static_route">get_static_route() (Client method)</a>
+</li>
+        <li><a href="static_route.html#rapyuta_io.rio_client.Client.get_static_route_by_name">get_static_route_by_name() (Client method)</a>
+</li>
+        <li><a href="deployment.html#rapyuta_io.clients.deployment.Deployment.get_status">get_status() (Deployment method)</a>
+
+        <ul>
+          <li><a href="volumes.html#rapyuta_io.clients.persistent_volumes.VolumeInstance.get_status">(VolumeInstance method)</a>
+</li>
+        </ul></li>
+        <li><a href="user_group.html#rapyuta_io.rio_client.Client.get_usergroup">get_usergroup() (Client method)</a>
+</li>
+        <li><a href="volumes.html#rapyuta_io.rio_client.Client.get_volume_instance">get_volume_instance() (Client method)</a>
+
+        <ul>
+          <li><a href="volumes.html#rapyuta_io.clients.persistent_volumes.PersistentVolumes.get_volume_instance">(PersistentVolumes method)</a>
+</li>
+        </ul></li>
+        <li><a href="build.html#rapyuta_io.clients.build.GithubWebhook">GithubWebhook (class in rapyuta_io.clients.build)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="I" class="genindex-section">
+  <h2>I</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="native_network.html#rapyuta_io.clients.common_models.InternalDeploymentStatus">InternalDeploymentStatus (class in rapyuta_io.clients.common_models)</a>, <a href="routed_network.html#rapyuta_io.clients.common_models.InternalDeploymentStatus">[1]</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.is_docker_enabled">is_docker_enabled() (Device method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.is_preinstalled_enabled">is_preinstalled_enabled() (Device method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="L" class="genindex-section">
+  <h2>L</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="device.html#rapyuta_io.clients.model.Label">Label (class in rapyuta_io.clients.model)</a>
+</li>
+        <li><a href="build.html#rapyuta_io.rio_client.Client.list_builds">list_builds() (Client method)</a>
+</li>
+        <li><a href="metrics.html#rapyuta_io.rio_client.Client.list_metrics">list_metrics() (Client method)</a>
+</li>
+        <li><a href="native_network.html#rapyuta_io.rio_client.Client.list_native_networks">list_native_networks() (Client method)</a>
+</li>
+        <li><a href="project.html#rapyuta_io.rio_client.Client.list_projects">list_projects() (Client method)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.rio_client.Client.list_rosbag_blobs">list_rosbag_blobs() (Client method)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.rio_client.Client.list_rosbag_jobs">list_rosbag_jobs() (Client method)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.rio_client.Client.list_rosbag_jobs_in_project">list_rosbag_jobs_in_project() (Client method)</a>
+</li>
+        <li><a href="secret.html#rapyuta_io.rio_client.Client.list_secrets">list_secrets() (Client method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="metrics.html#rapyuta_io.rio_client.Client.list_tag_keys">list_tag_keys() (Client method)</a>
+</li>
+        <li><a href="metrics.html#rapyuta_io.rio_client.Client.list_tag_values">list_tag_values() (Client method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.list_uploaded_files_for_device">list_uploaded_files_for_device() (Device method)</a>
+</li>
+        <li><a href="user_group.html#rapyuta_io.rio_client.Client.list_usergroups">list_usergroups() (Client method)</a>
+</li>
+        <li><a href="metrics.html#rapyuta_io.clients.metrics.ListMetricsRequest">ListMetricsRequest (class in rapyuta_io.clients.metrics)</a>
+</li>
+        <li><a href="metrics.html#rapyuta_io.clients.metrics.ListTagKeysRequest">ListTagKeysRequest (class in rapyuta_io.clients.metrics)</a>
+</li>
+        <li><a href="metrics.html#rapyuta_io.clients.metrics.ListTagValuesRequest">ListTagValuesRequest (class in rapyuta_io.clients.metrics)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.model.LogsUploadRequest">LogsUploadRequest (class in rapyuta_io.clients.model)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.model.LogUploads">LogUploads (class in rapyuta_io.clients.model)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.model.LogUploadStatus">LogUploadStatus (class in rapyuta_io.clients.model)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="M" class="genindex-section">
+  <h2>M</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rosbag.html#rapyuta_io.clients.rosbag.MessageType">MessageType (class in rapyuta_io.clients.rosbag)</a>
+</li>
+        <li><a href="metrics.html#rapyuta_io.clients.metrics.Metric">Metric (class in rapyuta_io.clients.metrics)</a>
+
+        <ul>
+          <li><a href="device.html#rapyuta_io.clients.model.Metric">(class in rapyuta_io.clients.model)</a>
+</li>
+        </ul></li>
+        <li><a href="metrics.html#rapyuta_io.clients.metrics.MetricFunction">MetricFunction (class in rapyuta_io.clients.metrics)</a>
+</li>
+        <li><a href="metrics.html#rapyuta_io.clients.metrics.MetricOperation">MetricOperation (class in rapyuta_io.clients.metrics)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.metrics">metrics() (Device method)</a>
+</li>
+        <li>
+    module
+
+        <ul>
+          <li><a href="build.html#module-rapyuta_io.clients.build">rapyuta_io.clients.build</a>
+</li>
+          <li><a href="build.html#module-rapyuta_io.clients.buildoperation">rapyuta_io.clients.buildoperation</a>
+</li>
+          <li><a href="deployment.html#module-rapyuta_io.clients.deployment">rapyuta_io.clients.deployment</a>
+</li>
+          <li><a href="device.html#module-rapyuta_io.clients.device">rapyuta_io.clients.device</a>
+</li>
+          <li><a href="device.html#module-rapyuta_io.clients.device_manager">rapyuta_io.clients.device_manager</a>
+</li>
+          <li><a href="metrics.html#module-rapyuta_io.clients.metrics">rapyuta_io.clients.metrics</a>
+</li>
+          <li><a href="device.html#module-rapyuta_io.clients.model">rapyuta_io.clients.model</a>
+</li>
+          <li><a href="native_network.html#module-rapyuta_io.clients.native_network">rapyuta_io.clients.native_network</a>
+</li>
+          <li><a href="organization.html#module-rapyuta_io.clients.organization">rapyuta_io.clients.organization</a>
+</li>
+          <li><a href="package.html#module-rapyuta_io.clients.package">rapyuta_io.clients.package</a>
+</li>
+          <li><a href="volumes.html#module-rapyuta_io.clients.persistent_volumes">rapyuta_io.clients.persistent_volumes</a>
+</li>
+          <li><a href="project.html#module-rapyuta_io.clients.project">rapyuta_io.clients.project</a>
+</li>
+          <li><a href="rosbag.html#module-rapyuta_io.clients.rosbag">rapyuta_io.clients.rosbag</a>
+</li>
+          <li><a href="routed_network.html#module-rapyuta_io.clients.routed_network">rapyuta_io.clients.routed_network</a>
+</li>
+          <li><a href="secret.html#module-rapyuta_io.clients.secret">rapyuta_io.clients.secret</a>
+</li>
+          <li><a href="static_route.html#module-rapyuta_io.clients.static_route">rapyuta_io.clients.static_route</a>
+</li>
+          <li><a href="user_group.html#module-rapyuta_io.clients.user_group">rapyuta_io.clients.user_group</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="package.html#rapyuta_io.clients.package.ProvisionConfiguration.mount_volume">mount_volume() (ProvisionConfiguration method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="N" class="genindex-section">
+  <h2>N</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="native_network.html#rapyuta_io.clients.native_network.NativeNetwork">NativeNetwork (class in rapyuta_io.clients.native_network)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="O" class="genindex-section">
+  <h2>O</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.onboard_script">onboard_script() (Device method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.OnboardScript">OnboardScript (class in rapyuta_io.clients.device)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="organization.html#rapyuta_io.clients.organization.Organization">Organization (class in rapyuta_io.clients.organization)</a>
+</li>
+        <li><a href="organization.html#rapyuta_io.clients.organization.OrganizationState">OrganizationState (class in rapyuta_io.clients.organization)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.clients.rosbag.OverrideOptions">OverrideOptions (class in rapyuta_io.clients.rosbag)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="P" class="genindex-section">
+  <h2>P</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="package.html#rapyuta_io.clients.package.Package">Package (class in rapyuta_io.clients.package)</a>
+</li>
+        <li><a href="native_network.html#rapyuta_io.clients.native_network.Parameters">Parameters (class in rapyuta_io.clients.native_network)</a>
+
+        <ul>
+          <li><a href="routed_network.html#rapyuta_io.clients.routed_network.Parameters">(class in rapyuta_io.clients.routed_network)</a>
+</li>
+        </ul></li>
+        <li><a href="rosbag.html#rapyuta_io.clients.rosbag.ROSBagJob.patch">patch() (ROSBagJob method)</a>
+</li>
+        <li><a href="volumes.html#rapyuta_io.clients.persistent_volumes.PersistentVolumes">PersistentVolumes (class in rapyuta_io.clients.persistent_volumes)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.clients.plan.Plan">Plan (class in rapyuta_io.clients.plan)</a>
+</li>
+        <li><a href="build.html#rapyuta_io.clients.build.Build.poll_build_till_ready">poll_build_till_ready() (Build method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="deployment.html#rapyuta_io.clients.deployment.Deployment.poll_deployment_till_ready">poll_deployment_till_ready() (Deployment method)</a>
+
+        <ul>
+          <li><a href="volumes.html#rapyuta_io.clients.persistent_volumes.VolumeInstance.poll_deployment_till_ready">(VolumeInstance method)</a>
+</li>
+        </ul></li>
+        <li><a href="native_network.html#rapyuta_io.clients.native_network.NativeNetwork.poll_native_network_till_ready">poll_native_network_till_ready() (NativeNetwork method)</a>
+</li>
+        <li><a href="routed_network.html#rapyuta_io.clients.routed_network.RoutedNetwork.poll_routed_network_till_ready">poll_routed_network_till_ready() (RoutedNetwork method)</a>
+</li>
+        <li><a href="project.html#rapyuta_io.clients.project.Project">Project (class in rapyuta_io.clients.project)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.clients.package.Package.provision">provision() (Package method)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.clients.package.ProvisionConfiguration">ProvisionConfiguration (class in rapyuta_io.clients.package)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="Q" class="genindex-section">
+  <h2>Q</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="device.html#rapyuta_io.clients.device.QoS">QoS (class in rapyuta_io.clients.device)</a>
+</li>
+        <li><a href="metrics.html#rapyuta_io.rio_client.Client.query_metrics">query_metrics() (Client method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="metrics.html#rapyuta_io.clients.metrics.QueryMetricsRequest">QueryMetricsRequest (class in rapyuta_io.clients.metrics)</a>
+</li>
+        <li><a href="metrics.html#rapyuta_io.clients.metrics.QueryMetricsResponse">QueryMetricsResponse (class in rapyuta_io.clients.metrics)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="R" class="genindex-section">
+  <h2>R</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    rapyuta_io.clients.build
+
+        <ul>
+          <li><a href="build.html#module-rapyuta_io.clients.build">module</a>
+</li>
+        </ul></li>
+        <li>
+    rapyuta_io.clients.buildoperation
+
+        <ul>
+          <li><a href="build.html#module-rapyuta_io.clients.buildoperation">module</a>
+</li>
+        </ul></li>
+        <li>
+    rapyuta_io.clients.deployment
+
+        <ul>
+          <li><a href="deployment.html#module-rapyuta_io.clients.deployment">module</a>
+</li>
+        </ul></li>
+        <li>
+    rapyuta_io.clients.device
+
+        <ul>
+          <li><a href="device.html#module-rapyuta_io.clients.device">module</a>
+</li>
+        </ul></li>
+        <li>
+    rapyuta_io.clients.device_manager
+
+        <ul>
+          <li><a href="device.html#module-rapyuta_io.clients.device_manager">module</a>
+</li>
+        </ul></li>
+        <li>
+    rapyuta_io.clients.metrics
+
+        <ul>
+          <li><a href="metrics.html#module-rapyuta_io.clients.metrics">module</a>
+</li>
+        </ul></li>
+        <li>
+    rapyuta_io.clients.model
+
+        <ul>
+          <li><a href="device.html#module-rapyuta_io.clients.model">module</a>
+</li>
+        </ul></li>
+        <li>
+    rapyuta_io.clients.native_network
+
+        <ul>
+          <li><a href="native_network.html#module-rapyuta_io.clients.native_network">module</a>
+</li>
+        </ul></li>
+        <li>
+    rapyuta_io.clients.organization
+
+        <ul>
+          <li><a href="organization.html#module-rapyuta_io.clients.organization">module</a>
+</li>
+        </ul></li>
+        <li>
+    rapyuta_io.clients.package
+
+        <ul>
+          <li><a href="package.html#module-rapyuta_io.clients.package">module</a>
+</li>
+        </ul></li>
+        <li>
+    rapyuta_io.clients.persistent_volumes
+
+        <ul>
+          <li><a href="volumes.html#module-rapyuta_io.clients.persistent_volumes">module</a>
+</li>
+        </ul></li>
+        <li>
+    rapyuta_io.clients.project
+
+        <ul>
+          <li><a href="project.html#module-rapyuta_io.clients.project">module</a>
+</li>
+        </ul></li>
+        <li>
+    rapyuta_io.clients.rosbag
+
+        <ul>
+          <li><a href="rosbag.html#module-rapyuta_io.clients.rosbag">module</a>
+</li>
+        </ul></li>
+        <li>
+    rapyuta_io.clients.routed_network
+
+        <ul>
+          <li><a href="routed_network.html#module-rapyuta_io.clients.routed_network">module</a>
+</li>
+        </ul></li>
+        <li>
+    rapyuta_io.clients.secret
+
+        <ul>
+          <li><a href="secret.html#module-rapyuta_io.clients.secret">module</a>
+</li>
+        </ul></li>
+        <li>
+    rapyuta_io.clients.static_route
+
+        <ul>
+          <li><a href="static_route.html#module-rapyuta_io.clients.static_route">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    rapyuta_io.clients.user_group
+
+        <ul>
+          <li><a href="user_group.html#module-rapyuta_io.clients.user_group">module</a>
+</li>
+        </ul></li>
+        <li><a href="build.html#rapyuta_io.clients.build.Build.refresh">refresh() (Build method)</a>
+
+        <ul>
+          <li><a href="deployment.html#rapyuta_io.clients.deployment.Deployment.refresh">(Deployment method)</a>
+</li>
+          <li><a href="device.html#rapyuta_io.clients.device.Device.refresh">(Device method)</a>
+</li>
+          <li><a href="native_network.html#rapyuta_io.clients.native_network.NativeNetwork.refresh">(NativeNetwork method)</a>
+</li>
+          <li><a href="package.html#rapyuta_io.clients.package.Package.refresh">(Package method)</a>
+</li>
+          <li><a href="rosbag.html#rapyuta_io.clients.rosbag.ROSBagBlob.refresh">(ROSBagBlob method)</a>
+</li>
+          <li><a href="routed_network.html#rapyuta_io.clients.routed_network.RoutedNetwork.refresh">(RoutedNetwork method)</a>
+</li>
+          <li><a href="volumes.html#rapyuta_io.clients.persistent_volumes.VolumeInstance.refresh">(VolumeInstance method)</a>
+</li>
+        </ul></li>
+        <li><a href="package.html#rapyuta_io.clients.package.ProvisionConfiguration.remove_rosbag_job">remove_rosbag_job() (ProvisionConfiguration method)</a>
+</li>
+        <li><a href="project.html#rapyuta_io.rio_client.Client.remove_user_from_project">remove_user_from_project() (Client method)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.clients.package.RestartPolicy">RestartPolicy (class in rapyuta_io.clients.package)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.clients.rosbag.ROSBagBlob.retry_upload">retry_upload() (ROSBagBlob method)</a>
+</li>
+        <li><a href="build.html#rapyuta_io.clients.build.Build.rollback">rollback() (Build method)</a>
+</li>
+        <li><a href="build.html#rapyuta_io.rio_client.Client.rollback_build">rollback_build() (Client method)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.clients.rosbag.ROSBagBlob">ROSBagBlob (class in rapyuta_io.clients.rosbag)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.clients.rosbag.ROSBagBlobStatus">ROSBagBlobStatus (class in rapyuta_io.clients.rosbag)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.clients.rosbag.ROSBagCompression">ROSBagCompression (class in rapyuta_io.clients.rosbag)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.clients.rosbag.ROSBagInfo">ROSBagInfo (class in rapyuta_io.clients.rosbag)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.clients.rosbag.ROSBagJob">ROSBagJob (class in rapyuta_io.clients.rosbag)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.clients.rosbag.ROSBagJobStatus">ROSBagJobStatus (class in rapyuta_io.clients.rosbag)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.clients.rosbag.ROSBagOnDemandUploadOptions">ROSBagOnDemandUploadOptions (class in rapyuta_io.clients.rosbag)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.clients.rosbag.ROSBagOptions">ROSBagOptions (class in rapyuta_io.clients.rosbag)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.clients.rosbag.ROSBagTimeRange">ROSBagTimeRange (class in rapyuta_io.clients.rosbag)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.clients.rosbag.ROSBagUploadTypes">ROSBagUploadTypes (class in rapyuta_io.clients.rosbag)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.clients.package.ROSDistro">ROSDistro (class in rapyuta_io.clients.package)</a>
+</li>
+        <li><a href="routed_network.html#rapyuta_io.clients.routed_network.RoutedNetwork">RoutedNetwork (class in rapyuta_io.clients.routed_network)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.OnboardScript.run">run() (OnboardScript method)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.clients.package.Runtime">Runtime (class in rapyuta_io.clients.package)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="S" class="genindex-section">
+  <h2>S</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="build.html#rapyuta_io.clients.build.Build.save">save() (Build method)</a>
+
+        <ul>
+          <li><a href="device.html#rapyuta_io.clients.device.Device.save">(Device method)</a>
+</li>
+        </ul></li>
+        <li><a href="secret.html#rapyuta_io.clients.secret.Secret">Secret (class in rapyuta_io.clients.secret)</a>
+</li>
+        <li><a href="secret.html#rapyuta_io.clients.secret.SecretConfigDocker">SecretConfigDocker (class in rapyuta_io.clients.secret)</a>
+</li>
+        <li><a href="secret.html#rapyuta_io.clients.secret.SecretType">SecretType (class in rapyuta_io.clients.secret)</a>
+</li>
+        <li><a href="package.html#rapyuta_io.clients.package.ProvisionConfiguration.set_component_alias">set_component_alias() (ProvisionConfiguration method)</a>
+</li>
+        <li><a href="project.html#rapyuta_io.rio_client.Client.set_project">set_project() (Client method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.model.SharedURL">SharedURL (class in rapyuta_io.clients.model)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="build.html#rapyuta_io.clients.build.SimulationOptions">SimulationOptions (class in rapyuta_io.clients.build)</a>
+</li>
+        <li><a href="metrics.html#rapyuta_io.clients.metrics.SortOrder">SortOrder (class in rapyuta_io.clients.metrics)</a>
+</li>
+        <li><a href="static_route.html#rapyuta_io.clients.static_route.StaticRoute">StaticRoute (class in rapyuta_io.clients.static_route)</a>
+</li>
+        <li><a href="metrics.html#rapyuta_io.clients.metrics.StepInterval">StepInterval (class in rapyuta_io.clients.metrics)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.rio_client.Client.stop_rosbag_jobs">stop_rosbag_jobs() (Client method)</a>
+</li>
+        <li><a href="build.html#rapyuta_io.clients.build.StrategyType">StrategyType (class in rapyuta_io.clients.build)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.subscribe_metric">subscribe_metric() (Device method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.subscribe_topic">subscribe_topic() (Device method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.SystemMetric">SystemMetric (class in rapyuta_io.clients.device)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="T" class="genindex-section">
+  <h2>T</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="metrics.html#rapyuta_io.clients.metrics.Tags">Tags (class in rapyuta_io.clients.metrics)</a>
+</li>
+        <li><a href="metrics.html#rapyuta_io.clients.metrics.QueryMetricsResponse.to_row_column_format">to_row_column_format() (QueryMetricsResponse method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.rio_client.Client.toggle_features">toggle_features() (Client method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.topic_status">topic_status() (Device method)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.clients.rosbag.TopicInfo">TopicInfo (class in rapyuta_io.clients.rosbag)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.TopicKind">TopicKind (class in rapyuta_io.clients.device)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="rosbag.html#rapyuta_io.clients.rosbag.TopicOverrideInfo">TopicOverrideInfo (class in rapyuta_io.clients.rosbag)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.TopicQOS">TopicQOS (class in rapyuta_io.clients.device)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.topics">topics() (Device method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.model.TopicsStatus">TopicsStatus (class in rapyuta_io.clients.model)</a>
+</li>
+        <li><a href="build.html#rapyuta_io.clients.build.Build.trigger">trigger() (Build method)</a>
+</li>
+        <li><a href="build.html#rapyuta_io.rio_client.Client.trigger_build">trigger_build() (Client method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="U" class="genindex-section">
+  <h2>U</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.unsubscribe_metric">unsubscribe_metric() (Device method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.unsubscribe_topic">unsubscribe_topic() (Device method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.update_config_variable">update_config_variable() (Device method)</a>
+</li>
+        <li><a href="deployment.html#rapyuta_io.rio_client.Client.update_deployment">update_deployment() (Client method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.update_label">update_label() (Device method)</a>
+</li>
+        <li><a href="user_group.html#rapyuta_io.rio_client.Client.update_usergroup">update_usergroup() (Client method)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.upgrade">upgrade() (Device method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="configuration.html#rapyuta_io.rio_client.Client.upload_configurations">upload_configurations() (Client method)</a>, <a href="parameter.html#rapyuta_io.rio_client.Client.upload_configurations">[1]</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.device.Device.upload_log_file">upload_log_file() (Device method)</a>
+</li>
+        <li><a href="rosbag.html#rapyuta_io.clients.rosbag.UploadOptions">UploadOptions (class in rapyuta_io.clients.rosbag)</a>
+</li>
+        <li><a href="device.html#rapyuta_io.clients.model.SharedURL.url">url (SharedURL property)</a>
+</li>
+        <li><a href="project.html#rapyuta_io.clients.project.User">User (class in rapyuta_io.clients.project)</a>
+</li>
+        <li><a href="user_group.html#rapyuta_io.clients.user_group.UserGroup">UserGroup (class in rapyuta_io.clients.user_group)</a>
+</li>
+        <li><a href="project.html#rapyuta_io.clients.project.UserState">UserState (class in rapyuta_io.clients.project)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="V" class="genindex-section">
+  <h2>V</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="volumes.html#rapyuta_io.clients.persistent_volumes.VolumeInstance">VolumeInstance (class in rapyuta_io.clients.persistent_volumes)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="volumes.html#rapyuta_io.clients.persistent_volumes.VolumeInstanceStatus">VolumeInstanceStatus (class in rapyuta_io.clients.persistent_volumes)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2023, Rapyuta Robotics |
+            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+              and
+              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+              <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/scripts/main.js"></script>
+    <script src="_static/js/rio-sphinx.js"></script>
+    </body>
+</html>
