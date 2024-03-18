@@ -119,6 +119,7 @@ class DeploymentNotRunningException(Exception):
     """
     :ivar deployment_status: Deployment status object retrieved from the last poll
     """
+
     def __init__(self, msg, deployment_status=None):
         self.deployment_status = deployment_status
         Exception.__init__(self, msg)
@@ -166,4 +167,22 @@ class ROSBagBlobError(Exception):
 
 class BuildOperationFailed(Exception):
     def __init__(self, msg):
+        Exception.__init__(self, msg)
+
+
+class InvalidJSONError(Exception):
+    def __init__(self, file_path=None):
+        msg = "Invalid JSON"
+        if file_path:
+            msg += ": {}".format(file_path)
+
+        Exception.__init__(self, msg)
+
+
+class InvalidYAMLError(Exception):
+    def __init__(self, file_path=None):
+        msg = "Invalid YAML"
+        if file_path:
+            msg += ": {}".format(file_path)
+
         Exception.__init__(self, msg)
