@@ -1,10 +1,11 @@
 from __future__ import absolute_import
+
 from collections import OrderedDict
 
+import six
 from mock import call, ANY
 
 from tests.utils.client import headers
-import six
 
 _URL_PREFIX = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/paramserver/'
 
@@ -38,6 +39,7 @@ def _get_mock_calls(tree_paths, ignore_tree_paths=None, delete_existing_trees=Fa
             json = {'type': 'FileNode', 'data': value, 'contentType': content_type}
         mock_calls.append(call(url=url, method='PUT', headers=headers, params={}, json=json))
     return mock_calls
+
 
 def _get_folder_mock_calls(tree_paths, ignore_tree_paths=None, delete_existing_trees=False):
     """
@@ -111,8 +113,9 @@ UPLOAD_SUCCESS_WITH_TREE_NAMES_MOCK_CALLS = _get_mock_calls(UPLOAD_SUCCESS_TREE_
                                                                                'tree1/attr'])
 
 UPLOAD_SUCCESS_WITH_TREE_NAMES_AS_FOLDER_MOCK_CALLS = _get_folder_mock_calls(UPLOAD_SUCCESS_TREE_PATHS,
-                                                            ignore_tree_paths=['tree1', 'tree1/config.yaml',
-                                                                               'tree1/attr'])
+                                                                             ignore_tree_paths=['tree1',
+                                                                                                'tree1/config.yaml',
+                                                                                                'tree1/attr'])
 
 UPLOAD_SUCCESS_DELETE_EXISTING_MOCK_CALLS = _get_mock_calls(UPLOAD_SUCCESS_TREE_PATHS, delete_existing_trees=True)
 
@@ -155,131 +158,131 @@ DOWNLOAD_TREES_RESPONSE = {
 }
 
 DOWNLOAD_TREE1_RESPONSE = {
-  'data': {
-    'version': 1,
-    'type': 'ValueNode',
-    'name': 'tree1',
-    'path': '/',
-    'children': [{
+    'data': {
         'version': 1,
-        'type': 'AttributeNode',
-        'name': 'attr',
-        'path': '/attr/',
-        'updatedAt': '2019-12-10T04:27:14Z',
+        'type': 'ValueNode',
+        'name': 'tree1',
+        'path': '/',
+        'children': [{
+            'version': 1,
+            'type': 'AttributeNode',
+            'name': 'attr',
+            'path': '/attr/',
+            'updatedAt': '2019-12-10T04:27:14Z',
+            'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
+        },
+            {
+                'version': 1,
+                'type': 'FileNode',
+                'data': 'a: b',
+                'name': 'config.yaml',
+                'path': '/config.yaml',
+                'updatedAt': '2019-12-10T04:27:11Z',
+                'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
+            }
+        ],
+        'updatedAt': '2019-12-10T04:27:01Z',
         'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
-      },
-      {
-        'version': 1,
-        'type': 'FileNode',
-        'data': 'a: b',
-        'name': 'config.yaml',
-        'path': '/config.yaml',
-        'updatedAt': '2019-12-10T04:27:11Z',
-        'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
-      }
-    ],
-    'updatedAt': '2019-12-10T04:27:01Z',
-    'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
-  }
+    }
 }
 
 DOWNLOAD_TREE2_RESPONSE = {
-  'data': {
-    'version': 1,
-    'type': 'ValueNode',
-    'name': 'tree2',
-    'path': '/',
-    'children': [{
-        'version': 2,
-        'type': 'FileNode',
-        'data': 'a: b',
-        'name': 'device.yaml',
-        'path': '/device.yaml',
-        'updatedAt': '2019-12-10T04:35:08Z',
-        'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
-      },
-      {
-        'version': 2,
-        'type': 'FileNode',
-        'data': 'a: b',
-        'name': 'motors.yaml',
-        'path': '/motors.yaml',
-        'updatedAt': '2019-12-10T04:35:20Z',
-        'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
-      },
-      {
+    'data': {
         'version': 1,
-        'type': 'AttributeNode',
-        'name': 'robot_type',
-        'path': '/robot_type/',
+        'type': 'ValueNode',
+        'name': 'tree2',
+        'path': '/',
         'children': [{
-            'version': 1,
-            'type': 'ValueNode',
-            'name': 'AGV',
-            'path': '/robot_type/AGV/',
-            'children': [{
+            'version': 2,
+            'type': 'FileNode',
+            'data': 'a: b',
+            'name': 'device.yaml',
+            'path': '/device.yaml',
+            'updatedAt': '2019-12-10T04:35:08Z',
+            'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
+        },
+            {
                 'version': 2,
                 'type': 'FileNode',
                 'data': 'a: b',
                 'name': 'motors.yaml',
-                'path': '/robot_type/AGV/motors.yaml',
-                'updatedAt': '2019-12-10T04:36:01Z',
+                'path': '/motors.yaml',
+                'updatedAt': '2019-12-10T04:35:20Z',
                 'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
-              },
-              {
+            },
+            {
                 'version': 1,
                 'type': 'AttributeNode',
-                'name': 'robot_name',
-                'path': '/robot_type/AGV/robot_name/',
+                'name': 'robot_type',
+                'path': '/robot_type/',
                 'children': [{
                     'version': 1,
                     'type': 'ValueNode',
-                    'name': 'robot1',
-                    'path': '/robot_type/AGV/robot_name/robot1/',
+                    'name': 'AGV',
+                    'path': '/robot_type/AGV/',
                     'children': [{
-                      'version': 2,
-                      'type': 'FileNode',
-                      'data': 'a: b',
-                      'name': 'device.yaml',
-                      'path': '/robot_type/AGV/robot_name/robot1/device.yaml',
-                      'updatedAt': '2019-12-10T04:36:38Z',
-                      'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
-                    }],
-                    'updatedAt': '2019-12-10T04:36:17Z',
+                        'version': 2,
+                        'type': 'FileNode',
+                        'data': 'a: b',
+                        'name': 'motors.yaml',
+                        'path': '/robot_type/AGV/motors.yaml',
+                        'updatedAt': '2019-12-10T04:36:01Z',
+                        'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
+                    },
+                        {
+                            'version': 1,
+                            'type': 'AttributeNode',
+                            'name': 'robot_name',
+                            'path': '/robot_type/AGV/robot_name/',
+                            'children': [{
+                                'version': 1,
+                                'type': 'ValueNode',
+                                'name': 'robot1',
+                                'path': '/robot_type/AGV/robot_name/robot1/',
+                                'children': [{
+                                    'version': 2,
+                                    'type': 'FileNode',
+                                    'data': 'a: b',
+                                    'name': 'device.yaml',
+                                    'path': '/robot_type/AGV/robot_name/robot1/device.yaml',
+                                    'updatedAt': '2019-12-10T04:36:38Z',
+                                    'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
+                                }],
+                                'updatedAt': '2019-12-10T04:36:17Z',
+                                'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
+                            },
+                                {
+                                    'version': 1,
+                                    'type': 'ValueNode',
+                                    'name': 'robot2',
+                                    'path': '/robot_type/AGV/robot_name/robot2/',
+                                    'updatedAt': '2019-12-10T04:36:49Z',
+                                    'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
+                                }
+                            ],
+                            'updatedAt': '2019-12-10T04:36:13Z',
+                            'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
+                        }
+                    ],
+                    'updatedAt': '2019-12-10T04:35:33Z',
                     'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
-                  },
-                  {
-                    'version': 1,
-                    'type': 'ValueNode',
-                    'name': 'robot2',
-                    'path': '/robot_type/AGV/robot_name/robot2/',
-                    'updatedAt': '2019-12-10T04:36:49Z',
-                    'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
-                  }
+                },
+                    {
+                        'version': 1,
+                        'type': 'ValueNode',
+                        'name': 'AMR',
+                        'path': '/robot_type/AMR/',
+                        'updatedAt': '2019-12-10T04:35:36Z',
+                        'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
+                    }
                 ],
-                'updatedAt': '2019-12-10T04:36:13Z',
+                'updatedAt': '2019-12-10T04:35:27Z',
                 'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
-              }
-            ],
-            'updatedAt': '2019-12-10T04:35:33Z',
-            'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
-          },
-          {
-            'version': 1,
-            'type': 'ValueNode',
-            'name': 'AMR',
-            'path': '/robot_type/AMR/',
-            'updatedAt': '2019-12-10T04:35:36Z',
-            'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
-          }
+            }
         ],
-        'updatedAt': '2019-12-10T04:35:27Z',
+        'updatedAt': '2019-12-10T04:34:22Z',
         'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
-      }
-    ],
-    'updatedAt': '2019-12-10T04:34:22Z',
-    'userGUID': 'c0b76341-a20c-4e3b-b11b-8a25dc973448'
-  }
+    }
 }
 
 GET_BLOB_TREE = {

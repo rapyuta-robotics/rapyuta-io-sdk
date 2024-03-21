@@ -8,11 +8,13 @@ from functools import wraps
 
 import requests
 import six
+import yaml
+from six.moves import range
+
 from rapyuta_io.utils import APIError, ParameterMissingException, InvalidParameterException, \
     UnauthorizedError, ResourceNotFoundError, BadRequestError, InternalServerError, ConflictError, \
-    ForbiddenError
+    ForbiddenError, InvalidJSONError, InvalidYAMLError
 from rapyuta_io.utils.settings import EMPTY, DEFAULT_RANDOM_VALUE_LENGTH
-from six.moves import range
 
 BEARER = "Bearer"
 
@@ -140,3 +142,42 @@ def is_true(value):
 def is_false(value):
     return value in [False, 'False', 'false']
 
+
+def parse_json(filepath):
+    """Parses the given file and checks if it is a valid JSON. If not, raises an error."""
+    try:
+        with open(filepath, 'r') as f:
+            data = f.read()
+    except Exception as e:
+        raise e
+
+    try:
+        json.loads(data)
+    except json.decoder.JSONDecodeError:
+        return InvalidJSONError(filepath)
+
+    return data
+
+
+def parse_yaml(filepath):
+    """Parse the given file and checks if it is a valid YAML. If not, raises an error."""
+    try:
+        with open(filepath, 'r') as f:
+            data = f.read()
+    except Exception as e:
+        raise e
+
+    try:
+        loaded = yaml.safe_load(data)
+    except yaml.YAMLError:
+        raise InvalidYAMLError(filepath)
+
+    # For example, consider a file with just the following text.
+    # The yaml.safe_load() function will still parse this file.
+    #
+    # invalid data
+    #
+    if not isinstance(loaded, dict):
+        raise InvalidYAMLError(filepath)
+
+    return data
