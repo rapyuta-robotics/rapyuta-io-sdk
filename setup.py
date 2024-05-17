@@ -28,6 +28,7 @@ setup(
         "urllib3>=1.23",
         "python-dateutil>=2.8.2",
         "pytz",
+        "pyyaml>=5.4.1",
         "setuptools",
         "jsonschema==4.0.0",
     ],
