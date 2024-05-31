@@ -154,7 +154,7 @@ def parse_json(filepath):
     try:
         json.loads(data)
     except json.decoder.JSONDecodeError:
-        return InvalidJSONError(filepath)
+        raise InvalidJSONError(filepath)
 
     return data
 
