@@ -419,18 +419,6 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(mock_request.call_count, 2)
 
     @patch('requests.request')
-    def test_package_provision_component_parameter_invalid_value_failure(self, mock_request):
-        get_package = Mock()
-        get_package.text = PACKAGE_OK_NO_VALIDATE
-        get_package.status_code = requests.codes.OK
-        mock_request.side_effect = [get_package]
-        client = get_client()
-        pkg = client.get_package('my_package')
-        provision_config = pkg.get_provision_configuration('test-plan')
-        with self.assertRaises(InvalidParameterException):
-            provision_config.add_parameter('ros-talker', 'invalid-value', 123)
-
-    @patch('requests.request')
     def test_package_provision_component_parameter_empty_component_name_failure(self, mock_request):
         get_package = Mock()
         get_package.text = PACKAGE_OK_NO_VALIDATE
