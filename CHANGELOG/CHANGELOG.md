@@ -1,3 +1,12 @@
+## [1.15.1](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.15.0...v1.15.1) (2024-06-04)
+
+
+### Bug Fixes
+
+* **package:** removes parameter value validation ([df2f0dc](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/df2f0dcf2874759775929557285053b0191f6d0a))
+* **paramserver:** validates yaml or json data ([#77](https://github.com/rapyuta-robotics/rapyuta-io-sdk/issues/77)) ([a543f71](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/a543f71a1fefde347f8721187b7094a161b2dc50))
+* **utils:** corrects exception handling in parse_json ([c16d229](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/c16d22972d544e35464f64073cb6cab9fb69fb87))
+
 # [1.15.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.14.0...v1.15.0) (2024-02-27)
 
 
