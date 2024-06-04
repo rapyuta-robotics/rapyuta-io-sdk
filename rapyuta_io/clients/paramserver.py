@@ -1,22 +1,32 @@
 from __future__ import absolute_import
+
+import enum
 import errno
+import hashlib
+import mimetypes
+import os
+import tempfile
+from concurrent import futures
 from os import listdir, makedirs
 from os.path import isdir, join
 from shutil import rmtree, copyfile
 
-from concurrent import futures
-import enum
-import tempfile
-import os
-import hashlib
-import mimetypes
+import six
 
 from rapyuta_io.utils import RestClient, InvalidParameterException, ConfigNotFoundException
+from rapyuta_io.utils.error import InvalidJSONError, InvalidYAMLError
 from rapyuta_io.utils.rest_client import HttpMethod
-from rapyuta_io.utils.settings import PARAMSERVER_API_TREE_PATH, PARAMSERVER_API_TREEBLOBS_PATH, PARAMSERVER_API_FILENODE_PATH
-from rapyuta_io.utils.utils import create_auth_header, prepend_bearer_to_auth_token, get_api_response_data, \
-    validate_list_of_strings
-import six
+from rapyuta_io.utils.settings import PARAMSERVER_API_TREE_PATH, PARAMSERVER_API_TREEBLOBS_PATH, \
+    PARAMSERVER_API_FILENODE_PATH
+from rapyuta_io.utils.utils import (
+    create_auth_header,
+    prepend_bearer_to_auth_token,
+    get_api_response_data,
+    validate_list_of_strings,
+    parse_json,
+    parse_yaml
+)
+
 
 class _Node(str, enum.Enum):
 
@@ -28,6 +38,7 @@ class _Node(str, enum.Enum):
     Attribute = 'AttributeNode'
     Folder = 'FolderNode'
 
+
 class _ParamserverClient:
     """
     Internal client for paramserver. Not for public use.
@@ -36,7 +47,6 @@ class _ParamserverClient:
     json_content_type = 'application/json'
     default_binary_content_type = "application/octet-stream"
     max_non_binary_size = 128 * 1024
-
 
     def __init__(self, auth_token, project, core_api_host):
         self._auth_token = auth_token
@@ -140,12 +150,10 @@ class _ParamserverClient:
                 if file_stat.st_size > self.max_non_binary_size:
                     future = executor.submit(self.create_binary_file, new_tree_path, full_path)
                 if file_name.endswith('.yaml'):
-                    with open(full_path, 'r') as f:
-                        data = f.read()
+                    data = parse_yaml(full_path)
                     future = executor.submit(self.create_file, new_tree_path, data)
                 elif file_name.endswith('.json'):
-                    with open(full_path, 'r') as f:
-                        data = f.read()
+                    data = parse_json(full_path)
                     future = executor.submit(self.create_file, new_tree_path, data, content_type=self.json_content_type)
                 else:
                     future = executor.submit(self.create_binary_file, new_tree_path, full_path)
@@ -165,19 +173,17 @@ class _ParamserverClient:
                 if file_stat.st_size > self.max_non_binary_size:
                     future = executor.submit(self.create_binary_file, new_tree_path, full_path)
                 elif file_name.endswith('.yaml'):
-                    with open(full_path, 'r') as f:
-                        data = f.read()
+                    data = parse_yaml(full_path)
                     future = executor.submit(self.create_file, new_tree_path, data)
                 elif file_name.endswith('.json'):
-                    with open(full_path, 'r') as f:
-                        data = f.read()
+                    data = parse_json(full_path)
                     future = executor.submit(self.create_file, new_tree_path, data, content_type=self.json_content_type)
                 else:
                     future = executor.submit(self.create_binary_file, new_tree_path, full_path)
                 file_futures[future] = new_tree_path
         return dir_futures, file_futures
 
-    def upload_configurations(self, rootdir, tree_names, delete_existing_trees, as_folder = False):
+    def upload_configurations(self, rootdir, tree_names, delete_existing_trees, as_folder=False):
         self.validate_args(rootdir, tree_names, delete_existing_trees, as_folder)
         with futures.ThreadPoolExecutor(max_workers=15) as executor:
             dir_futures = self.process_root_dir(executor, rootdir, tree_names, delete_existing_trees)
@@ -193,7 +199,8 @@ class _ParamserverClient:
                     raise exc
 
                 processor_func = self.process_dir if not as_folder else self.process_folder
-                dir_futures, file_futures = processor_func(executor, rootdir, tree_path, level, dir_futures, file_futures)
+                dir_futures, file_futures = processor_func(executor, rootdir, tree_path, level, dir_futures,
+                                                           file_futures)
                 done = futures.wait(dir_futures, return_when=futures.FIRST_COMPLETED).done
                 future = done.pop() if len(done) else None
 
@@ -241,7 +248,8 @@ class _ParamserverClient:
 
     def get_blob_data(self, tree_names):
         url = self._core_api_host + PARAMSERVER_API_TREEBLOBS_PATH
-        response = RestClient(url).method(HttpMethod.GET).query_param({'treeNames': tree_names}).headers(self._headers).retry(0).execute()
+        response = RestClient(url).method(HttpMethod.GET).query_param({'treeNames': tree_names}).headers(
+            self._headers).retry(0).execute()
         blob_data = get_api_response_data(response, parse_full=True).get('data', {})
         return blob_data
 
@@ -254,7 +262,7 @@ class _ParamserverClient:
                 f.write(chunk)
 
     @staticmethod
-    def validate_args(rootdir, tree_names, delete_existing_trees, as_folder = False):
+    def validate_args(rootdir, tree_names, delete_existing_trees, as_folder=False):
         if not isinstance(rootdir, six.string_types):
             raise InvalidParameterException('rootdir must be a string')
         if tree_names:
@@ -263,6 +271,7 @@ class _ParamserverClient:
             raise InvalidParameterException('delete_existing_trees must be a boolean')
         if not isinstance(as_folder, bool):
             raise InvalidParameterException('as_folder must be a boolean')
+
     def download_configurations(self, rootdir, tree_names, delete_existing_trees):
         self.validate_args(rootdir, tree_names, delete_existing_trees)
         self._safe_makedirs(rootdir)

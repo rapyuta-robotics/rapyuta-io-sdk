@@ -613,10 +613,10 @@ class ProvisionConfiguration(ObjDict):
             raise InvalidParameterException("component_name must be a non-empty string")
         if not key or not isinstance(key, six.string_types):
             raise InvalidParameterException("key must be a non-empty string")
-        if not value or not isinstance(value, six.string_types):
-            raise InvalidParameterException("value must be a non-empty string")
+
         component_id = self.plan.get_component_id(component_name)
         self.parameters[component_id][key] = value
+
         return self
 
     def set_component_alias(self, component_name, alias="", set_ros_namespace=False):

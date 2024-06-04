@@ -8,6 +8,7 @@ from mock import call, patch, MagicMock
 from pyfakefs import fake_filesystem_unittest
 from requests import Response
 
+import rapyuta_io.utils.error
 from rapyuta_io.utils.error import BadRequestError, InternalServerError
 from tests.utils.client import get_client, headers
 from tests.utils.paramserver import UPLOAD_SUCCESS_TREE_PATHS, UPLOAD_SUCCESS_MOCK_CALLS, UPLOAD_FAILURE_400CASE_TREE_PATHS, \
@@ -149,20 +150,17 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
             mock_response = MagicMock(spec=Response)
             url = kwargs['url']
             url_suffix = url[len(self.URL_PREFIX):]
-            if url_suffix == '/tree2/robot_type/AMR/motors.yaml':
-                mock_response.status_code = requests.codes.BAD_REQUEST
-                mock_response.text = '{"error": "invalid data"}'
-            else:
+            if url_suffix != '/tree2/robot_type/AMR/motors.yaml':
                 mock_response.status_code = requests.codes.OK
                 mock_response.text = 'null'
             return mock_response
         mock_request.side_effect = side_effect
 
-        with self.assertRaisesRegex(BadRequestError, 'invalid data') as exc:
+        with self.assertRaisesRegex(rapyuta_io.utils.error.InvalidYAMLError, 'Invalid YAML') as exc:
             get_client().upload_configurations(rootdir)
-        self.assertEqual('tree2/robot_type/AMR/motors.yaml', exc.exception.tree_path)
-        mock_request.assert_has_calls(expected_mock_calls, any_order=True)
-        self.assertEqual(len(expected_mock_calls), mock_request.call_count, 'extra request calls were made')
+        self.assertRegex(str(exc.exception), 'tree2/robot_type/AMR/motors.yaml')
+        self.assertNotEqual(len(expected_mock_calls), mock_request.call_count,
+                            'expected fewer calls due to client side exception')
 
     @patch('requests.request')
     def test_upload_configurations_failure_500case(self, mock_request):
