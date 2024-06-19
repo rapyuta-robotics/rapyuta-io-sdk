@@ -253,7 +253,8 @@ class Device(PartialMixin, ObjDict):
 
     def __init__(self, name, runtime=None, runtime_docker=False, runtime_preinstalled=False, ros_distro=None,
                  rosbag_mount_path=None,
-                 ros_workspace=None, description=None, python_version=DevicePythonVersion.PYTHON2):
+                 ros_workspace=None, description=None, python_version=DevicePythonVersion.PYTHON2,
+                 config_variables=None, labels=None):
         self.validate(name, runtime, runtime_docker, runtime_preinstalled, ros_distro, rosbag_mount_path, ros_workspace,
                       description, python_version)
         self.name = name
@@ -272,6 +273,8 @@ class Device(PartialMixin, ObjDict):
         self._ros_workspace = ros_workspace
         self.description = description
         self.python_version = python_version
+        self.config_variables = config_variables or {}
+        self.labels = labels or {}
 
     @staticmethod
     def validate(name, runtime, runtime_docker, runtime_preinstalled, ros_distro, rosbag_mount_path,
@@ -320,6 +323,8 @@ class Device(PartialMixin, ObjDict):
                       '_ros_workspace']:
             if getattr(self, field):
                 device['config_variables'][field[1:]] = getattr(self, field)
+        device['config_variables'].update(self.config_variables)
+        device['labels'] = self.labels
         return device
 
     @classmethod
