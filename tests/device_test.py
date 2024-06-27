@@ -566,7 +566,8 @@ class DeviceTests(unittest.TestCase):
                 'runtime_docker': True,
                 'ros_distro': 'melodic',
                 'rosbag_mount_path': 'test/path'
-            }
+            },
+            'labels': {}
         }
         expected_create_device_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/auth-keys/?download_type=script'
         expected_get_device_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/devices/test-device-id'
@@ -610,7 +611,8 @@ class DeviceTests(unittest.TestCase):
                 'runtime_preinstalled': True,
                 'ros_distro': 'melodic',
                 'ros_workspace': 'test/path'
-            }
+            },
+            'labels': {}
         }
         expected_create_device_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/auth-keys/?download_type=script'
         expected_get_device_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/devices/test-device-id'
@@ -654,13 +656,22 @@ class DeviceTests(unittest.TestCase):
                 'runtime_docker': True,
                 'runtime_preinstalled': True,
                 'ros_distro': 'melodic',
-                'rosbag_mount_path': 'test/path'
+                'rosbag_mount_path': 'test/path',
+                'custom-config-variable-1': 'value1',
+                'custom-config-variable-2': 'value2'
+            },
+            'labels': {
+                'custom-label-1': 'label1',
+                'custom-label-2': 'label2',
+                'custom-label-3': 'label3'
             }
         }
         expected_create_device_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/auth-keys/?download_type=script'
         expected_get_device_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/devices/test-device-id'
         device = Device(name='test-device', runtime_docker=True, runtime_preinstalled=True,
-                        ros_distro=ROSDistro.MELODIC, rosbag_mount_path='test/path', description='test-description')
+                        ros_distro=ROSDistro.MELODIC, rosbag_mount_path='test/path', description='test-description',
+                        config_variables={'custom-config-variable-1': 'value1','custom-config-variable-2': 'value2'},
+                        labels={'custom-label-1': 'label1','custom-label-2': 'label2','custom-label-3': 'label3'})
         create_device_response = Mock()
         create_device_response.text = CREATE_BOTH_RUNTIMES_DEVICE_SUCCESS
         create_device_response.status_code = requests.codes.OK
@@ -683,11 +694,21 @@ class DeviceTests(unittest.TestCase):
         expected_configs = {
             'runtime': 'dockercompose',
             'ros_distro': 'melodic',
-            'rosbag_mount_path': 'test/path'
+            'rosbag_mount_path': 'test/path',
+            'custom-config-variable-1': 'value1',
+            'custom-config-variable-2': 'value2',
         }
         for config in device.config_variables:
             if config.key in expected_configs:
                 self.assertEqual(expected_configs[config.key], config.value)
+        expected_labels = {
+            'custom-label-1': 'label1',
+            'custom-label-2': 'label2',
+            'custom-label-3': 'label3'
+        }
+        for label in device.labels:
+            if label.key in expected_labels:
+                self.assertEqual(expected_labels[label.key], label.value)
 
     @patch('requests.request')
     def test_onboard_script_dockercompose_success(self, mock_request):
@@ -893,7 +914,8 @@ class DeviceTests(unittest.TestCase):
                 'runtime_docker': True,
                 'ros_distro': 'melodic',
                 'rosbag_mount_path': 'test/path'
-            }
+            },
+            'labels': {}
         }
         expected_create_device_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/auth-keys/?download_type=script'
         expected_get_device_url = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/devices/test-device-id'
