@@ -15,4 +15,4 @@ from .clients.secret import Secret, SecretConfigDocker
 from .clients.rosbag import UploadOptions
 from .clients.user_group import UserGroup
 
-__version__ = "1.15.1"
+__version__ = "1.16.0"

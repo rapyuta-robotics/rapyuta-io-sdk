@@ -1,3 +1,10 @@
+# [1.16.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.15.1...v1.16.0) (2024-06-27)
+
+
+### Features
+
+* **device:** allow custom config variables and labels during creation ([#80](https://github.com/rapyuta-robotics/rapyuta-io-sdk/issues/80)) ([5834b1e](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/5834b1ec4dd969142021c7b6d8e44f0b63e2757a))
+
 ## [1.15.1](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.15.0...v1.15.1) (2024-06-04)
 
 
