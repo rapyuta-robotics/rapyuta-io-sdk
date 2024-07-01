@@ -16,8 +16,12 @@ pyyaml = ">=5.4.1"
 testtools = "==2.5.0"
 pyfakefs = "==3.7"
 mock = "==2.0.0"
-sphinx = "==4.2.0"
-furo = "==2021.10.9"
+
+[docs]
+pytz = "*"
+tzdata = "*"
+sphinx = "*"
+furo = "*"
 
 [requires]
 python_version = "3"
