@@ -6,21 +6,16 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.10"
 
       - name: Install Pipenv
         run: pip3 install pipenv
 
       - name: Install Dependencies
-        run: pipenv install --dev
+        run: pipenv install --categories docs
 
       - name: Build Documentation
         run: pipenv run python3 -m sphinx -M html docs/source docs/output
