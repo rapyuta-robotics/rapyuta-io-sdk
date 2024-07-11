@@ -2,7 +2,6 @@
 from __future__ import absolute_import
 
 import json
-import jsonschema
 import os
 
 import six
@@ -13,27 +12,20 @@ from rapyuta_io.clients.catalog_client import CatalogClient
 from rapyuta_io.clients.core_api_client import CoreAPIClient
 from rapyuta_io.clients.deployment import Deployment
 from rapyuta_io.clients.device import Device
-from rapyuta_io.clients.metrics import QueryMetricsRequest, MetricOperation, \
-    MetricFunction, QueryMetricsResponse, \
-    ListMetricsRequest, ListTagKeysRequest, \
-    Metric, Tags, ListTagValuesRequest
+from rapyuta_io.clients.metrics import ListMetricsRequest, ListTagKeysRequest, ListTagValuesRequest, Metric, \
+    MetricFunction, MetricOperation, QueryMetricsRequest, QueryMetricsResponse, Tags
 from rapyuta_io.clients.native_network import NativeNetwork
-from rapyuta_io.clients.package import Package
-from rapyuta_io.clients.package import Runtime, ROSDistro, RestartPolicy
+from rapyuta_io.clients.package import Package, ROSDistro, RestartPolicy, Runtime
 from rapyuta_io.clients.persistent_volumes import VolumeInstance
 from rapyuta_io.clients.project import Project
-from rapyuta_io.clients.rip_client import RIPClient, AuthTokenLevel
-from rapyuta_io.clients.rosbag import ROSBagJob, ROSBagJobStatus, ROSBagBlob, \
-    ROSBagBlobStatus
-from rapyuta_io.clients.routed_network import RoutedNetwork, Parameters
+from rapyuta_io.clients.rip_client import AuthTokenLevel, RIPClient
+from rapyuta_io.clients.rosbag import ROSBagBlob, ROSBagBlobStatus, ROSBagJob, ROSBagJobStatus
+from rapyuta_io.clients.routed_network import Parameters, RoutedNetwork
 from rapyuta_io.clients.secret import Secret
 from rapyuta_io.clients.user_group import UserGroup
-from rapyuta_io.utils import InvalidAuthTokenException, \
-    InvalidParameterException
-from rapyuta_io.utils import to_objdict
+from rapyuta_io.utils import InvalidAuthTokenException, InvalidParameterException, to_objdict
 from rapyuta_io.utils.settings import VOLUME_PACKAGE_ID, default_host_config
 from rapyuta_io.utils.utils import get_api_response_data, valid_list_elements
-from rapyuta_io.clients.validation_schema import UPDATE_DEPLOYMENT_SCHEMA
 
 
 class Client(object):
@@ -356,7 +348,6 @@ class Client(object):
             >>> status = client.update_deployment(payload)
 
         """
-        jsonschema.validate(instance=payload, schema=UPDATE_DEPLOYMENT_SCHEMA)
         return self._catalog_client.update_deployment(payload, retry_limit)
 
     def get_authenticated_user(self):
