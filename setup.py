@@ -30,7 +30,6 @@ setup(
         "pytz",
         "pyyaml>=5.4.1",
         "setuptools",
-        "jsonschema==4.0.0",
     ],
     extras_require={
         "dev": ["sphinx", "furo"],
