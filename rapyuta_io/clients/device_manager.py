@@ -38,12 +38,17 @@ class DeviceManagerClient:
             setattr(device, '_auth_token', self._auth_token)
             setattr(device, '_project', self._project)
 
-    def _get_device(self, device_id=None, retry_limit=0):
+    def _get_device(self, device_id=None, retry_limit=0, device_name=None):
         url = self._device_api_host + DEVICE_API_PATH
         if device_id:
             url = url + device_id
+
+        query = {}
+        if device_name is not None:
+            query = {"name": device_name}
+
         headers = create_auth_header(self._auth_token, self._project)
-        response = RestClient(url).retry(retry_limit).headers(headers).execute()
+        response = RestClient(url).retry(retry_limit).headers(headers).query_param(query_param=query).execute()
         return get_api_response_data(response)
 
     @staticmethod
@@ -69,14 +74,14 @@ class DeviceManagerClient:
     def set_project(self, project):
         self._project = project
 
-    def device_list(self, online_device=False, arch_list=None, retry_limit=0):
+    def device_list(self, online_device=False, arch_list=None, retry_limit=0, device_name=None):
         arch_filtered_uuids = set()
         if arch_list:
             for device in self._device_selection_by_arch(arch_list, retry_limit):
                 arch_filtered_uuids.add(device['uuid'])
 
         # TODO(shivam): if arch_list is set there's no need for _get_device all
-        device_list = self._get_device(retry_limit=retry_limit)
+        device_list = self._get_device(retry_limit=retry_limit, device_name=device_name)
         devices = []
         # todo: add a generic filter like status, name etc
         for device in device_list:

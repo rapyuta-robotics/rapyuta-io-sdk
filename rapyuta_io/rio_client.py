@@ -389,7 +389,7 @@ class Client(object):
         """
         return self._core_api_client.get_user_organizations()
 
-    def get_all_devices(self, online_device=False, arch_list=None, retry_limit=0):
+    def get_all_devices(self, online_device=False, arch_list=None, retry_limit=0, device_name=None):
         """
         Get all the devices
 
@@ -404,6 +404,8 @@ class Client(object):
         :param retry_limit: No of retry attempts to be carried out if any failures occurs\
                 during the API call.
         :type retry_limit: int
+        :param device_name: Optional parameter to filter the devices based on the device name.
+        :type device_name: str
         :return: List of instances of :py:class:`~Device` class
         :raises: :py:class:`APIError`: If the API returns an error, a status code
             of anything other than 200/201 is returned
@@ -418,7 +420,7 @@ class Client(object):
             >>>     DeviceArch.ARM32V7, DeviceArch.ARM64V8, DeviceArch.AMD64])
 
         """
-        return self._dmClient.device_list(online_device, arch_list, retry_limit)
+        return self._dmClient.device_list(online_device, arch_list, retry_limit, device_name=device_name)
 
     def get_device(self, device_id, retry_limit=0):
         """
