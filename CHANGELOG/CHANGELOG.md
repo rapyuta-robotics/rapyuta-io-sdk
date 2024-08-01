@@ -1,3 +1,45 @@
+# [1.17.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.16.0...v1.17.0) (2024-08-01)
+
+
+### Features
+
+* **devices:** filter device list by name ([#87](https://github.com/rapyuta-robotics/rapyuta-io-sdk/issues/87)) ([8be2eaf](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/8be2eaf4a24c9c1e3508967a2561af1763e63f58))
+
+# [1.16.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.15.1...v1.16.0) (2024-06-27)
+
+
+### Features
+
+* **device:** allow custom config variables and labels during creation ([#80](https://github.com/rapyuta-robotics/rapyuta-io-sdk/issues/80)) ([5834b1e](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/5834b1ec4dd969142021c7b6d8e44f0b63e2757a))
+
+## [1.15.1](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.15.0...v1.15.1) (2024-06-04)
+
+
+### Bug Fixes
+
+* **package:** removes parameter value validation ([df2f0dc](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/df2f0dcf2874759775929557285053b0191f6d0a))
+* **paramserver:** validates yaml or json data ([#77](https://github.com/rapyuta-robotics/rapyuta-io-sdk/issues/77)) ([a543f71](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/a543f71a1fefde347f8721187b7094a161b2dc50))
+* **utils:** corrects exception handling in parse_json ([c16d229](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/c16d22972d544e35464f64073cb6cab9fb69fb87))
+
+# [1.15.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.14.0...v1.15.0) (2024-02-27)
+
+
+### Features
+
+* **deployment:** adds support for host subpath uid/gid/perm ([d2ee458](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/d2ee458f2ff1e51b9718059e07a57b4f18614d8c))
+
+# [1.14.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.13.0...v1.14.0) (2024-01-22)
+
+
+### Bug Fixes
+
+* **paramserver:** raise exception during download when trees not found ([#73](https://github.com/rapyuta-robotics/rapyuta-io-sdk/issues/73)) ([42f2c41](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/42f2c4100e1383fea7bae1ff63b7aaf9f64c17a1))
+
+
+### Features
+
+* **params:** use binary file-upload if file is large ([f276b33](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/f276b33cf4dedc7a5d7271fe1daada9ef8f4849e))
+
 # [1.13.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.12.0...v1.13.0) (2023-12-13)
 
 
