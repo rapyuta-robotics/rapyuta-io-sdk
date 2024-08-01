@@ -1,3 +1,10 @@
+# [1.17.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.16.0...v1.17.0) (2024-08-01)
+
+
+### Features
+
+* **devices:** filter device list by name ([#87](https://github.com/rapyuta-robotics/rapyuta-io-sdk/issues/87)) ([8be2eaf](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/8be2eaf4a24c9c1e3508967a2561af1763e63f58))
+
 # [1.16.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.15.1...v1.16.0) (2024-06-27)
 
 
