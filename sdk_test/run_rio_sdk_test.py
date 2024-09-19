@@ -36,16 +36,12 @@ class IntegrationSuite(testtools.ConcurrentTestSuite):
     def setUpSuite(self):
         self.logger.info('Creating project')
         self.config.create_project()
-        self.logger.info('Creating secrets')
-        self.config.create_secrets()
         self.onboard_devices()
         self.wait_for_devices()
 
     def tearDownSuite(self):
         self.remove_devices()
         self.config.set_devices(None)
-        self.logger.info('Deleting secrets')
-        self.config.delete_secrets()
         self.logger.info('Deleting project')
         self.config.delete_project()
 

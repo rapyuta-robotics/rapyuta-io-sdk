@@ -1,9 +1,0 @@
-{
-  "buildName": "talker",
-  "repository": "https://github.com/rapyuta-robotics/io_tutorials.git",
-  "strategyType": "Source",
-  "architecture": "amd64",
-  "isRos": true,
-  "rosDistro": "melodic",
-  "contextDir": "talk/talker"
-}
