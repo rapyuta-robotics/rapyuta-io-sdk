@@ -3,7 +3,7 @@
 default_host_config = {
     "core_api_host": "https://gaapiserver.apps.okd4v2.prod.rapyuta.io",
     "catalog_host": "https://gacatalog.apps.okd4v2.prod.rapyuta.io",
-    "rip_host": "https://garip.apps.okd4v2.prod.rapyuta.io"
+    "rip_host": "https://garip.apps.okd4v2.prod.rapyuta.io",
 }
 
 # Paramserver APIs

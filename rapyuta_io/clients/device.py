@@ -10,7 +10,6 @@ import requests
 import six
 import rapyuta_io
 
-from rapyuta_io.clients.deployment import DeploymentPhaseConstants, Deployment
 from rapyuta_io.clients.model import TopicsStatus, DeviceConfig, Label, Metric, LogUploadStatus, \
     LogUploads, SharedURL
 from rapyuta_io.utils import ObjDict, RestClient, ParameterMissingException, \
@@ -292,11 +291,11 @@ class Device(PartialMixin, ObjDict):
             raise InvalidParameterException(
                 'python_version must be one of rapyuta.io.client.device.DevicePythonVersion')
         if ros_distro is not None and (
-                ros_distro not in list(rapyuta_io.clients.package.ROSDistro.__members__.values())):
+                ros_distro not in list(ROSDistro.__members__.values())):
             raise InvalidParameterException('ros_distro must be one of rapyuta_io.clients.package.ROSDistro')
-        if runtime_preinstalled and ros_distro == rapyuta_io.clients.package.ROSDistro.NOETIC:
+        if runtime_preinstalled and ros_distro == ROSDistro.NOETIC:
             raise InvalidParameterException('preinstalled runtime does not support noetic ros_distro yet')
-        if ros_distro == rapyuta_io.clients.package.ROSDistro.NOETIC and python_version == DevicePythonVersion.PYTHON2:
+        if ros_distro == ROSDistro.NOETIC and python_version == DevicePythonVersion.PYTHON2:
             raise InvalidParameterException('noetic ros_distro not supported on python_version 2')
         if rosbag_mount_path is not None and not isinstance(rosbag_mount_path, six.string_types):
             raise InvalidParameterException('rosbag_mount_path must be of type string')
@@ -344,8 +343,6 @@ class Device(PartialMixin, ObjDict):
             obj.config_variables = [DeviceConfig(to_objdict(config)) for config in obj.config_variables]
         if obj.labels:
             obj.labels = [Label(to_objdict(label)) for label in obj.labels]
-        if hasattr(obj, 'deployments') and obj.deployments:
-            obj.deployments = [Deployment(to_objdict(deployment)) for deployment in obj.deployments]
         return obj
 
     def is_online(self):
@@ -1396,3 +1393,43 @@ class Device(PartialMixin, ObjDict):
         if response.status_code == requests.codes.BAD_REQUEST:
             raise DeploymentRunningException()
         get_api_response_data(response)
+
+
+class ROSDistro(str, enum.Enum):
+    """
+    Enumeration variables for the Supported ROS Distros. ROS Distro may be one of: \n
+    ROSDistro.KINETIC ('kinetic') \n
+    ROSDistro.MELODIC ('melodic') \n
+    ROSDistro.NOETIC ('noetic') \n
+    """
+
+    def __str__(self):
+        return str(self.value)
+
+    KINETIC = 'kinetic'
+    MELODIC = 'melodic'
+    NOETIC = 'noetic'
+
+
+class DeploymentPhaseConstants(str, enum.Enum):
+    """
+    Enumeration variables for the deployment phase
+
+    Deployment phase can be any of the following types \n
+    DeploymentPhaseConstants.INPROGRESS \n
+    DeploymentPhaseConstants.PROVISIONING \n
+    DeploymentPhaseConstants.SUCCEEDED \n
+    DeploymentPhaseConstants.FAILED_TO_START \n
+    DeploymentPhaseConstants.PARTIALLY_DEPROVISIONED \n
+    DeploymentPhaseConstants.DEPLOYMENT_STOPPED \n
+    """
+
+    def __str__(self):
+        return str(self.value)
+
+    INPROGRESS = 'In progress'
+    PROVISIONING = 'Provisioning'
+    SUCCEEDED = 'Succeeded'
+    FAILED_TO_START = 'Failed to start'
+    PARTIALLY_DEPROVISIONED = 'Partially deprovisioned'
+    DEPLOYMENT_STOPPED = 'Deployment stopped'

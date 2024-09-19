@@ -1,6 +1,7 @@
 {
   "catalog_host": "https://v14catalog.az39.rapyuta.io",
   "core_api_host": "https://qaapiserver.az39.rapyuta.io",
+  "v2_api_host": "https://qaapi.rapyuta.io",
   "hwil_host": "https://hwil.rapyuta.io",
   "hwil_user": "USER",
   "hwil_password": "PASSWORD",
@@ -8,21 +9,13 @@
   "organization_guid": "org_guid",
   "devices": [
     {
-      "name":  "NAME",
-      "runtime": "RUNTIME",
-      "ip": "IP_ADDRESS",
-      "arch": "ARCHITECTURE",
-      "distro": "ROS_DISTRIBUTION"
+      "name": "docker-compose-amd64",
+      "runtime": "Dockercompose",
+      "ip": "10.224.4.5",
+      "arch": "amd64",
+      "distro": "melodic"
     }
   ],
-  "git": {
-    "ssh-key": "SSH_KEY"
-  },
-  "docker": {
-    "username": "DOCKER_USERNAME",
-    "password": "DOCKER_PASSWORD",
-    "email": "DOCKER_EMAIL"
-  },
   "test_files": [],
   "worker_threads": 1
 }

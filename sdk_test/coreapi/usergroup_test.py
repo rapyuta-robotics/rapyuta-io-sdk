@@ -1,6 +1,6 @@
 import unittest
 
-from rapyuta_io import UserGroup, Project
+from rapyuta_io import UserGroup
 
 from sdk_test.config import Configuration
 
@@ -82,12 +82,16 @@ class TestUserGroup(unittest.TestCase):
         payload = self.usergroup_create_payload
         self.usergroup = self.config.client.create_usergroup(self.config.organization_guid, payload)
 
-        p = Project(self.PROJECT_NAME, organization_guid=self.config.organization_guid)
-        self.project = self.config.client.create_project(p)
+        self.project_guid = self.config.v2_client.create_project({
+            'metadata': {
+                'name': self.PROJECT_NAME,
+                'organizationGUID': self.config.organization_guid
+            },
+        })
 
         upload_payload = self.usergroup_upload_payload
         upload_payload['update']['projects']['add'].append({
-            'guid': self.project.guid
+            'guid': self.project_guid
         })
 
         self.usergroup = self.config.client.update_usergroup(self.config.organization_guid, self.usergroup.guid,
@@ -96,8 +100,3 @@ class TestUserGroup(unittest.TestCase):
         self.assertEqual(len(self.usergroup.projects), 1)
         self.assertEqual(len(self.usergroup.admins), 1)
         self.assertEqual(len(self.usergroup.members), 1)
-
-
-
-
-

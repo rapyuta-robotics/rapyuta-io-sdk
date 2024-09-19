@@ -31,7 +31,6 @@ class UserTests(unittest.TestCase):
         for project in user.projects:
             self.assertIsInstance(project, Project)
             self.assertIsNotNone(project.guid)
-            self.assertTrue(hasattr(project, 'organization'))
         self.assertTrue(len(user.projects))
 
         self.assertIsInstance(user.organization, Organization)

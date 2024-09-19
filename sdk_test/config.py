@@ -6,11 +6,12 @@ import os
 import six
 from six.moves import filter
 
-from rapyuta_io import Client, SecretConfigDocker, \
-    DeviceArch, Secret, Project
+from rapyuta_io import Client, DeviceArch
 from rapyuta_io.utils.error import InvalidParameterException
 from rapyuta_io.utils.utils import create_auth_header, \
     prepend_bearer_to_auth_token, generate_random_value
+from sdk_test.util import get_logger
+from sdk_test.v2_client import V2Client
 
 
 class _Singleton(type):
@@ -62,15 +63,7 @@ class Configuration(six.with_metaclass(_Singleton, object)):
                     "arch": "ARCHITECTURE",
                     "distro": "ROS_DISTRO"
                 }
-            ],
-            "git": {
-                "ssh-key": "SSH_KEY"
-            },
-            "docker": {
-                "username": "DOCKER_USERNAME",
-                "password": "DOCKER_PASSWORD",
-                "email": "DOCKER_EMAIL"
-            }
+            ]
         }
     """
 
@@ -86,16 +79,17 @@ class Configuration(six.with_metaclass(_Singleton, object)):
         self.catalog_server = self._config['catalog_host']
         self.api_server = self._config['core_api_host']
         self.hwil_server = self._config['hwil_host']
-        self._project = None
+        self.v2_server = self._config['v2_api_host']
+        self._project_guid = None
         self.test_files = self._config['test_files']
         if not isinstance(self.test_files, list):
             raise InvalidParameterException('test_files must be a list of test file names')
         self.worker_threads = self._config['worker_threads']
         self.organization_guid = self._config.get('organization_guid')
+        self.logger = get_logger()
+        self.v2_client = V2Client(self._config['auth_token'], self.v2_server)
 
     def validate(self):
-        # if len(self.get_device_configs(arch=DeviceArch.AMD64, runtime='Preinstalled')) != 1:
-        #     raise InvalidConfig('One amd64 device with Preinstalled runtime is required')
         if len(self.get_device_configs(arch=DeviceArch.AMD64, runtime='Dockercompose')) != 1:
             raise InvalidConfig('One amd64 device with Docker Compose runtime is required')
 
@@ -112,14 +106,19 @@ class Configuration(six.with_metaclass(_Singleton, object)):
     def create_project(self):
         # Project name needs to be between 3 and 15 Characters
         name = 'test-{}'.format(generate_random_value(8))
-        self._project = self.client.create_project(
-            Project(name, organization_guid=self.organization_guid))
-        self.set_project(self._project.guid)
+        self._project_guid = self.v2_client.create_project({
+            'metadata': {
+                'name': name,
+                'organizationGUID': self.organization_guid
+            },
+        })
+        self.logger.info('Created project: {}'.format(name))
+        self.set_project(self._project_guid)
 
     def delete_project(self):
-        if self._project is None:
+        if self._project_guid is None:
             return
-        self._project.delete()
+        self.v2_client.delete_project(self._project_guid)
 
     def set_project(self, project_guid):
         self._config['project'] = project_guid
@@ -152,22 +151,6 @@ class Configuration(six.with_metaclass(_Singleton, object)):
             self._devices = None
         else:
             self._devices = list(filter(filter_devices_by_name(), devices))
-
-    def create_secrets(self):
-        docker = self._config['docker']
-        docker_secret = self.client.create_secret(Secret('docker-secret', SecretConfigDocker(
-            docker['username'], docker['password'], docker['email'])))
-        self._secrets = {'docker': docker_secret}
-
-    def delete_secrets(self):
-        for secret in self._secrets.values():
-            secret.delete()
-
-    def get_secret(self, secret_type):
-        """
-        Returns the Secret Object based on the secret_type ('git' and 'docker').
-        """
-        return self._secrets[secret_type]
 
 
 class InvalidConfig(Exception):
