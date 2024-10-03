@@ -573,9 +573,9 @@ class Device(PartialMixin, RefreshPollerMixin, ObjDict):
         jid = execution_result.get('jid')
         if not jid:
             raise ValueError("Job ID not found in the response")
-        return self.fetch_command_result(jid, [self.uuid], timeout=300)
+        return self.fetch_command_result(jid, [self.uuid], timeout=command.timeout)
 
-    def fetch_command_result(self, jid: str, deviceids: list, timeout: int = 300):
+    def fetch_command_result(self, jid: str, deviceids: list, timeout: int):
         """
         Fetch the result of the command execution using the job ID (jid) and the first device ID from the list.
         Args:
