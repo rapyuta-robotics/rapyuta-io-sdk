@@ -1,3 +1,10 @@
+## [1.17.2](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.17.1...v1.17.2) (2024-10-14)
+
+
+### Removed
+
+* Remove unsupported APIs ([18c9fe6](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/18c9fe6391623f3e235771edbf42be0df80bd853))
+
 ## [1.17.1](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.17.0...v1.17.1) (2024-09-12)
 
 
