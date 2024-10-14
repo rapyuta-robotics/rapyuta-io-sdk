@@ -8,25 +8,13 @@ data:
     {
       "catalog_host": "https://qacatalog.az39.rapyuta.io",
       "core_api_host": "https://qaapiserver.az39.rapyuta.io",
+      "v2_api_host": "https://qaapi.rapyuta.io",
       "hwil_host": "https://hwil.rapyuta.io",
       "hwil_user": "ansible",
       "hwil_password": "HWIL_PASSWORD",
-      "auth_token": "AUTH_TOKEN",
+      "auth_token": "Bearer AUTH_TOKEN",
+      "organization_guid": "org_guid",
       "devices": [
-        {
-          "name":  "supervisord-arm32",
-          "runtime": "Preinstalled",
-          "ip": "10.91.1.14",
-          "arch": "arm32v7",
-          "distro": "kinetic"
-        },
-        {
-          "name":  "docker-compose-arm32",
-          "runtime": "Dockercompose",
-          "ip": "10.91.1.15",
-          "arch": "arm32v7",
-          "distro": "kinetic"
-        },
         {
           "name":  "docker-compose-amd64",
           "runtime": "Dockercompose",
@@ -35,7 +23,4 @@ data:
           "distro": "melodic"
         }
       ],
-      "git": {
-         "ssh-key": "SSH_KEY"
-      }
     }
