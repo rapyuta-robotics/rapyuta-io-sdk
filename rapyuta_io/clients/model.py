@@ -61,7 +61,7 @@ class Command(ObjDict):
 
     """
 
-    def __init__(self, cmd, shell=None, env=None, bg=False, runas=None, pwd=None, cwd=None):
+    def __init__(self, cmd, shell=None, env=None, bg=False, runas=None, pwd=None, cwd=None, timeout=300):
         super(ObjDict, self).__init__()
         if env is None:
             env = dict()
@@ -73,6 +73,7 @@ class Command(ObjDict):
         self.cwd = pwd
         if cwd is not None:
             self.cwd = cwd
+        self.timeout = timeout
         self.validate()
 
     def validate(self):
@@ -93,6 +94,8 @@ class Command(ObjDict):
                         raise InvalidCommandException('Invalid environment variables')
                 return
             raise InvalidCommandException('Invalid environment variables')
+        if  self.timeout <= 0:
+            raise InvalidCommandException("Invalid timeout value")
 
     def to_json(self):
         # TODO: we need to rewrite this function.
