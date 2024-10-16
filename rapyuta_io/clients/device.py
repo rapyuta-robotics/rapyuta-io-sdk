@@ -571,7 +571,7 @@ class Device(PartialMixin, ObjDict):
             raise ValueError("Job ID not found in the response")
         return self.fetch_command_result(jid, [self.uuid], timeout=command.timeout)
 
-    def fetch_command_result(self, jid: str, deviceids: list, timeout: int):
+    def fetch_command_result(self, jid: str, deviceids: list, timeout: int, interval: int = 10):
         """
         Fetch the result of the command execution using the job ID (jid) and the first device ID from the list.
         Args:
@@ -592,15 +592,15 @@ class Device(PartialMixin, ObjDict):
             "jid": jid,
             "device_id": deviceids[0]
         }
-        total_time_waited = 0
-        wait_interval = 10
-        while total_time_waited < timeout:
+        time_elapsed = 0
+        wait_interval = interval
+        while time_elapsed < timeout:
             response = self._execute_api(url, HttpMethod.POST, payload)
             if response.status_code == requests.codes.OK:
                 result = get_api_response_data(response)
                 return result[deviceids[0]]
             sleep(wait_interval)
-            total_time_waited += wait_interval
+            time_elapsed += wait_interval
         raise TimeoutError(f"Command result not available after {timeout} seconds")
 
     def get_config_variables(self):
