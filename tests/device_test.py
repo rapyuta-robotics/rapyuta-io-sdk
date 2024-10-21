@@ -733,7 +733,7 @@ class DeviceTests(unittest.TestCase):
         temp_header['Content-Type'] = 'application/json'
 
         mock_request.assert_called_once_with(
-            url=expected_onboard_script_url, method='GET', headers=temp_header, params={}, json=None)
+            url=expected_onboard_script_url, method='GET', headers=temp_header, params=None, json=None)
         self.assertEqual(onboard_script.url, 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/start')
         self.assertEqual(onboard_script.command, 'sudo bash start -r dockercompose -d melodic -b test/path')
         self.assertEqual(onboard_script.token, 'sample-token')
@@ -762,7 +762,7 @@ class DeviceTests(unittest.TestCase):
         temp_header['Content-Type'] = 'application/json'
 
         mock_request.assert_called_once_with(
-            url=expected_onboard_script_url, method='GET', headers=temp_header, params={}, json=None)
+            url=expected_onboard_script_url, method='GET', headers=temp_header, params=None, json=None)
         self.assertEqual(onboard_script.url, 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/start')
         self.assertEqual(onboard_script.command, 'sudo bash start -r preinstalled -w test/path')
         self.assertEqual(onboard_script.token, 'sample-token')
@@ -792,7 +792,7 @@ class DeviceTests(unittest.TestCase):
         temp_header['Content-Type'] = 'application/json'
 
         mock_request.assert_called_once_with(
-            url=expected_onboard_script_url, method='GET', headers=temp_header, params={}, json=None)
+            url=expected_onboard_script_url, method='GET', headers=temp_header, params=None, json=None)
         self.assertEqual(onboard_script.url, 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/start')
         self.assertEqual(onboard_script.command, 'sudo bash start -r dockercompose -d melodic -b test/path -r '
                                                  'preinstalled')
@@ -869,7 +869,7 @@ class DeviceTests(unittest.TestCase):
         temp_header['Content-Type'] = 'application/json'
 
         mock_request.assert_called_once_with(
-            url=expected_upgrade_device_url, method='PUT', headers=temp_header, params={}, json=None)
+            url=expected_upgrade_device_url, method='PUT', headers=temp_header, params=None, json=None)
 
     @patch('requests.request')
     def test_upgrade_device_not_found(self, mock_request):

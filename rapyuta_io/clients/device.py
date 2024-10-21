@@ -4,6 +4,7 @@ import json
 import subprocess
 
 from six.moves.urllib.parse import urlencode
+from time import sleep
 import enum
 
 import requests
@@ -304,10 +305,10 @@ class Device(PartialMixin, ObjDict):
         if description is not None and not isinstance(description, six.string_types):
             raise InvalidParameterException('description must be of type string')
 
-    def _execute_api(self, url, request_method=HttpMethod.GET, payload=None, retry_limit=0):
+    def _execute_api(self, url, request_method=HttpMethod.GET, payload=None, retry_limit=0, query=None):
         headers = create_auth_header(self._auth_token, self._project)
         headers['Content-Type'] = 'application/json'
-        rest_client = RestClient(url).method(request_method).headers(headers)
+        rest_client = RestClient(url).method(request_method).headers(headers).query_param(query)
         response = rest_client.retry(retry_limit).execute(payload=payload)
         return response
 
@@ -563,7 +564,44 @@ class Device(PartialMixin, ObjDict):
         if response.status_code == requests.codes.BAD_REQUEST:
             raise ParameterMissingException(get_error(response.text))
         execution_result = get_api_response_data(response)
-        return execution_result[self.uuid]
+        if not command.bg:
+            return execution_result[self.uuid]
+        jid = execution_result.get('jid')
+        if not jid:
+            raise ValueError("Job ID not found in the response")
+        return self.fetch_command_result(jid, [self.uuid], timeout=command.timeout)
+
+    def fetch_command_result(self, jid: str, deviceids: list, timeout: int, interval: int = 10):
+        """
+        Fetch the result of the command execution using the job ID (jid) and the first device ID from the list.
+        Args:
+            jid (str): The job ID of the executed command.
+            deviceids (list): A list of device IDs on which the command was executed.
+            timeout (int): The maximum time to wait for the result (in seconds). Default is 300 seconds.
+            interval (int): time interval for retry
+        Returns:
+            dict: The result of the command execution.
+        Raises:
+            TimeoutError: If the result is not available within the timeout period.
+            APIError: If the API returns an error.
+        """
+
+        if not deviceids or not isinstance(deviceids, list):
+            raise ValueError("Device IDs must be provided as a non-empty list.")
+        url = self._device_api_host + DEVICE_COMMAND_API_PATH + jid
+        query = {
+            "device_id": deviceids[0]
+        }
+        time_elapsed = 0
+        wait_interval = interval
+        while time_elapsed < timeout:
+            response = self._execute_api(url, HttpMethod.GET, query=query)
+            if response.status_code == requests.codes.OK:
+                result = get_api_response_data(response)
+                return result[deviceids[0]]
+            sleep(wait_interval)
+            time_elapsed += wait_interval
+        raise TimeoutError(f"Command result not available after {timeout} seconds")
 
     def get_config_variables(self):
         """
