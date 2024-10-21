@@ -305,10 +305,10 @@ class Device(PartialMixin, ObjDict):
         if description is not None and not isinstance(description, six.string_types):
             raise InvalidParameterException('description must be of type string')
 
-    def _execute_api(self, url, request_method=HttpMethod.GET, payload=None, retry_limit=0):
+    def _execute_api(self, url, request_method=HttpMethod.GET, payload=None, retry_limit=0, query=None):
         headers = create_auth_header(self._auth_token, self._project)
         headers['Content-Type'] = 'application/json'
-        rest_client = RestClient(url).method(request_method).headers(headers)
+        rest_client = RestClient(url).method(request_method).headers(headers).query_param(query)
         response = rest_client.retry(retry_limit).execute(payload=payload)
         return response
 
@@ -575,9 +575,10 @@ class Device(PartialMixin, ObjDict):
         """
         Fetch the result of the command execution using the job ID (jid) and the first device ID from the list.
         Args:
-            jobid (str): The job ID of the executed command.
+            jid (str): The job ID of the executed command.
             deviceids (list): A list of device IDs on which the command was executed.
             timeout (int): The maximum time to wait for the result (in seconds). Default is 300 seconds.
+            interval (int): time interval for retry
         Returns:
             dict: The result of the command execution.
         Raises:
@@ -587,15 +588,14 @@ class Device(PartialMixin, ObjDict):
 
         if not deviceids or not isinstance(deviceids, list):
             raise ValueError("Device IDs must be provided as a non-empty list.")
-        url = self._device_api_host + DEVICE_COMMAND_API_PATH + "jobid"
-        payload = {
-            "jid": jid,
+        url = self._device_api_host + DEVICE_COMMAND_API_PATH + jid
+        query = {
             "device_id": deviceids[0]
         }
         time_elapsed = 0
         wait_interval = interval
         while time_elapsed < timeout:
-            response = self._execute_api(url, HttpMethod.POST, payload)
+            response = self._execute_api(url, HttpMethod.GET, query=query)
             if response.status_code == requests.codes.OK:
                 result = get_api_response_data(response)
                 return result[deviceids[0]]
