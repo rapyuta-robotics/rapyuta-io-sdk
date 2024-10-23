@@ -22,6 +22,7 @@ from rapyuta_io.utils.settings import *
 from rapyuta_io.utils.utils import create_auth_header, get_error, get_api_response_data, \
     validate_key_value, response_validator, is_true
 from rapyuta_io.utils.partials import PartialMixin
+from rapyuta_io.utils.pollers import RefreshPollerMixin
 
 DEVICE_API_ERRORS = {
     400: ParameterMissingException,
@@ -217,7 +218,7 @@ class DevicePythonVersion(str, enum.Enum):
     PYTHON3 = '3'
 
 
-class Device(PartialMixin, ObjDict):
+class Device(PartialMixin, RefreshPollerMixin, ObjDict):
     """
     Device class represents a device. Member variables of the class represent the
     properties of device. \n
@@ -349,6 +350,9 @@ class Device(PartialMixin, ObjDict):
         if self.status == DeviceStatus.ONLINE.value:
             return True
         return False
+
+    def is_ready(self):
+        return self.is_online()
 
     def get_runtime(self):
         """
