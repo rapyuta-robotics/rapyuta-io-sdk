@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.0.0...v2.1.0) (2024-10-23)
+
+
+### Features
+
+* **device:** implement RefreshPollerMixin for Device class ([#84](https://github.com/rapyuta-robotics/rapyuta-io-sdk/issues/84)) ([f0ebeb3](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/f0ebeb3ffbc9aaf036fc6b7315d43cad0ba951c9))
+
 # [2.0.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.17.1...v2.0.0) (2024-10-14)
 
 
