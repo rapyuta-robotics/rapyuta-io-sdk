@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.1.0...v2.1.1) (2024-11-12)
+
+
+### Bug Fixes
+
+* **paramserver:** file is too large error ([#98](https://github.com/rapyuta-robotics/rapyuta-io-sdk/issues/98)) ([3f379ee](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/3f379eef86e3fd8aa9e77fab44f5df5fae519a59)), closes [AB#33921](https://github.com/AB/issues/33921)
+
 # [2.1.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.0.0...v2.1.0) (2024-10-23)
 
 

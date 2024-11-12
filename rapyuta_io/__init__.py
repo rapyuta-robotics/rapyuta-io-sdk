@@ -7,4 +7,4 @@ from .clients.device_manager import DeviceArch
 from .clients.rosbag import UploadOptions
 from .clients.user_group import UserGroup
 
-__version__ = "2.1.0"
+__version__ = "2.1.1"
