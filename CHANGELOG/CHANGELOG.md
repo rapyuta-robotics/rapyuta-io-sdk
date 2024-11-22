@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.1.1...v2.2.0) (2024-11-22)
+
+
+### Features
+
+* add support for background command executes ([db34d48](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/db34d48bdbcd545837c659a1566e84a94f8c6502))
+
 ## [2.1.1](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.1.0...v2.1.1) (2024-11-12)
 
 
