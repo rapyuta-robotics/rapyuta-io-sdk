@@ -1,3 +1,10 @@
+## [2.2.1](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.2.0...v2.2.1) (2024-12-11)
+
+
+### Bug Fixes
+
+* **device:** update execute to accept query parameters ([928147d](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/928147d7d638f9047575a68d79dc649d8bbd0d22))
+
 # [2.2.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.1.1...v2.2.0) (2024-11-22)
 
 
