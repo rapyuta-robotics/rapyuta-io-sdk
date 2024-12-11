@@ -605,7 +605,7 @@ class Device(PartialMixin, RefreshPollerMixin, ObjDict):
                 result = get_api_response_data(response)
                 return result[deviceids[0]]
             sleep(wait_interval)
-            total_time_waited += wait_interval
+            time_elapsed += wait_interval
         raise TimeoutError(f"Command result not available after {timeout} seconds")
 
     def get_config_variables(self):
