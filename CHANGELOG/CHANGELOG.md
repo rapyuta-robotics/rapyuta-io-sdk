@@ -1,3 +1,10 @@
+## [2.2.2](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.2.1...v2.2.2) (2024-12-11)
+
+
+### Bug Fixes
+
+* **device:** fix timeout interval ([7c6a1ae](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/7c6a1ae638152e3d6737f3f88bcfa04e8f51b8bb))
+
 ## [2.2.1](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.2.0...v2.2.1) (2024-12-11)
 
 
