@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 import json
 import os
+import typing
 
 import six
 
@@ -12,6 +13,7 @@ from rapyuta_io.clients.core_api_client import CoreAPIClient
 from rapyuta_io.clients.device import Device
 from rapyuta_io.clients.metrics import ListMetricsRequest, ListTagKeysRequest, ListTagValuesRequest, Metric, \
     MetricFunction, MetricOperation, QueryMetricsRequest, QueryMetricsResponse, Tags
+from rapyuta_io.clients.model import Command
 from rapyuta_io.clients.rip_client import AuthTokenLevel, RIPClient
 from rapyuta_io.clients.rosbag import ROSBagBlob, ROSBagBlobStatus, ROSBagJob, ROSBagJobStatus
 from rapyuta_io.clients.user_group import UserGroup
@@ -230,6 +232,38 @@ class Client(object):
         if not device_id or not isinstance(device_id, six.string_types):
             raise InvalidParameterException('device_id needs to be a non empty string')
         return self._dmClient.delete_device(device_id)
+
+    def execute_command(
+            self,
+            device_ids: typing.List[str],
+            command: Command,
+            retry_limit: int = 0,
+            retry_interval: int = 10,
+            timeout: int = 300,
+    ):
+        """Execute a command on the specified devices.
+
+        :param device_ids: List of device IDs on which the command should be executed.
+        :type device_ids: list[str]
+        :param command: Command object to be executed.
+        :type command: Command
+        :param retry_limit: Number of retries in case of API failure.
+        :type retry_limit: int
+        :param retry_interval: Interval between retries.
+        :type retry_interval: int
+        :param timeout: Timeout for the command execution.
+        :type timeout: int
+
+        Following example demonstrates how to execute a command on a device.
+
+        >>> from rapyuta_io import Client
+        >>> from rapyuta_io.clients.model import Command
+        >>> client = Client(auth_token='auth_token', project='project_guid')
+        >>> command = Command('echo "Hello World!"')
+        >>> client.execute_command(['device-id'], command)
+
+        """
+        return self._dmClient.execute_command(device_ids, command, retry_limit, retry_interval, timeout)
 
     def toggle_features(self, device_id, features, config=None):
         """

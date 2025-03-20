@@ -1,14 +1,20 @@
 # encoding: utf-8
 from __future__ import absolute_import
 
+import time
+import typing
 from enum import Enum
 
+import requests
+
 from rapyuta_io.clients.device import Device, DeviceStatus
+from rapyuta_io.clients.model import Command
 from rapyuta_io.utils import RestClient
+from rapyuta_io.utils.error import ParameterMissingException
 from rapyuta_io.utils.rest_client import HttpMethod
-from rapyuta_io.utils.settings import DEVICE_API_PATH, DEVICE_SELECTION_API_PATH, PARAMETERS_API_PATH, \
-    DEVICE_API_ADD_DEVICE_PATH, DAEMONS_PATH
-from rapyuta_io.utils.utils import create_auth_header, prepend_bearer_to_auth_token, get_api_response_data, \
+from rapyuta_io.utils.settings import DAEMONS_PATH, DEVICE_API_ADD_DEVICE_PATH, DEVICE_API_PATH, \
+    DEVICE_COMMAND_API_PATH, DEVICE_SELECTION_API_PATH, PARAMETERS_API_PATH
+from rapyuta_io.utils.utils import create_auth_header, get_api_response_data, get_error, prepend_bearer_to_auth_token, \
     validate_list_of_strings
 
 
@@ -131,3 +137,65 @@ class DeviceManagerClient:
         headers = create_auth_header(self._auth_token, self._project)
         response = RestClient(url).method(HttpMethod.PATCH).headers(headers).execute(payload=payload)
         return get_api_response_data(response, parse_full=True)
+
+    def execute_command(
+            self,
+            device_ids: typing.List[str],
+            command: Command,
+            retry_limit: int = 0,
+            retry_interval: int = 10,
+            timeout: int = 300,
+    ):
+        """Execute a command on the specified devices.
+
+        Args:
+            device_ids: List of device IDs on which the command should be executed.
+            command: Command object to be executed.
+            retry_limit: Number of retries in case of API failure.
+            retry_interval: Interval between retries.
+            timeout: Maximum time to wait for the background command to finish.
+
+        Returns:
+            dict: Output of the command execution.
+
+        Raises:
+            ValueError: If device_ids is empty.
+            TimeoutError: If command execution takes longer than the specified timeout.
+            ParameterMissingException: If the command is missing required parameters.
+        """
+        if not device_ids:
+            raise ValueError("device_ids cannot be empty")
+
+        command.validate()
+        command.device_ids = device_ids
+
+        url = self._device_api_host + DEVICE_COMMAND_API_PATH
+        rc = RestClient(url).method(HttpMethod.POST).headers(
+            create_auth_header(self._auth_token, self._project))
+        response = rc.retry(retry_limit).execute(payload=command.to_json())
+        if response.status_code == requests.codes.BAD_REQUEST:
+            raise ParameterMissingException(get_error(response.text))
+
+        execution_result = get_api_response_data(response)
+
+        if not command.bg:
+            return execution_result
+
+        jid = execution_result.get('jid')
+        if not jid:
+            raise ValueError("job id not found in the response")
+
+        url = self._device_api_host + DEVICE_COMMAND_API_PATH + jid
+        query = {"jid": jid, "device_id": device_ids}
+        time_elapsed = 0
+        wait_interval = retry_interval
+        while time_elapsed < timeout:
+            response = RestClient(url).method(HttpMethod.GET).headers(
+                create_auth_header(self._auth_token, self._project)).query_param(query_param=query).execute()
+            if response.status_code == requests.codes.OK:
+                result = get_api_response_data(response)
+                return result
+            time.sleep(wait_interval)
+            time_elapsed += wait_interval
+
+        raise TimeoutError(f"command result not available after {timeout} seconds")
