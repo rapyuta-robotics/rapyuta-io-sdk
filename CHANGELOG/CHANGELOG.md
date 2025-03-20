@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.2.2...v2.3.0) (2025-03-20)
+
+
+### Features
+
+* adds method to exec on multiple devices ([e47d02b](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/e47d02b3263b062a20e240a5f99cec68c1a98784))
+
 ## [2.2.2](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.2.1...v2.2.2) (2024-12-11)
 
 
