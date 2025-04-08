@@ -15,7 +15,7 @@ from shutil import rmtree, copyfile
 import six
 
 from rapyuta_io.utils import RestClient, InvalidParameterException, ConfigNotFoundException
-from rapyuta_io.utils.error import InvalidJSONError, InvalidYAMLError
+from rapyuta_io.utils.error import InvalidJSONError, InvalidYAMLError, UploadError
 from rapyuta_io.utils.rest_client import HttpMethod
 from rapyuta_io.utils.settings import PARAMSERVER_API_TREE_PATH, PARAMSERVER_API_TREEBLOBS_PATH, \
     PARAMSERVER_API_FILENODE_PATH
@@ -93,7 +93,11 @@ class _ParamserverClient:
             headers.update({'Checksum': self.get_md5_checksum(f.read())})
             f.seek(0)
             response = RestClient(url).method(HttpMethod.PUT).headers(headers).execute(payload=f, raw=True)
-        return response
+
+        try:
+            return get_api_response_data(response, parse_full=True)
+        except Exception as e:
+            raise UploadError(file_path=file_path, msg=e)
 
     def create_value(self, tree_path, retry_limit=0):
         url = self._core_api_host + PARAMSERVER_API_TREE_PATH + tree_path
