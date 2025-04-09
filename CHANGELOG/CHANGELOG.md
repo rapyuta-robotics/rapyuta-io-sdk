@@ -1,3 +1,10 @@
+## [2.3.1](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.3.0...v2.3.1) (2025-04-09)
+
+
+### Bug Fixes
+
+* **paramserver:** raise exception on binary file upload failure ([73816fb](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/73816fb3cdac8b8c45ea34aaf7d7d3388a8e95e5))
+
 # [2.3.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.2.2...v2.3.0) (2025-03-20)
 
 
