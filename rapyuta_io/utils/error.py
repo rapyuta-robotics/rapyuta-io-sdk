@@ -186,3 +186,11 @@ class InvalidYAMLError(Exception):
             msg += ": {}".format(file_path)
 
         Exception.__init__(self, msg)
+
+class UploadError(Exception):
+    def __init__(self, msg, file_path):
+        full = "Uploading file {} failed".format(file_path)
+        if msg:
+            full += ": {}".format(msg)
+
+        Exception.__init__(self, full)
