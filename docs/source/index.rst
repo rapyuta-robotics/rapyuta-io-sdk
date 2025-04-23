@@ -81,7 +81,6 @@ You can read the documentation for individual resource modules:
    Native Network <native_network>
    Static Route   <static_route>
 
-   Rosbag <rosbag>
    Configuration <configuration>
    Metrics <metrics>
 
