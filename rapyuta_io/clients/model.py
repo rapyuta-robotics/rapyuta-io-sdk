@@ -52,6 +52,7 @@ class Command(ObjDict):
     :ivar shell: Represents the shell where it is going to execute
     :ivar env: List of environment variables.
     :ivar bg: Boolean value specifying whether the execution runs on the background or not
+    :ivar run_async: Boolean value to specify to run command in async mode i.e., to run command and return its jid (not depending on completion of the command).
     :ivar runas: Run the command as a specific user
     :ivar cmd: Command to execute on the device
     :ivar pwd: Present working directory
@@ -61,7 +62,7 @@ class Command(ObjDict):
 
     """
 
-    def __init__(self, cmd, shell=None, env=None, bg=False, runas=None, pwd=None, cwd=None, timeout=300):
+    def __init__(self, cmd, shell=None, env=None, bg=False, run_async=False, runas=None, pwd=None, cwd=None, timeout=300):
         super(ObjDict, self).__init__()
         if env is None:
             env = dict()
@@ -69,6 +70,7 @@ class Command(ObjDict):
         self.shell = shell
         self.env = env
         self.bg = bg
+        self.run_async = run_async
         self.runas = runas
         self.cwd = pwd
         if cwd is not None:
@@ -83,6 +85,8 @@ class Command(ObjDict):
             raise InvalidCommandException("Invalid shell")
         if self.bg is not None and not isinstance(self.bg, bool):
             raise InvalidCommandException("Invalid background option")
+        if self.run_async is not None and not isinstance(self.run_async, bool):
+            raise InvalidCommandException("Invalid run asynchronous option")
         if self.runas is not None and not isinstance(self.runas, six.string_types):
             raise InvalidCommandException("Invalid runas option")
         if self.cwd is not None and not isinstance(self.cwd, six.string_types):
