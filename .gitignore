@@ -15,3 +15,5 @@ sdk_test/package_info.json
 config.json
 venv/
 htmlcov/
+ignore
+.vscode

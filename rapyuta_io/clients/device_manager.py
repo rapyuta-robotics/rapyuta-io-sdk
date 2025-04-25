@@ -178,7 +178,7 @@ class DeviceManagerClient:
 
         execution_result = get_api_response_data(response)
 
-        if not command.bg:
+        if not command.run_async:
             return execution_result
 
         jid = execution_result.get('jid')

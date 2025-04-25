@@ -21,7 +21,7 @@ from rapyuta_io.utils import DeviceNotFoundException, ParameterMissingException,
 from rapyuta_io.utils import ObjDict, InvalidCommandException
 from tests.utils.client import get_client, headers
 from tests.utils.device_respones import DEVICE_LIST, DEVICE_INFO, DEVICE_LIST_EMPTY, \
-    DEVICE_NOT_FOUND, EXECUTE_COMMAND_BAD_REQUEST, EXECUTE_COMMAND_OK, DELETE_DEVICE_BAD_REQUEST, \
+    DEVICE_NOT_FOUND, EXECUTE_COMMAND_BAD_REQUEST, EXECUTE_COMMAND_OK, EXECUTE_COMMAND_OK_BG, DELETE_DEVICE_BAD_REQUEST, \
     DELETE_DEVICE_OK, UPDATE_DEVICE_BAD_REQUEST, UPDATE_DEVICE_OK, DEVICE_SELECTION, APPLY_PARAMETERS_SUCCESS_RESPONSE, \
     CREATE_DIRECT_LINK_SUCCESS_RESPONSE, CREATE_DOCKERCOMPOSE_DEVICE_SUCCESS, GET_DOCKERCOMPOSE_DEVICE_SUCCESS, \
     CREATE_PREINSTALLED_DEVICE_SUCCESS, GET_PREINSTALLED_DEVICE_SUCCESS, UPGRADE_DOCKERCOMPOSE_DEVICE_SUCCESS, \
@@ -276,8 +276,31 @@ class DeviceTests(unittest.TestCase):
         command.cwd = ''
         result = device.execute_command(command)
         self.assertEqual(mock_execute.call_count, 2)
-        expected = 'Linux rapyuta 4.9.80-v7+ #1098 SMP Fri Mar 9         19:11:42 GMT2018 armv7l ' \
-                   'armv7l armv7l GNU/Linux'
+        expected = {'test_device_id':'Linux rapyuta 4.9.80-v7+ #1098 SMP Fri Mar 9         19:11:42 GMT2018 armv7l ' \
+                   'armv7l armv7l GNU/Linux'}
+        self.assertEqual(result, expected)
+
+    @patch('requests.Response', spec=Response)
+    @patch('rapyuta_io.utils.rest_client.RestClient.execute')
+    def test_execute_command_ok_background(self, mock_execute, get_device_response):
+        get_device_response.text = DEVICE_INFO
+        get_device_response.status_code = requests.codes.OK
+        execute_command_response = get_device_response()
+        execute_command_response.text = EXECUTE_COMMAND_OK_BG
+        execute_command_response.status_code = requests.codes.OK
+        mock_execute.side_effect = [get_device_response, execute_command_response]
+        mock_execute.return_value = get_device_response
+        client = get_client()
+        device = client.get_device('test_device_id')
+        self.assertIsInstance(device, Device, 'Object should be an instance of class Device')
+        command = Command('uname -a')
+        command.shell = '/bin/bash'
+        command.bg = True
+        command.runas = 'root'
+        command.cwd = ''
+        result = device.execute_command(command)
+        self.assertEqual(mock_execute.call_count, 2)
+        expected = {'test_device_id':'SUCCESS'}
         self.assertEqual(result, expected)
 
     def test_execute_command_invalid_parameters(self):
@@ -297,6 +320,12 @@ class DeviceTests(unittest.TestCase):
             {
                 'response': 'Invalid background option',
                 'key': 'bg',
+                'value': 'true',
+                'correct_value': False
+            },
+            {
+                'response': 'Invalid run asynchronous option',
+                'key': 'run_async',
                 'value': 'true',
                 'correct_value': False
             },

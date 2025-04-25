@@ -523,6 +523,11 @@ EXECUTE_COMMAND_OK = ''' {
         "data": { "test_device_id":  "Linux rapyuta 4.9.80-v7+ #1098 SMP Fri Mar 9\
          19:11:42 GMT2018 armv7l armv7l armv7l GNU/Linux" } } } '''
 
+EXECUTE_COMMAND_OK_BG = ''' {
+    "status": "success",
+    "response": {
+        "data": { "test_device_id":  "SUCCESS" } } } '''
+
 EXECUTE_COMMAND_BAD_REQUEST = ''' {
             "status": "error",
             "response": { "data": {}, "error": "device_ids parameter missing" } } '''

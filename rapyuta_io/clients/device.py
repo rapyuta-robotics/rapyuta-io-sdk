@@ -568,8 +568,9 @@ class Device(PartialMixin, RefreshPollerMixin, ObjDict):
         if response.status_code == requests.codes.BAD_REQUEST:
             raise ParameterMissingException(get_error(response.text))
         execution_result = get_api_response_data(response)
-        if not command.bg:
-            return execution_result[self.uuid]
+        if not command.run_async:
+            return execution_result 
+        
         jid = execution_result.get('jid')
         if not jid:
             raise ValueError("Job ID not found in the response")
