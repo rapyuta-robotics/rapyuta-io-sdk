@@ -188,7 +188,8 @@ class QueryMetricsTests(unittest.TestCase):
                                              json=expected_payload,
                                              url=expected_url,
                                              method='POST',
-                                             params={})
+                                             params={},
+                                             timeout=(30, 150))
 
         rows, cols = response.to_row_column_format()
         self.assertEqual(len(response.columns) == len(response.rows), True)
@@ -229,7 +230,8 @@ class QueryMetricsTests(unittest.TestCase):
                                              json=expected_payload,
                                              url=expected_url,
                                              method='POST',
-                                             params={})
+                                             params={},
+                                             timeout=(30, 150))
 
         rows, cols = response.to_row_column_format()
         self.assertEqual(len(response.columns) == len(response.rows), True)
@@ -263,7 +265,8 @@ class QueryMetricsTests(unittest.TestCase):
                                              json=expected_payload,
                                              url=expected_url,
                                              method='POST',
-                                             params={})
+                                             params={},
+                                             timeout=(30, 150))
 
         rows, cols = response.to_row_column_format()
         self.assertEqual(len(response.columns) == len(response.rows), True)
@@ -300,8 +303,9 @@ class QueryMetricsTests(unittest.TestCase):
         response = client.query_metrics(query_metrics)
 
         mock_request.assert_has_calls([
-            call(headers=headers, json=None, method='GET', params={}, url=expected_get_user_url),
-            call(headers=headers, json=expected_payload, url=expected_query_url, method='POST', params={})
+            call(headers=headers, json=None, method='GET', params={}, url=expected_get_user_url, timeout=(30, 150)),
+            call(headers=headers, json=expected_payload, url=expected_query_url, method='POST', params={},
+                 timeout=(30, 150))
         ])
 
         rows, cols = response.to_row_column_format()
@@ -406,7 +410,8 @@ class QueryMetricsTests(unittest.TestCase):
                                              json=None,
                                              url=expected_url,
                                              method='GET',
-                                             params=expected_params)
+                                             params=expected_params,
+                                             timeout=(30, 150))
 
         self.assertEqual(response[0].metric_group, 'cpu')
         self.assertEqual(response[0].metric_names, ['usage_guest', 'usage_guest_nice', 'usage_idle',
@@ -510,7 +515,8 @@ class QueryMetricsTests(unittest.TestCase):
                                              json=None,
                                              url=expected_url,
                                              method='GET',
-                                             params=expected_params)
+                                             params=expected_params,
+                                             timeout=(30, 150))
 
         self.assertEqual(response[0].metric_group, 'cpu')
         self.assertEqual(response[0].tags, ['cpu', 'device_id', 'host', 'tenant_id'])
@@ -633,7 +639,8 @@ class QueryMetricsTests(unittest.TestCase):
         mock_request.assert_called_once_with(headers=headers, json=None,
                                              url=expected_url,
                                              method='GET',
-                                             params=expected_params)
+                                             params=expected_params,
+                                             timeout=(30, 150))
 
         self.assertEqual(response, ['cpu-total', 'cpu0', 'cpu1', 'cpu2', 'cpu3'])
 
@@ -657,6 +664,7 @@ class QueryMetricsTests(unittest.TestCase):
         mock_request.assert_called_once_with(headers=headers, json=None,
                                              url=expected_url,
                                              method='GET',
-                                             params=expected_params)
+                                             params=expected_params,
+                                             timeout=(30, 150))
 
         self.assertEqual(response, ['cpu-total', 'cpu0', 'cpu1', 'cpu2', 'cpu3'])

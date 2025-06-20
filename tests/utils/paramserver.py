@@ -28,7 +28,7 @@ def _get_mock_calls(tree_paths, ignore_tree_paths=None, delete_existing_trees=Fa
         url = _URL_PREFIX + api_prefix + '/' + tree_path
         slash_count = tree_path.count('/')
         if delete_existing_trees and slash_count == 0:
-            mock_calls.append(call(url=url, method='DELETE', headers=headers, params={}, json=None))
+            mock_calls.append(call(url=url, method='DELETE', headers=headers, params={}, json=None, timeout=(30, 150)))
 
         if value is None:
             if slash_count % 2 == 0:
@@ -37,7 +37,7 @@ def _get_mock_calls(tree_paths, ignore_tree_paths=None, delete_existing_trees=Fa
                 json = {'type': 'AttributeNode'}
         else:
             json = {'type': 'FileNode', 'data': value, 'contentType': content_type}
-        mock_calls.append(call(url=url, method='PUT', headers=headers, params={}, json=json))
+        mock_calls.append(call(url=url, method='PUT', headers=headers, params={}, json=json, timeout=(30, 150)))
     return mock_calls
 
 
@@ -59,7 +59,7 @@ def _get_folder_mock_calls(tree_paths, ignore_tree_paths=None, delete_existing_t
         url = _URL_PREFIX + api_prefix + '/' + tree_path
         slash_count = tree_path.count('/')
         if delete_existing_trees and slash_count == 0:
-            mock_calls.append(call(url=url, method='DELETE', headers=headers, params={}, json=None))
+            mock_calls.append(call(url=url, method='DELETE', headers=headers, params={}, json=None, timeout=(30, 150)))
 
         if value is None:
             if slash_count == 0:
@@ -68,7 +68,7 @@ def _get_folder_mock_calls(tree_paths, ignore_tree_paths=None, delete_existing_t
                 json = {'type': 'FolderNode'}
         else:
             json = {'type': 'FileNode', 'data': value, 'contentType': content_type}
-        mock_calls.append(call(url=url, method='PUT', headers=headers, params={}, json=json))
+        mock_calls.append(call(url=url, method='PUT', headers=headers, params={}, json=json, timeout=(30, 150)))
     return mock_calls
 
 
@@ -81,7 +81,7 @@ def _add_mock_binary_file_mock_call(mock_calls, tree_path):
                          'Content-Type': content_type,
                          'Checksum': '5e14cebcc5c5f444e0da2151a49999c0'})
 
-    mock_calls.append(call(url=url, method='PUT', headers=headers_copy, params={}, data=ANY))
+    mock_calls.append(call(url=url, method='PUT', headers=headers_copy, params={}, data=ANY, timeout=(30, 150)))
 
 
 BINARY_DATA = 'binary-data'

@@ -14,8 +14,8 @@ from six.moves import range
 
 class RESTClientTests(unittest.TestCase):
     PAYLOAD = {'key1': {'subkey1': 'subval1', 'subkey2': 1.2}}
-    CALL = call(json=None, method='GET', url='request_rul', headers={'headers': 'test'}, params={})
-    CALL_PAYLOAD = call(method='GET', url='request_rul', headers={'headers': 'test'}, json=PAYLOAD)
+    CALL = call(json=None, method='GET', url='request_rul', headers={'headers': 'test'}, params={}, timeout=(30, 150))
+    CALL_PAYLOAD = call(method='GET', url='request_rul', headers={'headers': 'test'}, json=PAYLOAD, timeout=(30, 150))
 
     @patch('requests.Response', spec=Response)
     @patch('requests.request')
@@ -26,7 +26,7 @@ class RESTClientTests(unittest.TestCase):
             query_param({'query': 'string'})
         c.execute()
         req_mock.assert_called_once_with(headers={'headers': 'test'}, method='POST', url='request_rul',
-                                         params={'query': 'string'}, json=None)
+                                         params={'query': 'string'}, json=None, timeout=(30, 150))
 
     @patch('rapyuta_io.utils.rest_client.WAIT_TIME_IN_SEC', 0.01)
     @patch('requests.Response', spec=Response)
@@ -40,7 +40,7 @@ class RESTClientTests(unittest.TestCase):
         self.assertEqual(req_mock.call_count, 1)
         req_mock.assert_called_once_with(method='GET', url='request_rul',
                                          headers={'headers': 'test'}, params={},
-                                         json=None)
+                                         json=None, timeout=(30, 150))
 
     @patch('rapyuta_io.utils.rest_client.WAIT_TIME_IN_SEC', 0.01)
     @patch('requests.request')
@@ -63,7 +63,7 @@ class RESTClientTests(unittest.TestCase):
         self.assertEqual(req_mock.call_count, 1)
         req_mock.assert_called_once_with(method='PATCH', url='request_rul',
                                          headers={'headers': 'test'}, params={},
-                                         json=None)
+                                         json=None, timeout=(30, 150))
 
     @patch('requests.Response', spec=Response)
     @patch('requests.request')
@@ -74,7 +74,7 @@ class RESTClientTests(unittest.TestCase):
         c.execute(self.PAYLOAD)
         req_mock.assert_called_once_with(method='POST', url='request_rul',
                                          headers={'headers': 'test'}, params={},
-                                         json=self.PAYLOAD)
+                                         json=self.PAYLOAD, timeout=(30, 150))
 
     @patch('rapyuta_io.utils.rest_client.WAIT_TIME_IN_SEC', 0.01)
     @patch('requests.Response', spec=Response)
@@ -88,7 +88,7 @@ class RESTClientTests(unittest.TestCase):
         self.assertEqual(req_mock.call_count, 1)
         req_mock.assert_called_once_with(method='GET', url='request_rul',
                                          headers={'headers': 'test'}, params={},
-                                         json=self.PAYLOAD)
+                                         json=self.PAYLOAD, timeout=(30, 150))
 
     @patch('rapyuta_io.utils.rest_client.WAIT_TIME_IN_SEC', 0.01)
     @patch('requests.request')
