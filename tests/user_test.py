@@ -22,7 +22,8 @@ class UserTests(unittest.TestCase):
         client = get_client()
         user = client.get_authenticated_user()
         mock_request.assert_called_once_with(headers=headers, json=None,
-                                             url=expected_get_user_url, method='GET', params={})
+                                             url=expected_get_user_url, method='GET', params={},
+                                             timeout=(30, 150))
 
         self.assertIsInstance(user, User)
         self.assertIsNotNone(user.guid)
@@ -53,7 +54,8 @@ class UserTests(unittest.TestCase):
         client = get_client()
         organizations = client.get_user_organizations()
         mock_request.assert_called_once_with(headers=headers, json=None,
-                                             url=expected_get_user_url, method='GET', params={})
+                                             url=expected_get_user_url, method='GET', params={},
+                                             timeout=(30, 150))
 
         self.assertTrue(len(organizations))
         for org in organizations:

@@ -383,7 +383,9 @@ class DeviceTests(unittest.TestCase):
         mock_request.assert_called_once_with(
             url='https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/parameters/', method='POST',
             headers=headers,
-            params={}, json=dict(device_list=device_list, tree_names=tree_names))
+            params={}, json=dict(device_list=device_list, tree_names=tree_names),
+            timeout=(30, 150),
+        )
 
     @patch('requests.request')
     def test_apply_parameters_failure(self, mock_request):
@@ -399,7 +401,9 @@ class DeviceTests(unittest.TestCase):
         mock_request.assert_called_once_with(
             url='https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/device-manager/v0/parameters/',
             method='POST', headers=headers, params={},
-            json=dict(device_list=device_list, tree_names=tree_names))
+            json=dict(device_list=device_list, tree_names=tree_names),
+            timeout=(30, 150),
+        )
 
     @patch('requests.request')
     def test_create_direct_link_for_log_file_not_found(self, mock_request):
@@ -585,8 +589,10 @@ class DeviceTests(unittest.TestCase):
         client = get_client()
         device = client.create_device(device)
         mock_request.assert_has_calls([
-            call(url=expected_create_device_url, method='POST', headers=headers, params={}, json=expected_payload),
-            call(headers=headers, json=None, url=expected_get_device_url, method='GET', params={})
+            call(url=expected_create_device_url, method='POST', headers=headers, params={}, json=expected_payload,
+                 timeout=(30, 150)),
+            call(headers=headers, json=None, url=expected_get_device_url, method='GET', params={},
+                 timeout=(30, 150)),
         ])
 
         self.assertEqual(device.name, 'test-device')
@@ -630,8 +636,10 @@ class DeviceTests(unittest.TestCase):
         client = get_client()
         device = client.create_device(device)
         mock_request.assert_has_calls([
-            call(url=expected_create_device_url, method='POST', headers=headers, params={}, json=expected_payload),
-            call(headers=headers, json=None, url=expected_get_device_url, method='GET', params={})
+            call(url=expected_create_device_url, method='POST', headers=headers, params={}, json=expected_payload,
+                 timeout=(30, 150)),
+            call(headers=headers, json=None, url=expected_get_device_url, method='GET', params={},
+                 timeout=(30, 150))
         ])
 
         self.assertEqual(device.name, 'test-device')
@@ -684,8 +692,9 @@ class DeviceTests(unittest.TestCase):
         client = get_client()
         device = client.create_device(device)
         mock_request.assert_has_calls([
-            call(url=expected_create_device_url, method='POST', headers=headers, params={}, json=expected_payload),
-            call(headers=headers, json=None, url=expected_get_device_url, method='GET', params={})
+            call(url=expected_create_device_url, method='POST', headers=headers, params={}, json=expected_payload,
+                 timeout=(30, 150)),
+            call(headers=headers, json=None, url=expected_get_device_url, method='GET', params={}, timeout=(30, 150))
         ])
 
         self.assertEqual(device.name, 'test-device')
@@ -733,7 +742,7 @@ class DeviceTests(unittest.TestCase):
         temp_header['Content-Type'] = 'application/json'
 
         mock_request.assert_called_once_with(
-            url=expected_onboard_script_url, method='GET', headers=temp_header, params=None, json=None)
+            url=expected_onboard_script_url, method='GET', headers=temp_header, params=None, json=None, timeout=(30, 150))
         self.assertEqual(onboard_script.url, 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/start')
         self.assertEqual(onboard_script.command, 'sudo bash start -r dockercompose -d melodic -b test/path')
         self.assertEqual(onboard_script.token, 'sample-token')
@@ -762,7 +771,7 @@ class DeviceTests(unittest.TestCase):
         temp_header['Content-Type'] = 'application/json'
 
         mock_request.assert_called_once_with(
-            url=expected_onboard_script_url, method='GET', headers=temp_header, params=None, json=None)
+            url=expected_onboard_script_url, method='GET', headers=temp_header, params=None, json=None, timeout=(30, 150))
         self.assertEqual(onboard_script.url, 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/start')
         self.assertEqual(onboard_script.command, 'sudo bash start -r preinstalled -w test/path')
         self.assertEqual(onboard_script.token, 'sample-token')
@@ -792,7 +801,7 @@ class DeviceTests(unittest.TestCase):
         temp_header['Content-Type'] = 'application/json'
 
         mock_request.assert_called_once_with(
-            url=expected_onboard_script_url, method='GET', headers=temp_header, params=None, json=None)
+            url=expected_onboard_script_url, method='GET', headers=temp_header, params=None, json=None, timeout=(30, 150))
         self.assertEqual(onboard_script.url, 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/start')
         self.assertEqual(onboard_script.command, 'sudo bash start -r dockercompose -d melodic -b test/path -r '
                                                  'preinstalled')
@@ -818,7 +827,7 @@ class DeviceTests(unittest.TestCase):
         client = get_client()
         client.delete_device('test-device-id')
         mock_request.assert_called_once_with(
-            url=expected_url, method='DELETE', headers=headers, params={}, json=None)
+            url=expected_url, method='DELETE', headers=headers, params={}, json=None, timeout=(30, 150))
 
     def test_toggle_features_invalid_id_failure(self):
         expected_msg = 'device_id needs to be a non empty string'
@@ -845,7 +854,7 @@ class DeviceTests(unittest.TestCase):
         client.toggle_features('test-device-id', [('vpn', True)])
         expected_payload = {"vpn": True}
         mock_request.assert_called_once_with(
-            url=expected_url, method='PATCH', headers=headers, params={}, json=expected_payload)
+            url=expected_url, method='PATCH', headers=headers, params={}, json=expected_payload, timeout=(30, 150))
 
     @patch('requests.request')
     def test_upgrade_device_dockercompose_success(self, mock_request):
@@ -869,7 +878,7 @@ class DeviceTests(unittest.TestCase):
         temp_header['Content-Type'] = 'application/json'
 
         mock_request.assert_called_once_with(
-            url=expected_upgrade_device_url, method='PUT', headers=temp_header, params=None, json=None)
+            url=expected_upgrade_device_url, method='PUT', headers=temp_header, params=None, json=None, timeout=(30, 150))
 
     @patch('requests.request')
     def test_upgrade_device_not_found(self, mock_request):
@@ -934,8 +943,10 @@ class DeviceTests(unittest.TestCase):
         client = get_client()
         device = client.create_device(device)
         mock_request.assert_has_calls([
-            call(url=expected_create_device_url, method='POST', headers=headers, params={}, json=expected_payload),
-            call(headers=headers, json=None, url=expected_get_device_url, method='GET', params={})
+            call(url=expected_create_device_url, method='POST', headers=headers, params={}, json=expected_payload,
+                 timeout=(30, 150)),
+            call(headers=headers, json=None, url=expected_get_device_url, method='GET', params={},
+                 timeout=(30, 150))
         ])
 
         self.assertEqual(device.name, 'test-device')

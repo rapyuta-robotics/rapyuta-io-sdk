@@ -34,7 +34,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
                                              json=None,
                                              url=expected_url,
                                              method='GET',
-                                             params=None)
+                                             params=None,
+                                             timeout=(30, 150))
         self.assertEqual(rosbag_job.guid, 'job-guid')
     
     def test_get_rosbag_job_invalid_job_id(self):
@@ -187,7 +188,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
                                              json=expected_payload,
                                              url=expected_url,
                                              method='POST',
-                                             params=None)
+                                             params=None,
+                                             timeout=(30, 150))
         self.assertEqual(job.guid, 'job-guid')
         self.assertEqual(job.name, 'job_name')
 
@@ -367,7 +369,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
                                              json=None,
                                              url=expected_url,
                                              method='GET',
-                                             params={})
+                                             params={},
+                                             timeout=(30, 150))
         self.assertEqual(rosbag_jobs[0].guid, 'job-guid')
 
     @patch('requests.request')
@@ -384,7 +387,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
                                              json=None,
                                              url=expected_url,
                                              method='GET',
-                                             params={'componentInstanceID': ['comp-inst-id']})
+                                             params={'componentInstanceID': ['comp-inst-id']},
+                                             timeout=(30, 150))
         self.assertEqual(rosbag_jobs[0].guid, 'job-guid')
 
     @patch('requests.request')
@@ -401,7 +405,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
                                              json=None,
                                              url=expected_url,
                                              method='GET',
-                                             params={'guid': ['job-id']})
+                                             params={'guid': ['job-id']},
+                                             timeout=(30, 150))
         self.assertEqual(rosbag_jobs[0].guid, 'job-guid')
 
     @patch('requests.request')
@@ -418,7 +423,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
                                              json=None,
                                              url=expected_url,
                                              method='GET',
-                                             params={'status': ['Running']})
+                                             params={'status': ['Running']},
+                                             timeout=(30, 150))
         self.assertEqual(rosbag_jobs[0].guid, 'job-guid')
 
     def test_list_rosbag_jobs_in_project_invalid_device_ids(self):
@@ -448,7 +454,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
                                              json=None,
                                              url=expected_url,
                                              method='GET',
-                                             params={'deviceID': ['device-id']})
+                                             params={'deviceID': ['device-id']},
+                                             timeout=(30, 150))
         self.assertEqual(rosbag_jobs[0].guid, 'job-guid')
 
     def test_stop_rosbag_jobs_invalid_component_instance_ids(self):
@@ -486,7 +493,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
                                              method='PATCH',
                                              url=expected_url,
                                              json=None,
-                                             params={})
+                                             params={},
+                                             timeout=(30, 150))
 
     @patch('requests.request')
     def test_stop_rosbag_jobs_success_with_component_instance_ids(self, mock_request):
@@ -501,7 +509,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
                                              method='PATCH',
                                              url=expected_url,
                                              json=None,
-                                             params={'componentInstanceID': ['comp-inst-id']})
+                                             params={'componentInstanceID': ['comp-inst-id']},
+                                             timeout=(30, 150))
 
     @patch('requests.request')
     def test_stop_rosbag_jobs_success_with_guids(self, mock_request):
@@ -516,7 +525,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
                                              method='PATCH',
                                              url=expected_url,
                                              json=None,
-                                             params={'guid': ['job-id']})
+                                             params={'guid': ['job-id']},
+                                             timeout=(30, 150))
 
     def test_patch_rosbags_invalid_upload_type(self):
         rosbag_options = ROSBagOptions(all_topics=True)
@@ -572,7 +582,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
                 method='PATCH',
                 url=expected_url,
                 json=expected_req_body,
-                params={}
+                params={},
+                timeout=(30, 150)
             ),
             mock_request.mock_calls[1],
         )
@@ -616,7 +627,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
                 method='PATCH',
                 url=expected_url,
                 json=expected_req_body,
-                params={}
+                params={},
+                timeout=(30, 150)
             ),
             mock_request.mock_calls[1],
         )
@@ -664,7 +676,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
                 method='PATCH',
                 url=expected_url,
                 json=expected_req_body,
-                params={}
+                params={},
+                timeout=(30, 150)
             ),
             mock_request.mock_calls[1],
         )
@@ -729,7 +742,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         mock_request.assert_called_once_with(headers=headers, method='GET',
                                              url=expected_url,
                                              json=None,
-                                             params={'guid': ['blob-id']})
+                                             params={'guid': ['blob-id']},
+                                             timeout=(30, 150))
         self.assertEqual(rosbag_blobs[0].guid, 'blob-id')
         self.assertEqual(rosbag_blobs[0].job.guid, 'job-id')
 
@@ -745,7 +759,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         mock_request.assert_called_once_with(headers=headers, method='GET',
                                              url=expected_url,
                                              json=None,
-                                             params={'deploymentID': ['dep-id']})
+                                             params={'deploymentID': ['dep-id']},
+                                             timeout=(30, 150))
         self.assertEqual(rosbag_blobs[0].guid, 'blob-id')
         self.assertEqual(rosbag_blobs[0].job.guid, 'job-id')
 
@@ -761,7 +776,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         mock_request.assert_called_once_with(headers=headers, method='GET',
                                              url=expected_url,
                                              json=None,
-                                             params={'jobID': ['job-id']})
+                                             params={'jobID': ['job-id']},
+                                             timeout=(30, 150))
         self.assertEqual(rosbag_blobs[0].guid, 'blob-id')
         self.assertEqual(rosbag_blobs[0].job.guid, 'job-id')
 
@@ -777,7 +793,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         mock_request.assert_called_once_with(headers=headers, method='GET',
                                              url=expected_url,
                                              json=None,
-                                             params={'status': ['Uploaded']})
+                                             params={'status': ['Uploaded']},
+                                             timeout=(30, 150))
         self.assertEqual(rosbag_blobs[0].guid, 'blob-id')
         self.assertEqual(rosbag_blobs[0].job.guid, 'job-id')
 
@@ -793,7 +810,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         mock_request.assert_called_once_with(headers=headers, method='GET',
                                              url=expected_url,
                                              json=None,
-                                             params={'componentInstanceID': ['comp-inst-id']})
+                                             params={'componentInstanceID': ['comp-inst-id']},
+                                             timeout=(30, 150))
         self.assertEqual(rosbag_blobs[0].guid, 'blob-id')
         self.assertEqual(rosbag_blobs[0].job.guid, 'job-id')
 
@@ -809,7 +827,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         mock_request.assert_called_once_with(headers=headers, method='GET',
                                              url=expected_url,
                                              json=None,
-                                             params={'deviceID': ['device-id']})
+                                             params={'deviceID': ['device-id']},
+                                             timeout=(30, 150))
         self.assertEqual(rosbag_blobs[0].guid, 'blob-id')
         self.assertEqual(rosbag_blobs[0].job.guid, 'job-id')
 
@@ -839,7 +858,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         mock_request.assert_called_once_with(headers=headers,
                                              url=expected_url,
                                              json=None, params=None,
-                                             method='DELETE')
+                                             method='DELETE',
+                                             timeout=(30, 150))
 
     @patch('requests.request')
     def test_delete_rosbag_blob_with_object_success(self, mock_request):
@@ -858,7 +878,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         mock_request.assert_called_with(headers=headers,
                                         url=expected_url,
                                         json=None, params={},
-                                        method='DELETE')
+                                        method='DELETE',
+                                        timeout=(30, 150))
 
     def test_download_rosbag_jobs_empty_blob_id(self):
         expected_err = 'guid needs to non empty string'
@@ -890,8 +911,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         client = get_client()
         client.download_rosbag_blob('blob-id')
         mock_request.assert_has_calls([
-            call(headers=headers, json=None, params=None, method='GET', url=expected_url),
-            call(headers={}, json=None, params={}, method='GET', url=signed_url)
+            call(headers=headers, json=None, params=None, method='GET', url=expected_url, timeout=(30, 150)),
+            call(headers={}, json=None, params={}, method='GET', url=signed_url, timeout=(30, 150))
         ])
         self.assertTrue(os.path.exists(blob_filename))
 
@@ -913,8 +934,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         client = get_client()
         client.download_rosbag_blob('blob-id', download_dir='/some/random/path/')
         mock_request.assert_has_calls([
-            call(headers=headers, json=None, params=None, method='GET', url=expected_url),
-            call(headers={}, json=None, params={}, method='GET', url=signed_url)
+            call(headers=headers, json=None, params=None, method='GET', url=expected_url, timeout=(30, 150)),
+            call(headers={}, json=None, params={}, method='GET', url=signed_url, timeout=(30, 150))
         ])
         self.assertTrue(os.path.exists(os.path.join(download_dir, blob_filename)))
 
@@ -934,8 +955,8 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
         client = get_client()
         client.download_rosbag_blob('blob-id', filename=blob_filename)
         mock_request.assert_has_calls([
-            call(headers=headers, json=None, params=None, method='GET', url=expected_url),
-            call(headers={}, json=None, params={}, method='GET', url=signed_url)
+            call(headers=headers, json=None, params=None, method='GET', url=expected_url, timeout=(30, 150)),
+            call(headers={}, json=None, params={}, method='GET', url=signed_url, timeout=(30, 150))
         ])
         self.assertTrue(os.path.exists(blob_filename))
 
@@ -953,8 +974,7 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
 
         mock_request.assert_has_calls([
             call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs',
-                 json=None,
-                 params={}),
+                 json=None, params={}, timeout=(30, 150)),
         ])
         self.assertEqual(1, mock_request.call_count, 'extra request calls were made')
 
@@ -972,8 +992,7 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
 
         mock_request.assert_has_calls([
             call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs',
-                 json=None,
-                 params={}),
+                 json=None, params={}, timeout=(30, 150)),
         ])
         self.assertEqual(1, mock_request.call_count, 'extra request calls were made')
 
@@ -993,11 +1012,10 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
 
         mock_request.assert_has_calls([
             call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs',
-                 json=None,
-                 params={}),
+                 json=None, params={}, timeout=(30, 150)),
             call(headers=headers, method='POST',
                  url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs/blob-id/retry',
-                 json=None, params={}),
+                 json=None, params={}, timeout=(30, 150)),
         ])
         self.assertEqual(2, mock_request.call_count, 'extra request calls were made')
         self.assertEqual(rosbag_blobs[0].status, ROSBagBlobStatus.STARTING)
@@ -1018,11 +1036,10 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
 
         mock_request.assert_has_calls([
             call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs',
-                 json=None,
-                 params={}),
+                 json=None, params={}, timeout=(30, 150)),
             call(headers=headers, method='GET',
                  url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs/blob-id',
-                 json=None, params={}),
+                 json=None, params={}, timeout=(30, 150)),
         ])
         self.assertEqual(2, mock_request.call_count, 'extra request calls were made')
         self.assertEqual(rosbag_blobs[0].status, ROSBagBlobStatus.UPLOADING)
@@ -1047,14 +1064,13 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
 
         mock_request.assert_has_calls([
             call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs',
-                 json=None,
-                 params={}),
+                 json=None, params={}, timeout=(30, 150)),
             call(headers=headers, method='GET',
                  url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs/blob-id',
-                 json=None, params={}),
+                 json=None, params={}, timeout=(30, 150)),
             call(headers=headers, method='GET',
                  url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs/blob-id',
-                 json=None, params={}),
+                 json=None, params={}, timeout=(30, 150)),
         ])
         self.assertEqual(3, mock_request.call_count, 'extra request calls were made')
         mock_sleep.assert_called_once_with(5)
@@ -1081,14 +1097,13 @@ class ROSBagTests(fake_filesystem_unittest.TestCase):
 
         mock_request.assert_has_calls([
             call(headers=headers, method='GET', url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs',
-                 json=None,
-                 params={}),
+                 json=None, params={}, timeout=(30, 150)),
             call(headers=headers, method='GET',
                  url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs/blob-id',
-                 json=None, params={}),
+                 json=None, params={}, timeout=(30, 150)),
             call(headers=headers, method='GET',
                  url='https://gacatalog.apps.okd4v2.prod.rapyuta.io/rosbag-blobs/blob-id',
-                 json=None, params={}),
+                 json=None, params={}, timeout=(30, 150)),
         ])
         self.assertEqual(3, mock_request.call_count, 'extra request calls were made')
         mock_sleep.assert_called_once_with(5)

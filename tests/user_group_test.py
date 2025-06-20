@@ -35,7 +35,8 @@ class UserGroupTests(unittest.TestCase):
         new_headers = dict(headers)
         new_headers['organization'] = self.organization
 
-        mock_request.assert_called_once_with(headers=new_headers, json=expected_payload, url=expected_url, method='POST', params={})
+        mock_request.assert_called_once_with(headers=new_headers, json=expected_payload, url=expected_url,
+                                             method='POST', params={}, timeout=(30, 150))
         self.assertIsInstance(user_group, object)
 
     @patch('requests.request')
@@ -65,7 +66,7 @@ class UserGroupTests(unittest.TestCase):
         new_headers['organization'] = self.organization
 
         mock_request.assert_called_once_with(headers=new_headers, json=expected_payload, url=expected_url,
-                                             method='PUT', params={})
+                                             method='PUT', params={}, timeout=(30, 150))
         self.assertIsInstance(user_group, object)
 
     @patch('requests.request')
@@ -83,7 +84,8 @@ class UserGroupTests(unittest.TestCase):
         new_headers = dict(headers)
         new_headers['organization'] = self.organization
 
-        mock_request.assert_called_once_with(headers=new_headers, json=None, url=expected_url, method='GET', params={})
+        mock_request.assert_called_once_with(headers=new_headers, json=None, url=expected_url, method='GET', params={},
+                                             timeout=(30, 150))
         self.assertIsInstance(user_groups, list)
 
     @patch('requests.request')
@@ -101,7 +103,8 @@ class UserGroupTests(unittest.TestCase):
         new_headers = dict(headers)
         new_headers['organization'] = self.organization
 
-        mock_request.assert_called_once_with(headers=new_headers, json=None, url=expected_url, method='GET', params={})
+        mock_request.assert_called_once_with(headers=new_headers, json=None, url=expected_url, method='GET', params={},
+                                             timeout=(30, 150))
         self.assertIsInstance(user_group, object)
 
     @patch('requests.request')
@@ -120,7 +123,7 @@ class UserGroupTests(unittest.TestCase):
         new_headers['organization'] = self.organization
 
         mock_request.assert_called_once_with(headers=new_headers, json={'guid': self.group}, url=expected_url,
-                                             method='DELETE', params={})
+                                             method='DELETE', params={}, timeout=(30, 150))
         self.assertTrue(resp['success'])
 
     @patch('requests.request')
@@ -139,6 +142,6 @@ class UserGroupTests(unittest.TestCase):
         new_headers['organization'] = self.organization
 
         mock_request.assert_called_once_with(headers=new_headers, json={'guid': self.group}, url=expected_url,
-                                             method='DELETE', params={})
+                                             method='DELETE', params={}, timeout=(30, 150))
         self.assertFalse(resp['success'])
 
