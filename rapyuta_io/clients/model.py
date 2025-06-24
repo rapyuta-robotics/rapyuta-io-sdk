@@ -24,8 +24,7 @@ class DeviceConfig(ObjDict):
     :ivar key: Configuration key.
     :ivar value: Value of the configuration key.
     """
-    DEFAULT_DEVICE_CONFIG_VARIABLES = ('runtime', 'ros_workspace', 'ros_distro',
-                                       'rosbag_mount_path')
+    DEFAULT_DEVICE_CONFIG_VARIABLES = ('runtime', 'ros_workspace', 'ros_distro')
 
     def __init__(self, *args, **kwargs):
         super(ObjDict, self).__init__(*args, **kwargs)
