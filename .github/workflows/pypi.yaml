@@ -25,6 +25,7 @@ jobs:
 
       - name: Upload Wheel
         run: |
+          pipenv install setuptools
           pipenv run python setup.py bdist_wheel sdist
           twine upload \
             --repository ${{ secrets.TWINE_REPOSITORY }} \
