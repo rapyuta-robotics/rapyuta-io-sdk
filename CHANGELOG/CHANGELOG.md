@@ -5,6 +5,13 @@
 
 * **rest_client:** configure default request timeouts ([cb9ae03](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/cb9ae035dbe886657544e194e38e37716c7a391f)), closes [rapyuta-robotics/rapyuta_io#853](https://github.com/rapyuta-robotics/rapyuta_io/issues/853)
 
+## [2.3.2](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.3.1...v2.3.2) (2025-06-27)
+
+
+### Bug Fixes
+
+* **rest_client:** configure default request timeouts ([cb9ae03](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/cb9ae035dbe886657544e194e38e37716c7a391f)), closes [rapyuta-robotics/rapyuta_io#853](https://github.com/rapyuta-robotics/rapyuta_io/issues/853)
+
 ## [2.3.1](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.3.0...v2.3.1) (2025-04-09)
 
 
