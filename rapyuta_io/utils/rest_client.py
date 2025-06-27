@@ -64,7 +64,8 @@ class RestClient:
 
     def _request(self, payload, raw=False):
         kwargs = {'method': self._method, 'url': self._url,
-                  'headers': self._headers, 'params': self._query_params}
+                  'headers': self._headers, 'params': self._query_params,
+                  'timeout': (30, 150) } # Configures ConnectTimeout(30sec) and ReadTimeout(150sec)
         if raw:
             response = requests.request(data=payload, **kwargs)
             return response

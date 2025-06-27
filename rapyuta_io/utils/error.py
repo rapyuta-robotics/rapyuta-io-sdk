@@ -160,11 +160,6 @@ class BuildFailed(Exception):
         Exception.__init__(self, msg)
 
 
-class ROSBagBlobError(Exception):
-    def __init__(self, msg=None):
-        Exception.__init__(self, msg)
-
-
 class BuildOperationFailed(Exception):
     def __init__(self, msg):
         Exception.__init__(self, msg)

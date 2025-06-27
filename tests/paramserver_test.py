@@ -193,12 +193,12 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
         rootdir = '/download/success'
         test_signed_url = 'http://test-signedurl'
         expected_mock_calls = [
-            call(url=test_signed_url, method='GET', headers={}, params={}, json=None),
+            call(url=test_signed_url, method='GET', headers={}, params={}, json=None, timeout=(30, 150)),
             call(url=self.URL_PREFIX + 'blobs', method='GET', headers=headers, params={'treeNames': ['tree1', 'tree2']},
-                 json=None),
-            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None),
-            call(url=self.URL_PREFIX + '/tree1', method='GET', headers=headers, params={}, json=None),
-            call(url=self.URL_PREFIX + '/tree2', method='GET', headers=headers, params={}, json=None),
+                 json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX + '/tree1', method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX + '/tree2', method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
         ]
 
         def side_effect(*args, **kwargs):
@@ -236,11 +236,11 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
         rootdir = '/download/success/with_tree_names'
         test_signed_url = 'http://test-signedurl'
         expected_mock_calls = [
-            call(url=test_signed_url, method='GET', headers={}, params={}, json=None),
+            call(url=test_signed_url, method='GET', headers={}, params={}, json=None, timeout=(30, 150)),
             call(url=self.URL_PREFIX + 'blobs', method='GET', headers=headers, params={'treeNames': ['tree2']},
-                 json=None),
-            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None),
-            call(url=self.URL_PREFIX + '/tree2', method='GET', headers=headers, params={}, json=None),
+                 json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX + '/tree2', method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
         ]
 
         def side_effect(*args, **kwargs):
@@ -280,12 +280,12 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
         os.makedirs('/tmp/test_blob_dir')
         test_signed_url = 'http://test-signedurl'
         expected_mock_calls = [
-            call(url=test_signed_url, method='GET', headers={}, params={}, json=None),
+            call(url=test_signed_url, method='GET', headers={}, params={}, json=None, timeout=(30, 150)),
             call(url=self.URL_PREFIX + 'blobs', method='GET', headers=headers, params={'treeNames': ['tree1', 'tree2']},
-                 json=None),
-            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None),
-            call(url=self.URL_PREFIX + '/tree1', method='GET', headers=headers, params={}, json=None),
-            call(url=self.URL_PREFIX + '/tree2', method='GET', headers=headers, params={}, json=None),
+                 json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX + '/tree1', method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX + '/tree2', method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
         ]
 
         def side_effect(*args, **kwargs):
@@ -325,11 +325,11 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
     def test_download_configurations_failure_tree_list(self, mock_request):
         rootdir = '/download/failure/tree_list'
         expected_mock_calls = [
-            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None),
-            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None),
-            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None),
-            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None),
-            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None),
+            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
         ]
 
         def side_effect(*args, **kwargs):
@@ -351,14 +351,14 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
         rootdir = '/download/failure/500case'
         expected_mock_calls = [
             call(url=self.URL_PREFIX + 'blobs', method='GET', headers=headers, params={'treeNames': ['tree1', 'tree2']},
-                 json=None),
-            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None),
-            call(url=self.URL_PREFIX + '/tree1', method='GET', headers=headers, params={}, json=None),
-            call(url=self.URL_PREFIX + '/tree1', method='GET', headers=headers, params={}, json=None),
-            call(url=self.URL_PREFIX + '/tree1', method='GET', headers=headers, params={}, json=None),
-            call(url=self.URL_PREFIX + '/tree1', method='GET', headers=headers, params={}, json=None),
-            call(url=self.URL_PREFIX + '/tree1', method='GET', headers=headers, params={}, json=None),
-            call(url=self.URL_PREFIX + '/tree2', method='GET', headers=headers, params={}, json=None),
+                 json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX + '/tree1', method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX + '/tree1', method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX + '/tree1', method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX + '/tree1', method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX + '/tree1', method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX + '/tree2', method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
         ]
 
         def side_effect(*args, **kwargs):
@@ -392,10 +392,10 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
         rootdir = '/download/failure/fileopen'
         expected_mock_calls = [
             call(url=self.URL_PREFIX + 'blobs', method='GET', headers=headers, params={'treeNames': ['tree1', 'tree2']},
-                 json=None),
-            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None),
-            call(url=self.URL_PREFIX + '/tree1', method='GET', headers=headers, params={}, json=None),
-            call(url=self.URL_PREFIX + '/tree2', method='GET', headers=headers, params={}, json=None),
+                 json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX, method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX + '/tree1', method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
+            call(url=self.URL_PREFIX + '/tree2', method='GET', headers=headers, params={}, json=None, timeout=(30, 150)),
         ]
         # simulate failure by creating a directory in place of a file
         os.makedirs(rootdir+'/tree2/motors.yaml')

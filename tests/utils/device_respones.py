@@ -191,7 +191,7 @@ GET_DOCKERCOMPOSE_DEVICE_SUCCESS = '''
                 "device_version": "3", 
                 "labels": [], 
                 "deployments": [], 
-                "config_variables": [{"id": 2053, "key": "rosbag_mount_path", "value": "test/path", "type": null}, {"id": 2052, "key": "runtime", "value": "dockercompose", "type": null}, {"id": 2051, "key": "ros_workspace", "value": "", "type": null}, {"id": 2050, "key": "ros_distro", "value": "melodic", "type": null}]
+                "config_variables": [{"id": 2052, "key": "runtime", "value": "dockercompose", "type": null}, {"id": 2051, "key": "ros_workspace", "value": "", "type": null}, {"id": 2050, "key": "ros_distro", "value": "melodic", "type": null}]
         }
     }
 }
@@ -212,7 +212,7 @@ GET_PREINSTALLED_DEVICE_SUCCESS = '''
                 "device_version": "3", 
                 "labels": [], 
                 "deployments": [], 
-                "config_variables": [{"id": 2053, "key": "rosbag_mount_path", "value": "", "type": null}, {"id": 2052, "key": "runtime", "value": "preinstalled", "type": null}, {"id": 2051, "key": "ros_workspace", "value": "test/path", "type": null}, {"id": 2050, "key": "ros_distro", "value": "melodic", "type": null}]
+                "config_variables": [{"id": 2052, "key": "runtime", "value": "preinstalled", "type": null}, {"id": 2051, "key": "ros_workspace", "value": "test/path", "type": null}, {"id": 2050, "key": "ros_distro", "value": "melodic", "type": null}]
         }
     }
 }
@@ -407,11 +407,6 @@ DOCKER_EMPTY_ROSBAG_CONFIG_VARIABLES = ''' {
         "key": "ros_workspace"
       },
       {
-        "value": "",
-        "id": 2138,
-        "key": "rosbag_mount_path"
-      },
-      {
         "value": "ros_distro",
         "id": 2137,
         "key": "ros_distro"
@@ -433,11 +428,6 @@ DOCKER_CONFIG_VARIABLE_WITH_ROSBAG_VARIABLES = ''' {
         "value": "",
         "id": 2139,
         "key": "ros_workspace"
-      },
-      {
-        "value": "/test",
-        "id": 2138,
-        "key": "rosbag_mount_path"
       },
       {
         "value": "ros_distro",
@@ -522,6 +512,11 @@ EXECUTE_COMMAND_OK = ''' {
     "response": {
         "data": { "test_device_id":  "Linux rapyuta 4.9.80-v7+ #1098 SMP Fri Mar 9\
          19:11:42 GMT2018 armv7l armv7l armv7l GNU/Linux" } } } '''
+
+EXECUTE_COMMAND_OK_BG = ''' {
+    "status": "success",
+    "response": {
+        "data": { "test_device_id":  "SUCCESS" } } } '''
 
 EXECUTE_COMMAND_BAD_REQUEST = ''' {
             "status": "error",

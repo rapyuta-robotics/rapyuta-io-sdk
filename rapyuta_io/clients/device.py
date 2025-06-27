@@ -253,10 +253,9 @@ class Device(PartialMixin, RefreshPollerMixin, ObjDict):
     DOCKER_COMPOSE = 'dockercompose'
 
     def __init__(self, name, runtime=None, runtime_docker=False, runtime_preinstalled=False, ros_distro=None,
-                 rosbag_mount_path=None,
                  ros_workspace=None, description=None, python_version=DevicePythonVersion.PYTHON2,
                  config_variables=None, labels=None):
-        self.validate(name, runtime, runtime_docker, runtime_preinstalled, ros_distro, rosbag_mount_path, ros_workspace,
+        self.validate(name, runtime, runtime_docker, runtime_preinstalled, ros_distro, ros_workspace,
                       description, python_version)
         self.name = name
         # The below is done to ensure backward compatibility
@@ -270,7 +269,6 @@ class Device(PartialMixin, RefreshPollerMixin, ObjDict):
             self._runtime_docker = runtime_docker
             self._runtime_preinstalled = runtime_preinstalled
         self._ros_distro = ros_distro
-        self._rosbag_mount_path = rosbag_mount_path
         self._ros_workspace = ros_workspace
         self.description = description
         self.python_version = python_version
@@ -278,7 +276,7 @@ class Device(PartialMixin, RefreshPollerMixin, ObjDict):
         self.labels = labels or {}
 
     @staticmethod
-    def validate(name, runtime, runtime_docker, runtime_preinstalled, ros_distro, rosbag_mount_path,
+    def validate(name, runtime, runtime_docker, runtime_preinstalled, ros_distro,
                  ros_workspace, description, python_version):
         if not name or not isinstance(name, six.string_types):
             raise InvalidParameterException('name must be a non-empty string')
@@ -299,8 +297,6 @@ class Device(PartialMixin, RefreshPollerMixin, ObjDict):
             raise InvalidParameterException('preinstalled runtime does not support noetic ros_distro yet')
         if ros_distro == ROSDistro.NOETIC and python_version == DevicePythonVersion.PYTHON2:
             raise InvalidParameterException('noetic ros_distro not supported on python_version 2')
-        if rosbag_mount_path is not None and not isinstance(rosbag_mount_path, six.string_types):
-            raise InvalidParameterException('rosbag_mount_path must be of type string')
         if ros_workspace is not None and not isinstance(ros_workspace, six.string_types):
             raise InvalidParameterException('ros_workspace must be of type string')
         if description is not None and not isinstance(description, six.string_types):
@@ -320,8 +316,7 @@ class Device(PartialMixin, RefreshPollerMixin, ObjDict):
         device['config_variables'] = {}
         if self.description:
             device['description'] = self.description
-        for field in ['_runtime_docker', '_runtime_preinstalled', '_ros_distro', '_rosbag_mount_path',
-                      '_ros_workspace']:
+        for field in ['_runtime_docker', '_runtime_preinstalled', '_ros_distro','_ros_workspace']:
             if getattr(self, field):
                 device['config_variables'][field[1:]] = getattr(self, field)
         device['config_variables'].update(self.config_variables)
@@ -568,8 +563,9 @@ class Device(PartialMixin, RefreshPollerMixin, ObjDict):
         if response.status_code == requests.codes.BAD_REQUEST:
             raise ParameterMissingException(get_error(response.text))
         execution_result = get_api_response_data(response)
-        if not command.bg:
-            return execution_result[self.uuid]
+        if not command.run_async:
+            return execution_result 
+        
         jid = execution_result.get('jid')
         if not jid:
             raise ValueError("Job ID not found in the response")
