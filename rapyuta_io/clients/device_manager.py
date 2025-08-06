@@ -139,12 +139,12 @@ class DeviceManagerClient:
         return get_api_response_data(response, parse_full=True)
 
     def execute_command(
-            self,
-            device_ids: typing.List[str],
-            command: Command,
-            retry_limit: int = 0,
-            retry_interval: int = 10,
-            timeout: int = 300,
+        self,
+        device_ids: typing.List[str],
+        command: Command,
+        retry_limit: int = 0,
+        retry_interval: int = 10,
+        timeout: int = 300,
     ):
         """Execute a command on the specified devices.
 
@@ -170,28 +170,38 @@ class DeviceManagerClient:
         command.device_ids = device_ids
 
         url = self._device_api_host + DEVICE_COMMAND_API_PATH
-        rc = RestClient(url).method(HttpMethod.POST).headers(
-            create_auth_header(self._auth_token, self._project))
+        rc = (
+            RestClient(url)
+            .method(HttpMethod.POST)
+            .headers(create_auth_header(self._auth_token, self._project))
+        )
         response = rc.retry(retry_limit).execute(payload=command.to_json())
         if response.status_code == requests.codes.BAD_REQUEST:
             raise ParameterMissingException(get_error(response.text))
 
         execution_result = get_api_response_data(response)
 
-        if not command.run_async:
-            return execution_result
+        return execution_result
 
-        jid = execution_result.get('jid')
-        if not jid:
-            raise ValueError("job id not found in the response")
-
+    def fetch_cmd_result(
+        self,
+        jid,
+        device_ids,
+        retry_interval: int = 10,
+        timeout: int = 300,
+    ):
         url = self._device_api_host + DEVICE_COMMAND_API_PATH + jid
         query = {"jid": jid, "device_id": device_ids}
         time_elapsed = 0
         wait_interval = retry_interval
         while time_elapsed < timeout:
-            response = RestClient(url).method(HttpMethod.GET).headers(
-                create_auth_header(self._auth_token, self._project)).query_param(query_param=query).execute()
+            response = (
+                RestClient(url)
+                .method(HttpMethod.GET)
+                .headers(create_auth_header(self._auth_token, self._project))
+                .query_param(query_param=query)
+                .execute()
+            )
             if response.status_code == requests.codes.OK:
                 result = get_api_response_data(response)
                 return result

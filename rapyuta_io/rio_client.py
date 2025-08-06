@@ -254,6 +254,20 @@ class Client(object):
 
         """
         return self._dmClient.execute_command(device_ids, command, retry_limit, retry_interval, timeout)
+    
+    def fetch_cmd_result(
+        self,
+        jid,
+        device_ids,
+        retry_interval: int = 10,
+        timeout: int = 300,
+    ):
+        return self._dmClient.fetch_cmd_result(
+            jid=jid,
+            device_ids=device_ids,
+            retry_interval=retry_interval,
+            timeout=timeout,
+        )
 
     def toggle_features(self, device_id, features, config=None):
         """
