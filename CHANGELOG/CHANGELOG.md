@@ -1,3 +1,15 @@
+# [3.0.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.3.2...v3.0.0) (2025-08-12)
+
+
+### Features
+
+* **devices:** support fetching async command execution results ([11271ca](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/11271ca133a56d3dbd22ef196959b6be5a23be47))
+
+
+### BREAKING CHANGES
+
+* **devices:** The updated execute_command function is backwards incompatible.
+
 ## [2.3.2](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.3.1...v2.3.2) (2025-06-27)
 
 
