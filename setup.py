@@ -24,6 +24,8 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
     ],
     install_requires=[
         "requests>=2.20.0",
@@ -33,6 +35,7 @@ setup(
         "pytz",
         "pyyaml>=5.4.1",
         "setuptools",
+        "azure-storage-blob>=12.20.0,<12.27.0"
     ],
     extras_require={
         "dev": ["sphinx", "furo"],

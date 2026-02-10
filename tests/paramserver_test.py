@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import requests
 import json
 import os
+import shutil
 
 from mock import call, patch, MagicMock
 from pyfakefs import fake_filesystem_unittest
@@ -17,6 +18,23 @@ from tests.utils.paramserver import UPLOAD_SUCCESS_TREE_PATHS, UPLOAD_SUCCESS_MO
     UPLOAD_SUCCESS_DELETE_EXISTING_MOCK_CALLS, GET_BLOB_TREE, BINARY_DATA, BINARY_FILE_NODE, BYTE_ARRAY_DATA,\
     UPLOAD_SUCCESS_FOLDER_MOCK_CALLS, UPLOAD_SUCCESS_WITH_TREE_NAMES_AS_FOLDER_MOCK_CALLS
 import six
+
+
+def _fake_rmtree(path):
+    """pyfakefs-compatible rmtree for Python 3.12+.
+
+    Python 3.12 changed shutil.rmtree to use _rmtree_safe_fd which relies
+    on os.open(O_PATH) and os.fstat on directory fds — operations that
+    pyfakefs does not fully support.  This simple recursive implementation
+    uses only the os calls that pyfakefs handles correctly.
+    """
+    for entry in os.listdir(path):
+        entry_path = os.path.join(path, entry)
+        if os.path.isdir(entry_path):
+            _fake_rmtree(entry_path)
+        else:
+            os.remove(entry_path)
+    os.rmdir(path)
 
 
 class ParamserverClientTests(fake_filesystem_unittest.TestCase):
@@ -63,7 +81,10 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
         def side_effect(*args, **kwargs):
             mock_response = MagicMock(spec=Response)
             mock_response.status_code = requests.codes.OK
-            mock_response.text = 'null'
+            if 'binaryfilenode' in kwargs.get('url', ''):
+                mock_response.text = json.dumps({'data': {}})
+            else:
+                mock_response.text = 'null'
             return mock_response
         mock_request.side_effect = side_effect
 
@@ -80,7 +101,10 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
         def side_effect(*args, **kwargs):
             mock_response = MagicMock(spec=Response)
             mock_response.status_code = requests.codes.OK
-            mock_response.text = 'null'
+            if 'binaryfilenode' in kwargs.get('url', ''):
+                mock_response.text = json.dumps({'data': {}})
+            else:
+                mock_response.text = 'null'
             return mock_response
         mock_request.side_effect = side_effect
 
@@ -97,7 +121,10 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
         def side_effect(*args, **kwargs):
             mock_response = MagicMock(spec=Response)
             mock_response.status_code = requests.codes.OK
-            mock_response.text = 'null'
+            if 'binaryfilenode' in kwargs.get('url', ''):
+                mock_response.text = json.dumps({'data': {}})
+            else:
+                mock_response.text = 'null'
             return mock_response
         mock_request.side_effect = side_effect
 
@@ -114,7 +141,10 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
         def side_effect(*args, **kwargs):
             mock_response = MagicMock(spec=Response)
             mock_response.status_code = requests.codes.OK
-            mock_response.text = 'null'
+            if 'binaryfilenode' in kwargs.get('url', ''):
+                mock_response.text = json.dumps({'data': {}})
+            else:
+                mock_response.text = 'null'
             return mock_response
         mock_request.side_effect = side_effect
 
@@ -131,13 +161,192 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
         def side_effect(*args, **kwargs):
             mock_response = MagicMock(spec=Response)
             mock_response.status_code = requests.codes.OK
-            mock_response.text = 'null'
+            if 'binaryfilenode' in kwargs.get('url', ''):
+                mock_response.text = json.dumps({'data': {}})
+            else:
+                mock_response.text = 'null'
             return mock_response
         mock_request.side_effect = side_effect
 
         get_client().upload_configurations(rootdir, delete_existing_trees=True)
         mock_request.assert_has_calls(expected_mock_calls, any_order=True)
         self.assertEqual(len(expected_mock_calls), mock_request.call_count, 'extra request calls were made')
+
+    @patch('rapyuta_io.clients.paramserver.new_anonymous_azure')
+    @patch('requests.request')
+    def test_upload_configurations_azure_upload_and_commit(self, mock_request, mock_new_azure):
+        """When the binaryfilenode PUT returns blobRefId/uploadUrl the client
+        must upload the blob via the Azure SDK and then issue a commit PATCH."""
+        rootdir = '/upload/azure_commit'
+        self._create_fake_filesystem(rootdir, UPLOAD_SUCCESS_TREE_PATHS)
+
+        blob_ref_id = 'test-blob-123'
+        azure_signed_url = 'https://test-azure.blob.core.windows.net/container/blob?sig=test'
+
+        # Mock Azure client
+        mock_azure_client = MagicMock()
+        mock_new_azure.return_value = mock_azure_client
+
+        # Expected headers for the binary file PUT and commit PATCH
+        binary_headers = headers.copy()
+        binary_headers.update({
+            'X-Rapyuta-Params-Version': "0",
+            'Content-Type': 'image/png',
+            'Checksum': '5e14cebcc5c5f444e0da2151a49999c0'
+        })
+
+        binaryfilenode_base = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/paramserver/binaryfilenode/'
+
+        def side_effect(*args, **kwargs):
+            mock_response = MagicMock(spec=Response)
+            mock_response.status_code = requests.codes.OK
+            url = kwargs.get('url', '')
+            method = kwargs.get('method', '')
+            if 'binaryfilenode' in url and method == 'PATCH':
+                # commit call
+                mock_response.text = json.dumps({'data': {}})
+            elif 'binaryfilenode' in url and method == 'PUT':
+                # blob reference creation – return blobRefId + uploadUrl
+                mock_response.text = json.dumps({
+                    'data': {
+                        'blobRefId': blob_ref_id,
+                        'uploadUrl': azure_signed_url
+                    }
+                })
+            else:
+                mock_response.text = 'null'
+            return mock_response
+        mock_request.side_effect = side_effect
+
+        get_client().upload_configurations(rootdir)
+
+        # --- Assert the binaryfilenode PUT was issued ---
+        mock_request.assert_any_call(
+            url=binaryfilenode_base + 'tree2/device.png',
+            method='PUT', headers=binary_headers, params={}, data=None,
+            timeout=(30, 150)
+        )
+
+        # --- Assert the commit PATCH was issued ---
+        expected_commit_url = binaryfilenode_base + 'tree2/blobref/' + blob_ref_id
+        mock_request.assert_any_call(
+            url=expected_commit_url,
+            method='PATCH', headers=binary_headers, params={}, json=None,
+            timeout=(30, 150)
+        )
+
+        # --- Assert Azure SDK was used correctly ---
+        mock_new_azure.assert_called_once()
+        mock_azure_client.upload.assert_called_once()
+
+        # Verify UploadOptions passed to Azure.upload()
+        upload_call_args = mock_azure_client.upload.call_args
+        _file_obj = upload_call_args[0][0]  # first positional arg: opened file
+        upload_options = upload_call_args[0][1]  # second positional arg: UploadOptions
+        self.assertEqual(upload_options.signed_url, azure_signed_url)
+        self.assertEqual(upload_options.max_concurrency, 4)
+        self.assertIn('x-ms-blob-content-type', upload_options.headers)
+        self.assertEqual(upload_options.headers['x-ms-blob-content-type'], 'image/png')
+        self.assertIn('x-ms-blob-content-md5', upload_options.headers)
+
+        # Total HTTP calls = non-binary tree calls + binary PUT + commit PATCH
+        expected_total = len(UPLOAD_SUCCESS_MOCK_CALLS) + 1  # +1 for the PATCH commit
+        self.assertEqual(expected_total, mock_request.call_count,
+                         'expected exactly one extra PATCH commit call')
+
+    @patch('rapyuta_io.clients.paramserver.new_anonymous_azure')
+    @patch('requests.request')
+    def test_upload_binary_azure_upload_failure_raises_upload_error(self, mock_request, mock_new_azure):
+        """When the Azure SDK upload raises an exception the client must
+        propagate it as an UploadError."""
+        rootdir = '/upload/azure_failure'
+        self._create_fake_filesystem(rootdir, UPLOAD_SUCCESS_TREE_PATHS)
+
+        blob_ref_id = 'fail-blob-456'
+        azure_signed_url = 'https://test-azure.blob.core.windows.net/container/blob?sig=fail'
+
+        mock_azure_client = MagicMock()
+        mock_azure_client.upload.side_effect = Exception('connection timed out')
+        mock_new_azure.return_value = mock_azure_client
+
+        def side_effect(*args, **kwargs):
+            mock_response = MagicMock(spec=Response)
+            mock_response.status_code = requests.codes.OK
+            url = kwargs.get('url', '')
+            if 'binaryfilenode' in url and kwargs.get('method') == 'PUT':
+                mock_response.text = json.dumps({
+                    'data': {
+                        'blobRefId': blob_ref_id,
+                        'uploadUrl': azure_signed_url,
+                    }
+                })
+            else:
+                mock_response.text = 'null'
+            return mock_response
+        mock_request.side_effect = side_effect
+
+        with self.assertRaises(rapyuta_io.utils.error.UploadError) as ctx:
+            get_client().upload_configurations(rootdir)
+        self.assertIn('Failed to upload to Azure blob storage', str(ctx.exception))
+        mock_azure_client.upload.assert_called_once()
+
+    @patch('rapyuta_io.clients.paramserver.new_anonymous_azure')
+    @patch('requests.request')
+    def test_upload_binary_commit_blobref_already_uploaded_tolerated(self, mock_request, mock_new_azure):
+        """When two concurrent uploads share the same blobRef the second
+        commit receives 'blobRef already uploaded'. The client must treat
+        this as a successful upload rather than raising."""
+        rootdir = '/upload/azure_dup'
+        self._create_fake_filesystem(rootdir, UPLOAD_SUCCESS_TREE_PATHS)
+
+        blob_ref_id = 'dup-blob-789'
+        azure_signed_url = 'https://test-azure.blob.core.windows.net/container/blob?sig=dup'
+
+        mock_azure_client = MagicMock()
+        mock_new_azure.return_value = mock_azure_client
+
+        def side_effect(*args, **kwargs):
+            mock_response = MagicMock(spec=Response)
+            url = kwargs.get('url', '')
+            method = kwargs.get('method', '')
+            if 'binaryfilenode' in url and method == 'PATCH':
+                # Simulate "blobRef already uploaded" error from commit
+                mock_response.status_code = requests.codes.BAD_REQUEST
+                mock_response.text = json.dumps({
+                    'error': 'blobRef already uploaded'
+                })
+            elif 'binaryfilenode' in url and method == 'PUT':
+                mock_response.status_code = requests.codes.OK
+                mock_response.text = json.dumps({
+                    'data': {
+                        'blobRefId': blob_ref_id,
+                        'uploadUrl': azure_signed_url,
+                    }
+                })
+            else:
+                mock_response.status_code = requests.codes.OK
+                mock_response.text = 'null'
+            return mock_response
+        mock_request.side_effect = side_effect
+
+        # Should NOT raise — the "already uploaded" error is tolerated
+        get_client().upload_configurations(rootdir)
+
+        mock_azure_client.upload.assert_called_once()
+        # Verify the commit PATCH was attempted
+        binaryfilenode_base = 'https://gaapiserver.apps.okd4v2.prod.rapyuta.io/api/paramserver/binaryfilenode/'
+        expected_commit_url = binaryfilenode_base + 'tree2/blobref/' + blob_ref_id
+        binary_headers = headers.copy()
+        binary_headers.update({
+            'X-Rapyuta-Params-Version': "0",
+            'Content-Type': 'image/png',
+            'Checksum': '5e14cebcc5c5f444e0da2151a49999c0',
+        })
+        mock_request.assert_any_call(
+            url=expected_commit_url,
+            method='PATCH', headers=binary_headers, params={}, json=None,
+            timeout=(30, 150),
+        )
 
     @patch('requests.request')
     def test_upload_configurations_failure_400case(self, mock_request):
@@ -188,9 +397,13 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
         mock_request.assert_has_calls(expected_mock_calls, any_order=True)
         self.assertEqual(len(expected_mock_calls), mock_request.call_count, 'extra request calls were made')
 
+    @patch('rapyuta_io.clients.paramserver.rmtree', side_effect=_fake_rmtree)
+    @patch('tempfile.mkdtemp')
     @patch('requests.request')
-    def test_download_configurations_success(self, mock_request):
+    def test_download_configurations_success(self, mock_request, mock_temp_dir, _mock_rmtree):
         rootdir = '/download/success'
+        os.makedirs('/tmp/test_blob_dir_success')
+        mock_temp_dir.return_value = '/tmp/test_blob_dir_success'
         test_signed_url = 'http://test-signedurl'
         expected_mock_calls = [
             call(url=test_signed_url, method='GET', headers={}, params={}, json=None, timeout=(30, 150)),
@@ -231,9 +444,13 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
         self._validate_tree_node_on_filesystem(DOWNLOAD_TREE1_RESPONSE['data'], rootdir)
         self._validate_tree_node_on_filesystem(DOWNLOAD_TREE2_RESPONSE['data'], rootdir)
 
+    @patch('rapyuta_io.clients.paramserver.rmtree', side_effect=_fake_rmtree)
+    @patch('tempfile.mkdtemp')
     @patch('requests.request')
-    def test_download_configurations_success_with_tree_names(self, mock_request):
+    def test_download_configurations_success_with_tree_names(self, mock_request, mock_temp_dir, _mock_rmtree):
         rootdir = '/download/success/with_tree_names'
+        os.makedirs('/tmp/test_blob_dir_tree_names')
+        mock_temp_dir.return_value = '/tmp/test_blob_dir_tree_names'
         test_signed_url = 'http://test-signedurl'
         expected_mock_calls = [
             call(url=test_signed_url, method='GET', headers={}, params={}, json=None, timeout=(30, 150)),
@@ -270,9 +487,10 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
         self.assertFalse(os.path.exists(os.path.join(rootdir, 'tree1')), 'tree1 should not be created')
         self._validate_tree_node_on_filesystem(DOWNLOAD_TREE2_RESPONSE['data'], rootdir)
 
+    @patch('rapyuta_io.clients.paramserver.rmtree', side_effect=_fake_rmtree)
     @patch('tempfile.mkdtemp')
     @patch('requests.request')
-    def test_download_configurations_success_delete_existing(self, mock_request, mock_temp_dir):
+    def test_download_configurations_success_delete_existing(self, mock_request, mock_temp_dir, _mock_rmtree):
         rootdir = '/download/success/delete_existing'
         # create empty dirs under trees to later validate they were deleted
         os.makedirs(os.path.join(rootdir, 'tree1/empty_dir'))
@@ -399,7 +617,7 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
         ]
         # simulate failure by creating a directory in place of a file
         os.makedirs(rootdir+'/tree2/motors.yaml')
-        expected_exc_regex = "Is a directory in the fake filesystem: '{}/tree2/motors.yaml'".format(rootdir)
+        expected_exc_regex = r"Is a directory.*{}/tree2/motors\.yaml".format(rootdir)
 
         def side_effect(*args, **kwargs):
             mock_response = MagicMock(spec=Response)
