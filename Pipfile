@@ -10,6 +10,7 @@ urllib3 = ">=1.23"
 python-dateutil = ">=2.8.1"
 pytz = "*"
 pyyaml = ">=5.4.1"
+azure-storage-blob = "<12.27.0,>=12.20.0"
 
 [dev-packages]
 testtools = "==2.5.0"

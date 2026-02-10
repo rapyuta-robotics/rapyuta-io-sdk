@@ -75,13 +75,13 @@ def _get_folder_mock_calls(tree_paths, ignore_tree_paths=None, delete_existing_t
 def _add_mock_binary_file_mock_call(mock_calls, tree_path):
     headers_copy = headers.copy()
     content_type = 'image/png'
-    api_prefix = 'filenode'
+    api_prefix = 'binaryfilenode'
     url = _URL_PREFIX + api_prefix + '/' + tree_path
     headers_copy.update({'X-Rapyuta-Params-Version': "0",
                          'Content-Type': content_type,
                          'Checksum': '5e14cebcc5c5f444e0da2151a49999c0'})
 
-    mock_calls.append(call(url=url, method='PUT', headers=headers_copy, params={}, data=ANY, timeout=(30, 150)))
+    mock_calls.append(call(url=url, method='PUT', headers=headers_copy, params={}, data=None, timeout=(30, 150)))
 
 
 BINARY_DATA = 'binary-data'

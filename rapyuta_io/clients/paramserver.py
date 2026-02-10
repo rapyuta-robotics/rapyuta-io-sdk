@@ -18,7 +18,8 @@ from rapyuta_io.utils import RestClient, InvalidParameterException, ConfigNotFou
 from rapyuta_io.utils.error import InvalidJSONError, InvalidYAMLError, UploadError
 from rapyuta_io.utils.rest_client import HttpMethod
 from rapyuta_io.utils.settings import PARAMSERVER_API_TREE_PATH, PARAMSERVER_API_TREEBLOBS_PATH, \
-    PARAMSERVER_API_FILENODE_PATH
+    PARAMSERVER_API_BINARYFILENODE_PATH
+from rapyuta_io.utils.storage import UploadOptions, new_anonymous_azure
 from rapyuta_io.utils.utils import (
     create_auth_header,
     prepend_bearer_to_auth_token,
@@ -71,16 +72,14 @@ class _ParamserverClient:
         return get_api_response_data(response, parse_full=True)
 
     def create_binary_file(self, tree_path, file_path, retry_limit=0):
-        url = self._core_api_host + PARAMSERVER_API_FILENODE_PATH + tree_path
         content_type = self.default_binary_content_type
-        headers = self._headers.copy()
         guessed_content_type = mimetypes.MimeTypes().guess_type(file_path)
+        headers = self._headers.copy()
         if len(guessed_content_type) != 0:
             if guessed_content_type[0]:
                 content_type = guessed_content_type[0]
             if guessed_content_type[1]:
                 headers['Content-Encoding'] = guessed_content_type[1]
-
         # Override Content-Type for JSON and YAML to allow creating Binary files.
         # This is required for large YAML/JSON files.
         if content_type in (self.json_content_type, self.yaml_content_type):
@@ -90,14 +89,68 @@ class _ParamserverClient:
                         'Content-Type': content_type})
 
         with open(file_path, 'rb') as f:
-            headers.update({'Checksum': self.get_md5_checksum(f.read())})
             f.seek(0)
-            response = RestClient(url).method(HttpMethod.PUT).headers(headers).execute(payload=f, raw=True)
+            file_content = f.read()
+            checksum = self.get_md5_checksum(file_content)
+            headers.update({'Checksum': checksum})
+
+        # Create blob reference and get signed URL
+        url = self._core_api_host + PARAMSERVER_API_BINARYFILENODE_PATH + tree_path
+        response = RestClient(url).method(HttpMethod.PUT).headers(headers).retry(retry_limit).execute(raw=True)
 
         try:
-            return get_api_response_data(response, parse_full=True)
+            blob_data = get_api_response_data(response, parse_full=True).get('data', {})
         except Exception as e:
-            raise UploadError(file_path=file_path, msg=e)
+            raise UploadError(file_path=file_path, msg=f"Failed to create blob reference: {e}")
+
+        blob_ref_id = blob_data.get('blobRefId', None)
+        signed_url = blob_data.get('uploadUrl', None)
+
+        if not blob_ref_id or not signed_url:
+            # The blob is already uploaded; skip the Azure upload and commit
+            # steps and return the API response as-is to indicate success.
+            return get_api_response_data(response, parse_full=True)
+
+        # Upload file to Azure blob storage using signed URL
+        if signed_url and blob_ref_id:
+            try:
+                azure_client = new_anonymous_azure()
+                file_size = os.path.getsize(file_path)
+                upload_headers = {
+                    'x-ms-blob-content-type': content_type,
+                    'x-ms-blob-content-md5': bytearray.fromhex(checksum),
+                }
+                if headers.get('Content-Encoding'):
+                    upload_headers['x-ms-blob-content-encoding'] = headers['Content-Encoding']
+                upload_options = UploadOptions(
+                    signed_url=signed_url,
+                    headers=upload_headers,
+                    length=file_size,
+                    max_concurrency=4,
+                )
+
+                with open(file_path, 'rb') as f:
+                    f.seek(0)
+                    azure_client.upload(f, upload_options)
+            except Exception as e:
+                raise UploadError(file_path=file_path, msg=f"Failed to upload to Azure blob storage: {e}")
+
+            # Commit the blob reference & Update the status
+            tree_name = tree_path.split('/')[0]
+            commit_url = self._core_api_host + PARAMSERVER_API_BINARYFILENODE_PATH + tree_name + '/blobref/' + str(blob_ref_id)
+            commit_response = RestClient(commit_url).method(HttpMethod.PATCH).headers(headers).retry(retry_limit).execute()
+
+            try:
+                return get_api_response_data(commit_response, parse_full=True)
+            except Exception as e:
+                # When two files with identical content are uploaded concurrently, one
+                # will successfully commit the shared blobRef first.  The second commit
+                # then receives a "blobRef already uploaded" error from the server, which
+                # just means the content is already present — treat it as success.
+                error_msg = str(e).lower()
+                if 'blobref already uploaded' in error_msg or 'signed url not generated' in error_msg:
+                    return {}
+                raise UploadError(file_path=file_path, msg=f"Failed to commit blob reference: {e}")
 
     def create_value(self, tree_path, retry_limit=0):
         url = self._core_api_host + PARAMSERVER_API_TREE_PATH + tree_path
