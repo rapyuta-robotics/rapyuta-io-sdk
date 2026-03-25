@@ -3,7 +3,7 @@
 Rapyuta.io Python SDK enables you to access platform services and resources in
 your python applications.
 
-The SDK supports Python 3.8+. For older Python 2.x support, you can use the
+The SDK supports Python 3.10+. For older Python 2.x support, you can use the
 0.x.x [releases](https://pypi.org/project/rapyuta-io/#history) from Pypi.
 
 ## Install
@@ -14,20 +14,25 @@ The SDK is distributed through PyPi index, and can be installed directly using `
 pip install rapyuta-io
 ```
 
-To install the SDK from source, you can use the `setup.py` script directly.
-Clone the repository and from the root of the directory, run the following
-command.
+To install the SDK from source, clone the repository and from the root of the
+directory, run the following command.
 
 ``` bash
-python setup.py install
+pip install .
 ```
 
 ## Development
 
-Create a python virtual environment, having version less than 3.11
+This project uses [uv](https://docs.astral.sh/uv/) for dependency management.
 
 ```bash
-pipenv install --dev
+uv sync
+```
+
+To install with dev dependencies:
+
+```bash
+uv sync --dev
 ```
 
 ## Getting Started

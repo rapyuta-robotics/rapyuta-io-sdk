@@ -2,23 +2,22 @@
 
 ## Setup Virtual Environment
 
-The SDK project uses [Pipenv](https://pipenv.pypa.io/en/latest/) for
+The SDK project uses [uv](https://docs.astral.sh/uv/) for
 development. It needs to be installed to setup the development environment.
 
 ``` bash
-pip install pipenv
+pip install uv
 ```
 
-Once Pipenv is installed, a Python virtual environment can be quickly
+Once uv is installed, a Python virtual environment can be quickly
 bootstrapped by running the following commands in the root of the repository.
 
 ``` bash
-pipenv install --dev
+uv sync --dev
 ```
 
-This will create a virtual environment in the Pipenv's preconfigured location
-(if one doesn't already exists). It will also install all the dependencies and
-development dependencies.
+This will create a virtual environment in the project directory (`.venv`)
+and install all the dependencies and development dependencies.
 
 
 ## Run Unit Tests

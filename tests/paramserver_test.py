@@ -4,6 +4,8 @@ import requests
 import json
 import os
 import shutil
+import sys
+from concurrent import futures
 
 from mock import call, patch, MagicMock
 from pyfakefs import fake_filesystem_unittest
@@ -37,6 +39,38 @@ def _fake_rmtree(path):
     os.rmdir(path)
 
 
+class _SynchronousExecutor:
+    """Drop-in replacement for ThreadPoolExecutor that runs tasks
+    synchronously in the calling thread.
+
+    Workaround for a pyfakefs race condition on Python 3.13+:
+    ``FakeOsModule.use_original`` is a class-level (non-thread-local) flag.
+    The ``use_original_os()`` context-manager used by pyfakefs's linecache
+    patcher can temporarily set it to ``True`` in one thread while a
+    ThreadPoolExecutor worker is checking the same flag, causing the worker
+    to fall through to the real OS and fail.  Running synchronously avoids
+    the race entirely while still exercising all paramserver logic.
+    """
+
+    def __init__(self, **kwargs):
+        pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        pass
+
+    def submit(self, fn, *args, **kwargs):
+        future = futures.Future()
+        try:
+            result = fn(*args, **kwargs)
+            future.set_result(result)
+        except BaseException as exc:
+            future.set_exception(exc)
+        return future
+
+
 class ParamserverClientTests(fake_filesystem_unittest.TestCase):
     FILE_NODE = 'FileNode'
     VALUE_NODE = 'ValueNode'
@@ -47,6 +81,17 @@ class ParamserverClientTests(fake_filesystem_unittest.TestCase):
 
     def setUp(self):
         self.setUpPyfakefs()
+        # Python 3.13+ exposes a pyfakefs threading race condition
+        # (FakeOsModule.use_original is not thread-local). Patch the
+        # executor to run synchronously so the fake filesystem is used
+        # consistently. See _SynchronousExecutor docstring for details.
+        if sys.version_info >= (3, 13):
+            patcher = patch(
+                'rapyuta_io.clients.paramserver.futures.ThreadPoolExecutor',
+                _SynchronousExecutor,
+            )
+            patcher.start()
+            self.addCleanup(patcher.stop)
 
     @staticmethod
     def _create_fake_filesystem(rootdir, tree_paths):

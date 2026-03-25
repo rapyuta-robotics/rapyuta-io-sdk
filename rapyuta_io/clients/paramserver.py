@@ -88,6 +88,8 @@ class _ParamserverClient:
         headers.update({'X-Rapyuta-Params-Version': "0",
                         'Content-Type': content_type})
 
+        # Consider computing the MD5 incrementally (streaming chunks) and reusing the same read pass
+        # where possible to optimize for large files, if this becomes a bottleneck.
         with open(file_path, 'rb') as f:
             f.seek(0)
             file_content = f.read()
@@ -151,6 +153,7 @@ class _ParamserverClient:
                 if 'blobref already uploaded' in error_msg or 'signed url not generated' in error_msg:
                     return {}
                 raise UploadError(file_path=file_path, msg=f"Failed to commit blob reference: {e}")
+        return None
 
     def create_value(self, tree_path, retry_limit=0):
         url = self._core_api_host + PARAMSERVER_API_TREE_PATH + tree_path
