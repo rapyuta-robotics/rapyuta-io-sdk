@@ -2,12 +2,12 @@
 
 set +x
 
-pipenv install --dev
+uv sync --dev
 
-pipenv run pip3 install coverage
-pipenv run coverage run --source=rapyuta_io sdk_test/run_rio_sdk_test.py
-pipenv run coverage report
-pipenv run coverage html
+uv run pip3 install coverage
+uv run coverage run --source=rapyuta_io sdk_test/run_rio_sdk_test.py
+uv run coverage report
+uv run coverage html
 
 if [ -z "${MINIO_ALIAS}" ]
 then

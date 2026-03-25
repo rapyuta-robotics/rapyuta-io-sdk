@@ -11,14 +11,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install Pipenv
-        run: pip3 install pipenv
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Install Dependencies
-        run: pipenv install --categories docs
+        run: uv sync --extra docs
 
       - name: Build Documentation
-        run: pipenv run python3 -m sphinx -M html docs/source docs/output
+        run: uv run python3 -m sphinx -M html docs/source docs/output
 
       - name: Deploy gh-pages
         if: github.repository == 'rapyuta-robotics/rapyuta-io-sdk' && github.event_name == 'push'
