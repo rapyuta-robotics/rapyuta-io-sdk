@@ -1,3 +1,88 @@
+# [3.0.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.3.2...v3.0.0) (2025-08-12)
+
+
+### Features
+
+* **devices:** support fetching async command execution results ([11271ca](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/11271ca133a56d3dbd22ef196959b6be5a23be47))
+
+
+### BREAKING CHANGES
+
+* **devices:** The updated execute_command function is backwards incompatible.
+
+## [2.3.2](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.3.1...v2.3.2) (2025-06-27)
+
+
+### Bug Fixes
+
+* **rest_client:** configure default request timeouts ([cb9ae03](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/cb9ae035dbe886657544e194e38e37716c7a391f)), closes [rapyuta-robotics/rapyuta_io#853](https://github.com/rapyuta-robotics/rapyuta_io/issues/853)
+
+## [2.3.2](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.3.1...v2.3.2) (2025-06-27)
+
+
+### Bug Fixes
+
+* **rest_client:** configure default request timeouts ([cb9ae03](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/cb9ae035dbe886657544e194e38e37716c7a391f)), closes [rapyuta-robotics/rapyuta_io#853](https://github.com/rapyuta-robotics/rapyuta_io/issues/853)
+
+## [2.3.1](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.3.0...v2.3.1) (2025-04-09)
+
+
+### Bug Fixes
+
+* **paramserver:** raise exception on binary file upload failure ([73816fb](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/73816fb3cdac8b8c45ea34aaf7d7d3388a8e95e5))
+
+# [2.3.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.2.2...v2.3.0) (2025-03-20)
+
+
+### Features
+
+* adds method to exec on multiple devices ([e47d02b](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/e47d02b3263b062a20e240a5f99cec68c1a98784))
+
+## [2.2.2](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.2.1...v2.2.2) (2024-12-11)
+
+
+### Bug Fixes
+
+* **device:** fix timeout interval ([7c6a1ae](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/7c6a1ae638152e3d6737f3f88bcfa04e8f51b8bb))
+
+## [2.2.1](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.2.0...v2.2.1) (2024-12-11)
+
+
+### Bug Fixes
+
+* **device:** update execute to accept query parameters ([928147d](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/928147d7d638f9047575a68d79dc649d8bbd0d22))
+
+# [2.2.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.1.1...v2.2.0) (2024-11-22)
+
+
+### Features
+
+* add support for background command executes ([db34d48](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/db34d48bdbcd545837c659a1566e84a94f8c6502))
+
+## [2.1.1](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.1.0...v2.1.1) (2024-11-12)
+
+
+### Bug Fixes
+
+* **paramserver:** file is too large error ([#98](https://github.com/rapyuta-robotics/rapyuta-io-sdk/issues/98)) ([3f379ee](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/3f379eef86e3fd8aa9e77fab44f5df5fae519a59)), closes [AB#33921](https://github.com/AB/issues/33921)
+
+# [2.1.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.0.0...v2.1.0) (2024-10-23)
+
+
+### Features
+
+* **device:** implement RefreshPollerMixin for Device class ([#84](https://github.com/rapyuta-robotics/rapyuta-io-sdk/issues/84)) ([f0ebeb3](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/f0ebeb3ffbc9aaf036fc6b7315d43cad0ba951c9))
+
+# [2.0.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.17.1...v2.0.0) (2024-10-14)
+
+
+* fix!: remove unsupported APIs ([fd05053](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/fd0505337ffc25a9105d8ac00d5cb9f0f0ac9446))
+
+
+### BREAKING CHANGES
+
+* The SDK methods for unsupported APIs are dropped
+
 ## [1.17.1](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v1.17.0...v1.17.1) (2024-09-12)
 
 
