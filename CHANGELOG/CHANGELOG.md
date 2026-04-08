@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v3.0.0...v3.1.0) (2026-04-08)
+
+
+### Features
+
+* adds azure blob storage client ([4ba31d0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/commit/4ba31d0701424a0d08844e133a548c095d5259d6))
+
 # [3.0.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v2.3.2...v3.0.0) (2025-08-12)
 
 
