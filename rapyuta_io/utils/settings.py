@@ -21,7 +21,6 @@ DEVICE_API_PATH = DEVICE_API_BASE_PATH + 'devices/'
 DEVICE_SELECTION_API_PATH = DEVICE_API_BASE_PATH + 'selection/query/'
 DEVICE_CONFIG_VAR_API_PATH = DEVICE_API_BASE_PATH + 'config_variables/'
 DEVICE_COMMAND_API_PATH = DEVICE_API_BASE_PATH + 'cmd/'
-DEVICE_TOPIC_API_PATH = DEVICE_API_BASE_PATH + 'topics/'
 PARAMETERS_API_PATH = DEVICE_API_BASE_PATH + 'parameters/'
 
 # Metric
@@ -33,16 +32,11 @@ LIST_TAGS_VALUE_API_QUERY_PATH = METRICS_API_BASE_PATH + '/v0/tags/{}/{}/{}'
 
 GET_USER_PATH = '/api/user/me/get'
 
-TOPIC_STATUS = '/status'
-TOPIC_SUBSCRIBE = '/subscribe'
-TOPIC_UNSUBSCRIBE = '/unsubscribed'
-
 DEVICE_LABEL_API_PATH = DEVICE_API_BASE_PATH + 'labels/'
 DEVICE_LOG_API_PATH = DEVICE_API_BASE_PATH + 'logs/'
 
 FILE_DOWNLOAD_PATH = 'download?file_path='
 DESERIALIZE_PATH = 'deserialize'
-DEVICE_METRIC_API_PATH = DEVICE_API_BASE_PATH + 'metrics/'
 
 
 # Device Onboarding Script
@@ -96,8 +90,6 @@ EMPTY = ''
 AUTH_TOKEN = ''
 PROJECT = ''
 DEVICE = 'device'
-TOPICS = 'topics'
-KIND = 'kind'
 STATUS = 'status'
 SUCCESS = 'success'
 RESUMABLE_UPLOAD_URL = 'resumable_upload_url'

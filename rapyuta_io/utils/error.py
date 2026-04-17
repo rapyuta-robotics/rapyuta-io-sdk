@@ -100,16 +100,6 @@ class InvalidParameterException(Exception):
         Exception.__init__(self, msg)
 
 
-class UnknownTopicException(Exception):
-    def __init__(self, msg=None):
-        Exception.__init__(self, msg)
-
-
-class UnknownTopicStatusException(Exception):
-    def __init__(self, msg=None):
-        Exception.__init__(self, msg)
-
-
 class RetriesExhausted(Exception):
     def __init__(self, msg=None):
         Exception.__init__(self, msg)
