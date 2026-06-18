@@ -18,7 +18,15 @@ jobs:
         run: uv python install ${{ matrix.python-version }}
 
       - name: Install Dependencies
-        run: uv sync --dev
+        run: uv sync --python ${{ matrix.python-version }} --dev
+
+      - name: Smoke import
+        run: |
+          uv run --python ${{ matrix.python-version }} python -c "
+          import rapyuta_io
+          from rapyuta_io import RIOClient
+          print('smoke imports OK')
+          "
 
       - name: Unit Tests
-        run: uv run pytest --cov=rapyuta_io tests/
+        run: uv run --python ${{ matrix.python-version }} pytest --cov=rapyuta_io tests/
