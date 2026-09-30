@@ -5,6 +5,14 @@ using [git-cliff](https://git-cliff.org/).
 
 <!-- git-cliff: end of header -->
 
+## [3.1.1] - 2026-09-24
+
+### 🐛 Bug Fixes
+
+- Use explicit --python in matrix CI to ensure correct Python version
+- Correct smoke import class name (Client, not RIOClient)
+
+
 ## [3.1.0](https://github.com/rapyuta-robotics/rapyuta-io-sdk/compare/v3.0.0...v3.1.0) (2026-04-08)
 
 
