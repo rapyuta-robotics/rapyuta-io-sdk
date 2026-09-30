@@ -110,20 +110,6 @@ class Command(ObjDict):
         return ret
 
 
-class TopicsStatus(ObjDict):
-    """
-    Topic class represents the status - subscribed and unsubscribed - for logs and metrics
-
-    :ivar master_up: Boolean represents whether the master is running or not
-    :ivar subscribed: List of subscribed topics
-    :ivar unsubscribed: List of unsubscribed topics
-
-     """
-
-    def __init__(self, *args, **kwargs):
-        super(ObjDict, self).__init__(*args, **kwargs)
-
-
 class Label(ObjDict):
     """ Label class represents labels associated with a device.
 
@@ -132,19 +118,6 @@ class Label(ObjDict):
          :ivar value: Value of the label
 
          """
-
-    def __init__(self, *args, **kwargs):
-        super(ObjDict, self).__init__(*args, **kwargs)
-
-
-class Metric(ObjDict):
-    """
-    Class represents current status of subscription of the metric
-
-    :ivar name: Name of the metric
-    :ivar kind: metric
-    :ivar config: Metric collection configuration
-    """
 
     def __init__(self, *args, **kwargs):
         super(ObjDict, self).__init__(*args, **kwargs)
