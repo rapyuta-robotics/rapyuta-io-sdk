@@ -6,4 +6,4 @@ from .rio_client import Client
 from .clients.device_manager import DeviceArch
 from .clients.user_group import UserGroup
 
-__version__ = "3.0.0"
+__version__ = "3.1.0"
